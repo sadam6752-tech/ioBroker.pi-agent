@@ -185,6 +185,8 @@ class PiAgent extends utils.Adapter {
         this.restartList = [];
         /** How long a restarted instance may take to run again. */
         this.restartWaitMs = 45_000;
+        /** Enabled instances of the scheduler adapter fullcalendar, e.g. ["fullcalendar.0"]. */
+        this.schedulers = [];
         /** Users of the admin tab whose request runs now (requests resumed after a restart are in this.pending). */
         this.adminRunning = new Set();
         /** "<instance>/<chat id>" -> conversation id, persisted in telegram.chats. */
@@ -221,6 +223,7 @@ class PiAgent extends utils.Adapter {
             // a backup chosen for restore replaces the store before anything opens it
             await this.applyRestore();
             await this.memory.load();
+            await this.watchSchedulers();
             // the user may edit the facts in the state memory.list
             await this.subscribeStatesAsync('memory.list');
             // the table "Write permissions" and the regular expressions of the expert fields both count
@@ -549,6 +552,7 @@ class PiAgent extends utils.Adapter {
                     cancel: (conversationId, id) => this.cancelPlanned(conversationId, id),
                 },
                 logFile: () => findLogFile(utils.getAbsoluteDefaultDataDir()),
+                schedulers: () => this.schedulers,
             })),
         );
 
@@ -1113,6 +1117,37 @@ class PiAgent extends utils.Adapter {
         this.log.info(
             `Conversations restored from a backup (${Object.keys(restored.chats).length} chat(s)); waiting requests were dropped`,
         );
+    }
+
+    /** Read the enabled instances of the scheduler adapter fullcalendar (the prompt tells the model what it can plan). */
+    async refreshSchedulers() {
+        try {
+            const view = await this.getObjectViewAsync('system', 'instance', {
+                startkey: 'system.adapter.fullcalendar.',
+                endkey: 'system.adapter.fullcalendar.香',
+            });
+            this.schedulers = view.rows
+                .filter(row => row.value?.common?.enabled !== false)
+                .map(row => row.id.slice('system.adapter.'.length))
+                .sort();
+        } catch (e) {
+            this.log.debug(`No list of fullcalendar instances: ${e.message}`);
+        }
+    }
+
+    /** Keep the list of fullcalendar instances current when one is installed, removed, switched on or off. */
+    async watchSchedulers() {
+        await this.refreshSchedulers();
+        this.on('objectChange', id => {
+            if (String(id).startsWith('system.adapter.fullcalendar.') && !this.stopping) {
+                void this.refreshSchedulers();
+            }
+        });
+        try {
+            await this.subscribeForeignObjectsAsync('system.adapter.fullcalendar.*');
+        } catch (e) {
+            this.log.debug(`Cannot watch the fullcalendar instances: ${e.message}`);
+        }
     }
 
     /**

@@ -1,5 +1,9 @@
 # Older Changelog
 
+### 0.5.2 (2026-10-28)
+
+- Settings: the base URL and the notes on the system-wide AI settings are not wider on a large display than on a small one (repository checker E5509)
+
 ### 0.5.1 (2026-10-28)
 
 - Timers of the adapter instead of the ones of Node.js (repository checker E5005)

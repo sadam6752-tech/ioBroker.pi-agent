@@ -221,6 +221,24 @@ Select **OpenAI-compatible (own URL)** for any server with the OpenAI chat compl
   `list_notifications` shows the notifications of ioBroker (the bell in admin). Both only read.
 - A message from a conversation of a `sendTo` caller (e.g. ioBroker.assistant) goes to `chat.answer`.
 
+## Scheduler fullcalendar
+
+For actions that repeat (every weekday at 7:00), lie more than 7 days ahead, switch something on for a while, or
+depend on a condition, the agent uses the adapter [fullcalendar](https://github.com/ioBroker/ioBroker.fullcalendar)
+(3.3 or newer) through `send_to`: `addEvent`, `updateEvent`, `deleteEvent`, `listEvents`, `getCalendars`,
+`enableCalendar`. The events appear in the calendar and can be changed there. What is planned the agent reads in
+`fullcalendar.0.events.today`, `.tomorrow` and `.next`.
+
+- It needs **Write allowed** for `fullcalendar.0` in "Write permissions".
+- fullcalendar writes the state of an event by itself, later. So pi-agent checks that state (`oid`) against its own
+  write permissions first: an event for a state pi-agent may not write is blocked. For `updateEvent` without `oid`
+  the state of the event is looked up. Where the state, or the row of `fullcalendar.0`, has **Confirmation
+  required**, the user confirms the event with what and when, e.g. "addEvent: hm-rpc.0.heater.STATE = false, start
+  23:00, recurring daily".
+- When fullcalendar is not installed, or not allowed, the agent tells the user what is missing and offers what works
+  without it (`schedule_set_state` once within 7 days, `notify_when`, `remind_me`). The agent notices an
+  installation without a restart.
+
 ## Restart of instances
 
 The tool `restart_instance` restarts an adapter instance, e.g. "telegram does not answer, restart it":
@@ -290,6 +308,12 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.6.4 (2026-10-29)
+
+- Scheduler fullcalendar: repeating, longer and timed actions go to fullcalendar through `send_to`, but only for
+  states pi-agent may write; asked where "Confirmation required" is set
+- When fullcalendar is not installed or not allowed, the agent tells the user what is missing
+
 ### 0.6.3 (2026-10-29)
 
 - Tool `notify_when`: a message in the chat when a state meets a condition, also for some minutes
@@ -316,10 +340,6 @@ the last copy.
   confirmation in the chat; never pi-agent or admin
 - Long-term memory: facts kept across all conversations (tools `remember` and `forget`, state `memory.list`, part
   of the backups); switch "Long-term memory" in the settings
-
-### 0.5.2 (2026-10-28)
-
-- Settings: the base URL and the notes on the system-wide AI settings are not wider on a large display than on a small one (repository checker E5509)
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

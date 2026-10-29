@@ -77,7 +77,7 @@ test('system key source: provider, model and key come from system.ai; a change o
     assert.equal(providerCalls[0][0], 'anthropic');
     assert.equal(providerCalls[0][1], 'sk-system');
     assert.equal(providerCalls[0][2].modelId, 'claude-haiku-5-5');
-    assert.deepEqual(agent.objectSubscriptions, ['system.ai', CREDENTIAL]);
+    assert.deepEqual(agent.objectSubscriptions.filter(id => !id.startsWith('system.adapter.')), ['system.ai', CREDENTIAL]);
     assert.equal(agent.db.states[`${NAMESPACE}.info.connection`].val, true);
 
     agent.emit('objectChange', 'system.ai', systemAi({ ...native, hideFab: true }));
@@ -99,7 +99,7 @@ test('system key source without a provider in system.ai: idle with a hint where 
         JSON.stringify(agent.logs),
     );
     assert.equal(agent.db.states[`${NAMESPACE}.info.connection`].val, false);
-    assert.deepEqual(agent.objectSubscriptions, ['system.ai'], 'setting it up later restarts the instance');
+    assert.deepEqual(agent.objectSubscriptions.filter(id => !id.startsWith('system.adapter.')), ['system.ai'], 'setting it up later restarts the instance');
     await stopAgent(agent);
 });
 

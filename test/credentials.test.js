@@ -68,7 +68,7 @@ test('central key: the agent starts with the key of the credential and restarts 
     });
     assert.equal(providerCalls.length, 1);
     assert.equal(providerCalls[0][1], 'sk-central');
-    assert.deepEqual(agent.objectSubscriptions, [CREDENTIAL]);
+    assert.deepEqual(agent.objectSubscriptions.filter(id => !id.startsWith('system.adapter.')), [CREDENTIAL]);
     assert.equal(agent.db.states[`${NAMESPACE}.info.connection`].val, true);
 
     agent.emit('objectChange', 'system.credentials.other', credentialObject('x'));

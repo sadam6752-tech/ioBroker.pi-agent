@@ -64,4 +64,6 @@ export interface Policy {
     };
     /** Path of the ioBroker log file, or null. */
     logFile?: () => string | null;
+    /** Enabled instances of the scheduler adapter fullcalendar, e.g. ["fullcalendar.0"]. */
+    schedulers?: () => string[];
 }

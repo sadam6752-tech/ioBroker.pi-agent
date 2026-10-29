@@ -1127,6 +1127,19 @@ const DESC = [
 ];
 /** common.news per version, newest first; the repository builder keeps at most seven. */
 const NEWS = {};
+NEWS['0.6.4'] = [
+    'Scheduler fullcalendar: repeating, longer and timed actions go to fullcalendar through send_to, but only for states pi-agent may write (also asked where "Confirmation required" is set); when fullcalendar is not installed or not allowed, the agent tells the user',
+    'Planer fullcalendar: wiederkehrende, längere und zeitlich begrenzte Aktionen gehen per send_to an fullcalendar, aber nur für Datenpunkte, die pi-agent schreiben darf (bei „Bestätigung erforderlich“ mit Rückfrage); ist fullcalendar nicht installiert oder nicht erlaubt, sagt der Agent das dem Benutzer',
+    'Планировщик fullcalendar: повторяющиеся, долгие и ограниченные по времени действия идут в fullcalendar через send_to, но только для состояний, в которые pi-agent может писать (с подтверждением, где стоит «Требуется подтверждение»); если fullcalendar не установлен или не разрешён, агент сообщает об этом пользователю',
+    'Planeador fullcalendar: ações repetidas, mais longas e temporizadas vão para o fullcalendar via send_to, mas só para estados que o pi-agent pode escrever (com confirmação onde "Confirmação necessária" está definida); se o fullcalendar não estiver instalado ou permitido, o agente informa o utilizador',
+    'Planner fullcalendar: terugkerende, langere en getimede acties gaan via send_to naar fullcalendar, maar alleen voor states die pi-agent mag schrijven (met bevestiging waar "Bevestiging vereist" is ingesteld); is fullcalendar niet geïnstalleerd of niet toegestaan, dan zegt de agent dat tegen de gebruiker',
+    "Planificateur fullcalendar : les actions répétées, plus longues et temporisées passent par send_to vers fullcalendar, mais seulement pour les états que pi-agent peut écrire (avec confirmation là où « Confirmation requise » est activée) ; si fullcalendar n'est pas installé ou pas autorisé, l'agent le dit à l'utilisateur",
+    "Pianificatore fullcalendar: le azioni ripetute, più lunghe e temporizzate vanno a fullcalendar tramite send_to, ma solo per gli stati che pi-agent può scrivere (con conferma dove è impostata «Conferma richiesta»); se fullcalendar non è installato o non consentito, l'agente lo dice all'utente",
+    'Planificador fullcalendar: las acciones repetidas, más largas y temporizadas van a fullcalendar mediante send_to, pero solo para estados que pi-agent puede escribir (con confirmación donde está «Confirmación necesaria»); si fullcalendar no está instalado o permitido, el agente se lo dice al usuario',
+    'Planer fullcalendar: powtarzające się, dłuższe i czasowe działania trafiają przez send_to do fullcalendar, ale tylko dla stanów, które pi-agent może zapisywać (z potwierdzeniem tam, gdzie ustawiono „Wymagane potwierdzenie”); jeśli fullcalendar nie jest zainstalowany lub dozwolony, agent mówi o tym użytkownikowi',
+    'Планувальник fullcalendar: повторювані, довші та обмежені в часі дії йдуть у fullcalendar через send_to, але лише для станів, у які pi-agent може писати (з підтвердженням там, де встановлено «Потрібне підтвердження»); якщо fullcalendar не встановлено або не дозволено, агент повідомляє про це користувачеві',
+    '调度器 fullcalendar：重复、较长和定时的操作通过 send_to 交给 fullcalendar，但仅限 pi-agent 可写入的状态（设置了“需要确认”的需确认）；若未安装或未允许 fullcalendar，代理会告诉用户',
+];
 NEWS['0.6.3'] = [
     'Tools notify_when (a message when a state meets a condition, also for some minutes), schedule_set_state (a write later, checked again when due), list_scheduled and cancel_scheduled, get_logs and list_notifications',
     'Werkzeuge notify_when (eine Nachricht, wenn ein Datenpunkt eine Bedingung erfüllt, auch für einige Minuten), schedule_set_state (ein späterer Schreibvorgang, bei Fälligkeit erneut geprüft), list_scheduled und cancel_scheduled, get_logs und list_notifications',
