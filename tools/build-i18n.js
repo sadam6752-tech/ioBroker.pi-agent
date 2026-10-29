@@ -1127,6 +1127,19 @@ const DESC = [
 ];
 /** common.news per version, newest first; the repository builder keeps at most seven. */
 const NEWS = {};
+NEWS['0.6.2'] = [
+    'Tools list_rooms, list_functions and find_states: the states of a room and/or a function as set up in ioBroker ("the lights in the kitchen"); search_objects and get_state also show min, max and the allowed values of a state',
+    'Werkzeuge list_rooms, list_functions und find_states: die Datenpunkte eines Raums und/oder einer Funktion, wie in ioBroker eingerichtet („das Licht in der Küche“); search_objects und get_state zeigen auch Minimum, Maximum und die erlaubten Werte eines Datenpunkts',
+    'Инструменты list_rooms, list_functions и find_states: состояния комнаты и/или функции, как они настроены в ioBroker («свет на кухне»); search_objects и get_state также показывают минимум, максимум и допустимые значения состояния',
+    'Ferramentas list_rooms, list_functions e find_states: os estados de uma divisão e/ou de uma função tal como configurados no ioBroker ("as luzes da cozinha"); search_objects e get_state mostram também o mínimo, o máximo e os valores permitidos de um estado',
+    'Tools list_rooms, list_functions en find_states: de states van een ruimte en/of een functie zoals ingesteld in ioBroker ("de lampen in de keuken"); search_objects en get_state tonen ook minimum, maximum en de toegestane waarden van een state',
+    "Outils list_rooms, list_functions et find_states : les états d'une pièce et/ou d'une fonction tels que configurés dans ioBroker (« les lumières de la cuisine ») ; search_objects et get_state montrent aussi le minimum, le maximum et les valeurs autorisées d'un état",
+    'Strumenti list_rooms, list_functions e find_states: gli stati di una stanza e/o di una funzione come configurati in ioBroker («le luci della cucina»); search_objects e get_state mostrano anche minimo, massimo e i valori consentiti di uno stato',
+    'Herramientas list_rooms, list_functions y find_states: los estados de una habitación y/o una función tal como están configurados en ioBroker («las luces de la cocina»); search_objects y get_state muestran también el mínimo, el máximo y los valores permitidos de un estado',
+    'Narzędzia list_rooms, list_functions i find_states: stany pomieszczenia i/lub funkcji skonfigurowane w ioBroker („światła w kuchni”); search_objects i get_state pokazują też minimum, maksimum i dozwolone wartości stanu',
+    'Інструменти list_rooms, list_functions і find_states: стани кімнати та/або функції, як їх налаштовано в ioBroker («світло на кухні»); search_objects і get_state також показують мінімум, максимум і допустимі значення стану',
+    '工具 list_rooms、list_functions 和 find_states：按 ioBroker 中的设置获取某个房间和/或功能的状态（“厨房的灯”）；search_objects 和 get_state 还会显示状态的最小值、最大值和允许的值',
+];
 NEWS['0.6.1'] = [
     'Tool send_to: commands to other adapters (e.g. a Telegram message), only to instances with "Write allowed", confirmed where "Confirmation required" is set; the agent answers in the language of the question unless the instructions name a language',
     'Werkzeug send_to: Befehle an andere Adapter (z. B. eine Telegram-Nachricht), nur an Instanzen mit „Schreiben erlaubt“, bestätigt, wo „Bestätigung erforderlich“ gesetzt ist; der Agent antwortet in der Sprache der Frage, außer die Anweisungen nennen eine Sprache',

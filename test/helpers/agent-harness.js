@@ -99,7 +99,7 @@ function fakeAdapterCore(hooks) {
             this.db.save();
         }
         async getObjectViewAsync(design, search, params) {
-            const type = search === 'instance' ? 'instance' : 'state';
+            const type = search; // the views of js-controller are named like the object types (state, instance, enum)
             const rows = Object.keys(this.db.objects)
                 .sort()
                 .filter(id => this.db.objects[id].type === type && id >= params.startkey && id <= params.endkey)

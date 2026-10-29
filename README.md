@@ -17,7 +17,12 @@ before it runs, so an interrupted request continues after the adapter starts aga
 ## What it does
 
 - Reads and searches states through the tools `search_objects`, `get_state` (one id or a `*` pattern) and
-  `list_instances`. These tools may be repeated safely.
+  `list_instances`. These tools may be repeated safely. Both show type, unit, writable, and where the state has them
+  min, max and the allowed values (`common.states`), so the agent writes the value the device expects.
+- Finds the states of a room and/or a function as set up in ioBroker (`enum.rooms`, `enum.functions`) with
+  `find_states`, e.g. room "Küche" and function "Licht" for "the lights in the kitchen"; `list_rooms` and
+  `list_functions` show what exists. Names match in every language of the enum and in part; a member that is a
+  device or channel brings the states below it.
 - `list_instances` starts from the instance objects and reads `alive` and `connected` of each instance by its exact id.
   A `*` pattern only finds states that have an object, so a stale `alive` value of an instance whose state object is
   gone is missing from a pattern query but not from `list_instances`.
@@ -269,6 +274,12 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.6.2 (2026-10-29)
+
+- Tools `list_rooms`, `list_functions` and `find_states`: the states of a room and/or a function as set up in
+  ioBroker ("the lights in the kitchen")
+- `search_objects` and `get_state` also show min, max and the allowed values of a state
+
 ### 0.6.1 (2026-10-29)
 
 - Tool `send_to`: commands to other adapters (e.g. a Telegram message), only to instances with "Write allowed",
@@ -290,16 +301,6 @@ the last copy.
 ### 0.5.1 (2026-10-28)
 
 - Timers of the adapter instead of the ones of Node.js (repository checker E5005)
-
-### 0.5.0 (2026-10-28)
-
-- The system-wide AI settings of admin (System settings, tab "AI") can be used: new key source; an instance without a key of its own takes them too
-- Google Gemini and OpenRouter as providers (OpenRouter: one key for the models of many vendors, model IDs as `vendor/model`)
-- sendTo `ask` accepts `conversation` and `instructions`: a conversation of its own per caller conversation, e.g. one per room of a voice assistant
-- The three points above by GermanBluefox; an instance updated from 0.2.0 or older keeps its own key
-- Admin chat: switch "Details" with the tool calls, their results and times, and the tokens of every request
-- Admin chat: administrators can read the other conversations (messengers, other admin users, ioBroker.assistant)
-- Admin chat: "New conversation" deletes the old conversation from the store at the next start (after a safety copy)
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

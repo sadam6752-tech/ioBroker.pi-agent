@@ -1,5 +1,15 @@
 # Older Changelog
 
+### 0.5.0 (2026-10-28)
+
+- The system-wide AI settings of admin (System settings, tab "AI") can be used: new key source; an instance without a key of its own takes them too
+- Google Gemini and OpenRouter as providers (OpenRouter: one key for the models of many vendors, model IDs as `vendor/model`)
+- sendTo `ask` accepts `conversation` and `instructions`: a conversation of its own per caller conversation, e.g. one per room of a voice assistant
+- The three points above by GermanBluefox; an instance updated from 0.2.0 or older keeps its own key
+- Admin chat: switch "Details" with the tool calls, their results and times, and the tokens of every request
+- Admin chat: administrators can read the other conversations (messengers, other admin users, ioBroker.assistant)
+- Admin chat: "New conversation" deletes the old conversation from the store at the next start (after a safety copy)
+
 ### 0.4.0 (2026-10-28)
 
 - Tab "Backup": backups of the conversations by hand and automatic (daily or weekly) in the storage folder, which
