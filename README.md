@@ -55,7 +55,7 @@ The settings have four tabs: **General**, **Write permissions**, **Messengers** 
 | Write allowlist, Confirmation required | Under "Advanced": regular expressions, one per line, in addition to the table (the settings of 0.0.5 and earlier keep working). |
 | Time zone       | IANA name such as `Europe/Berlin` for reminders, `get_time` and history times, chosen from a list with the current UTC offsets (the instance must be running for the list) or typed in. Empty: the time zone of the ioBroker server. |
 | History instance | `history`, `sql` or `influxdb` instance for `get_history`. Empty: the default history of the system settings. |
-| Instructions    | Text appended to the system prompt, for example room names and house rules.     |
+| Instructions    | Text appended to the system prompt, for example room names and house rules. The agent answers in the language of the question; a language named here (e.g. "Always answer in German.") wins. |
 | Messengers      | Table, one row per `telegram` or `max` instance (bot): active, instance, allowed users, prefix. No row: no messenger is used. |
 | ↳ Allowed users | User ID, user name or first name (as in the messenger adapter), separated by commas. Messages from anyone else are ignored. |
 | ↳ Prefix        | Only messages that start with it go to the agent, e.g. `/ai`. Empty: every message of an allowed user. |
@@ -213,6 +213,18 @@ The tool `restart_instance` restarts an adapter instance, e.g. "telegram does no
 - The restart works like the restart button of admin. The agent then waits up to 45 seconds until the instance runs
   again and says so. A switched-off instance is not switched on. In simulation mode nothing is restarted.
 
+## Commands to other adapters
+
+The tool `send_to` sends a command to another adapter and returns its answer, e.g. instance `telegram.0`, command
+`send`, message `{"text": "Hello"}`, or a text to speech adapter. The agent uses the command and message the adapter
+documents.
+
+- Only to instances whose row in "Write permissions" is the whole instance (`telegram.0`) with **Write allowed**; a
+  row for some states of an instance (`telegram.0.communicate.*`) is not enough. Never to pi-agent or admin.
+- With **Confirmation required** in that row, every command is confirmed with ✅/❌ in the chat first.
+- The agent waits up to 30 seconds for the answer; many adapters do not answer, then the command may still have worked.
+  A command is never sent a second time after an interruption. In simulation mode nothing is sent.
+
 ## Long-term memory
 
 A conversation remembers everything said in it, but the conversations do not know each other. Facts that should
@@ -257,6 +269,13 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.6.1 (2026-10-29)
+
+- Tool `send_to`: commands to other adapters (e.g. a Telegram message), only to instances with "Write allowed",
+  confirmed where "Confirmation required" is set
+- The agent answers in the language of the question, unless the instructions (of the user or of the calling adapter)
+  name a language
+
 ### 0.6.0 (2026-10-28)
 
 - Tool `restart_instance`: restarts adapter instances with "Restart allowed" in the write permissions, after a
@@ -281,12 +300,6 @@ the last copy.
 - Admin chat: switch "Details" with the tool calls, their results and times, and the tokens of every request
 - Admin chat: administrators can read the other conversations (messengers, other admin users, ioBroker.assistant)
 - Admin chat: "New conversation" deletes the old conversation from the store at the next start (after a safety copy)
-
-### 0.4.0 (2026-10-28)
-
-- Tab "Backup": backups of the conversations by hand and automatic (daily or weekly) in the storage folder, which
-  the ioBroker backup (BackItUp) contains; restore with a safety copy
-- Copy of every backup to an external server over SFTP, and restore from it
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

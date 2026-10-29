@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.6.0",
+		"version": "0.6.1",
 		"news": {
+			"0.6.1": {
+				"en": "Tool send_to: commands to other adapters (e.g. a Telegram message), only to instances with \"Write allowed\", confirmed where \"Confirmation required\" is set; the agent answers in the language of the question unless the instructions name a language",
+				"de": "Werkzeug send_to: Befehle an andere Adapter (z. B. eine Telegram-Nachricht), nur an Instanzen mit „Schreiben erlaubt“, bestätigt, wo „Bestätigung erforderlich“ gesetzt ist; der Agent antwortet in der Sprache der Frage, außer die Anweisungen nennen eine Sprache",
+				"ru": "Инструмент send_to: команды другим адаптерам (например, сообщение в Telegram), только инстансам с «Запись разрешена», с подтверждением там, где стоит «Требуется подтверждение»; агент отвечает на языке вопроса, если инструкции не задают язык",
+				"pt": "Ferramenta send_to: comandos para outros adaptadores (p. ex. uma mensagem do Telegram), só para instâncias com \"Escrita permitida\", confirmados onde \"Confirmação necessária\" está definida; o agente responde no idioma da pergunta, salvo se as instruções indicarem um idioma",
+				"nl": "Tool send_to: opdrachten aan andere adapters (bv. een Telegram-bericht), alleen aan instanties met \"Schrijven toegestaan\", bevestigd waar \"Bevestiging vereist\" is ingesteld; de agent antwoordt in de taal van de vraag, tenzij de instructies een taal noemen",
+				"fr": "Outil send_to : commandes vers d'autres adaptateurs (p. ex. un message Telegram), uniquement vers les instances avec « Écriture autorisée », confirmées là où « Confirmation requise » est activée ; l'agent répond dans la langue de la question, sauf si les instructions indiquent une langue",
+				"it": "Strumento send_to: comandi ad altri adattatori (ad es. un messaggio Telegram), solo alle istanze con «Scrittura consentita», confermati dove è impostata «Conferma richiesta»; l'agente risponde nella lingua della domanda, salvo che le istruzioni indichino una lingua",
+				"es": "Herramienta send_to: comandos a otros adaptadores (p. ej. un mensaje de Telegram), solo a instancias con «Escritura permitida», confirmados donde está activada «Confirmación necesaria»; el agente responde en el idioma de la pregunta, salvo que las instrucciones indiquen un idioma",
+				"pl": "Narzędzie send_to: polecenia do innych adapterów (np. wiadomość w Telegramie), tylko do instancji z „Zapis dozwolony”, z potwierdzeniem tam, gdzie ustawiono „Wymagane potwierdzenie”; agent odpowiada w języku pytania, chyba że instrukcje podają język",
+				"uk": "Інструмент send_to: команди іншим адаптерам (наприклад, повідомлення в Telegram), лише інстансам із «Запис дозволено», з підтвердженням там, де встановлено «Потрібне підтвердження»; агент відповідає мовою питання, якщо інструкції не задають мову",
+				"zh-cn": "工具 send_to：向其他适配器发送命令（例如 Telegram 消息），仅限具有“允许写入”的实例，设置了“需要确认”的需先确认；代理使用提问的语言回答，除非指令指定了语言"
+			},
 			"0.6.0": {
 				"en": "Tool restart_instance: the agent restarts adapter instances with \"Restart allowed\" in the write permissions, after a confirmation in the chat; long-term memory: facts kept across all conversations (tools remember and forget, state memory.list, part of the backups)",
 				"de": "Werkzeug restart_instance: der Agent startet Adapterinstanzen mit „Neustart erlaubt“ in den Schreibrechten neu, nach einer Bestätigung im Chat; Langzeitgedächtnis: Fakten über alle Unterhaltungen hinweg (Werkzeuge remember und forget, Datenpunkt memory.list, Teil der Backups)",
@@ -80,19 +93,6 @@
 				"pl": "Serwery zgodne z OpenAI z własnym bazowym URL (Ollama, LM Studio, vLLM, Groq, OpenRouter, ...); klucz API może pochodzić z centralnego magazynu danych uwierzytelniających admina 8; przycisk „Testuj połączenie”",
 				"uk": "OpenAI-сумісні сервери з власним базовим URL (Ollama, LM Studio, vLLM, Groq, OpenRouter, ...); API-ключ можна брати з центрального сховища облікових даних admin 8; кнопка «Перевірити зʼєднання»",
 				"zh-cn": "支持自定义基础 URL 的 OpenAI 兼容服务器（Ollama、LM Studio、vLLM、Groq、OpenRouter 等）；API 密钥可来自 admin 8 的中央凭据存储；“测试连接”按钮"
-			},
-			"0.2.0": {
-				"en": "Chat in the admin: the menu entry \"Pi Agent\" opens a chat with the agent, one conversation per ioBroker user, with tool calls, confirmation buttons and reminders",
-				"de": "Chat im Admin: Der Menüpunkt „Pi Agent“ öffnet einen Chat mit dem Agenten, eine Unterhaltung pro ioBroker-Benutzer, mit Werkzeugaufrufen, Bestätigungs-Schaltflächen und Erinnerungen",
-				"ru": "Чат в админке: пункт меню «Pi Agent» открывает чат с агентом, отдельная беседа для каждого пользователя ioBroker, с вызовами инструментов, кнопками подтверждения и напоминаниями",
-				"pt": "Chat no admin: a entrada de menu \"Pi Agent\" abre um chat com o agente, uma conversa por utilizador do ioBroker, com chamadas de ferramentas, botões de confirmação e lembretes",
-				"nl": "Chat in de admin: het menu-item \"Pi Agent\" opent een chat met de agent, één gesprek per ioBroker-gebruiker, met toolaanroepen, bevestigingsknoppen en herinneringen",
-				"fr": "Chat dans l'admin : l'entrée de menu « Pi Agent » ouvre une discussion avec l'agent, une conversation par utilisateur ioBroker, avec les appels d'outils, des boutons de confirmation et des rappels",
-				"it": "Chat nell'admin: la voce di menu \"Pi Agent\" apre una chat con l'agente, una conversazione per ogni utente ioBroker, con chiamate agli strumenti, pulsanti di conferma e promemoria",
-				"es": "Chat en el admin: la entrada de menú \"Pi Agent\" abre un chat con el agente, una conversación por usuario de ioBroker, con llamadas a herramientas, botones de confirmación y recordatorios",
-				"pl": "Czat w panelu admina: pozycja menu „Pi Agent” otwiera czat z agentem, jedna rozmowa na użytkownika ioBroker, z wywołaniami narzędzi, przyciskami potwierdzenia i przypomnieniami",
-				"uk": "Чат в адмінці: пункт меню «Pi Agent» відкриває чат з агентом, окрема розмова для кожного користувача ioBroker, з викликами інструментів, кнопками підтвердження та нагадуваннями",
-				"zh-cn": "管理界面中的聊天：菜单项“Pi Agent”打开与代理的聊天，每个 ioBroker 用户一个对话，显示工具调用、确认按钮和提醒"
 			}
 		},
 		"titleLang": {

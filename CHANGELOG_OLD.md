@@ -1,5 +1,11 @@
 # Older Changelog
 
+### 0.4.0 (2026-10-28)
+
+- Tab "Backup": backups of the conversations by hand and automatic (daily or weekly) in the storage folder, which
+  the ioBroker backup (BackItUp) contains; restore with a safety copy
+- Copy of every backup to an external server over SFTP, and restore from it
+
 ### 0.3.0 (2026-10-28)
 
 - OpenAI-compatible servers with an own base URL (Ollama, LM Studio, vLLM, Groq, OpenRouter, ...)

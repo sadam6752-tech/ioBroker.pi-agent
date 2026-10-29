@@ -1127,6 +1127,19 @@ const DESC = [
 ];
 /** common.news per version, newest first; the repository builder keeps at most seven. */
 const NEWS = {};
+NEWS['0.6.1'] = [
+    'Tool send_to: commands to other adapters (e.g. a Telegram message), only to instances with "Write allowed", confirmed where "Confirmation required" is set; the agent answers in the language of the question unless the instructions name a language',
+    'Werkzeug send_to: Befehle an andere Adapter (z. B. eine Telegram-Nachricht), nur an Instanzen mit „Schreiben erlaubt“, bestätigt, wo „Bestätigung erforderlich“ gesetzt ist; der Agent antwortet in der Sprache der Frage, außer die Anweisungen nennen eine Sprache',
+    'Инструмент send_to: команды другим адаптерам (например, сообщение в Telegram), только инстансам с «Запись разрешена», с подтверждением там, где стоит «Требуется подтверждение»; агент отвечает на языке вопроса, если инструкции не задают язык',
+    'Ferramenta send_to: comandos para outros adaptadores (p. ex. uma mensagem do Telegram), só para instâncias com "Escrita permitida", confirmados onde "Confirmação necessária" está definida; o agente responde no idioma da pergunta, salvo se as instruções indicarem um idioma',
+    'Tool send_to: opdrachten aan andere adapters (bv. een Telegram-bericht), alleen aan instanties met "Schrijven toegestaan", bevestigd waar "Bevestiging vereist" is ingesteld; de agent antwoordt in de taal van de vraag, tenzij de instructies een taal noemen',
+    "Outil send_to : commandes vers d'autres adaptateurs (p. ex. un message Telegram), uniquement vers les instances avec « Écriture autorisée », confirmées là où « Confirmation requise » est activée ; l'agent répond dans la langue de la question, sauf si les instructions indiquent une langue",
+    "Strumento send_to: comandi ad altri adattatori (ad es. un messaggio Telegram), solo alle istanze con «Scrittura consentita», confermati dove è impostata «Conferma richiesta»; l'agente risponde nella lingua della domanda, salvo che le istruzioni indichino una lingua",
+    'Herramienta send_to: comandos a otros adaptadores (p. ej. un mensaje de Telegram), solo a instancias con «Escritura permitida», confirmados donde está activada «Confirmación necesaria»; el agente responde en el idioma de la pregunta, salvo que las instrucciones indiquen un idioma',
+    'Narzędzie send_to: polecenia do innych adapterów (np. wiadomość w Telegramie), tylko do instancji z „Zapis dozwolony”, z potwierdzeniem tam, gdzie ustawiono „Wymagane potwierdzenie”; agent odpowiada w języku pytania, chyba że instrukcje podają język',
+    'Інструмент send_to: команди іншим адаптерам (наприклад, повідомлення в Telegram), лише інстансам із «Запис дозволено», з підтвердженням там, де встановлено «Потрібне підтвердження»; агент відповідає мовою питання, якщо інструкції не задають мову',
+    '工具 send_to：向其他适配器发送命令（例如 Telegram 消息），仅限具有“允许写入”的实例，设置了“需要确认”的需先确认；代理使用提问的语言回答，除非指令指定了语言',
+];
 NEWS['0.6.0'] = [
     'Tool restart_instance: the agent restarts adapter instances with "Restart allowed" in the write permissions, after a confirmation in the chat; long-term memory: facts kept across all conversations (tools remember and forget, state memory.list, part of the backups)',
     'Werkzeug restart_instance: der Agent startet Adapterinstanzen mit „Neustart erlaubt“ in den Schreibrechten neu, nach einer Bestätigung im Chat; Langzeitgedächtnis: Fakten über alle Unterhaltungen hinweg (Werkzeuge remember und forget, Datenpunkt memory.list, Teil der Backups)',
