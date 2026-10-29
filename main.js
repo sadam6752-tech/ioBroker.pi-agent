@@ -32,6 +32,8 @@ const {
 const { autoBackupDelay } = require('./lib/backup-schedule');
 const { queuedPurges, queuePurge, purgeQueued } = require('./lib/purge');
 const { createMemory } = require('./lib/memory');
+const { createWatches } = require('./lib/watches');
+const { findLogFile } = require('./lib/diagnostics');
 const {
     copyBackupToRemote,
     settingsForConnectionTest,
@@ -177,6 +179,8 @@ class PiAgent extends utils.Adapter {
         this.adminChat = createAdminChat(this);
         /** Long-term memory shared by all conversations (lib/memory.js). */
         this.memory = createMemory(this, () => this.config.longTermMemory !== false);
+        /** Watches of notify_when (lib/watches.js); they tell the chat of their conversation like a reminder. */
+        this.watches = createWatches(this, (conversationId, text) => this.deliverReminder(conversationId, text));
         /** Instances with "Restart allowed" in the write permissions. */
         this.restartList = [];
         /** How long a restarted instance may take to run again. */
@@ -253,6 +257,8 @@ class PiAgent extends utils.Adapter {
             await this.startHarness(apiKey);
             await this.subscribeStatesAsync('chat.input');
             await this.startMessengers();
+            // after the chats: a watch that fires at once tells its chat
+            await this.watches.load();
             await this.scheduleAutoBackup();
             await this.setStateAsync('info.connection', { val: true, ack: true });
             this.markReady();
@@ -537,6 +543,12 @@ class PiAgent extends utils.Adapter {
                 restartList: this.restartList,
                 restartInstance: instance => this.restartInstance(instance),
                 memory: this.memory,
+                watches: this.watches,
+                scheduled: {
+                    tasks: conversationId => this.plannedTasks(conversationId),
+                    cancel: (conversationId, id) => this.cancelPlanned(conversationId, id),
+                },
+                logFile: () => findLogFile(utils.getAbsoluteDefaultDataDir()),
             })),
         );
 
@@ -1140,6 +1152,59 @@ class PiAgent extends utils.Adapter {
         return `The restart of ${instance} was sent, but it did not report running again within ${Math.round(this.restartWaitMs / 1000)} s. Tell the user to look at the log of ${instance}.`;
     }
 
+    /**
+     * The reminders and scheduled writes of a conversation that are not done yet: the live tasks of the harness.
+     *
+     * @param {unknown} conversationId conversation
+     * @returns {Promise<Array<{ id: string, taskId: import("@earendil-works/pi-durable").TaskId, kind: string, at: number, text?: string, state?: string, value?: unknown }>>} planned tasks
+     */
+    async plannedTasks(conversationId) {
+        const inspection = await this.harness.inspect(this.context);
+        return inspection.tasks
+            .map(t => t.record)
+            .filter(
+                r =>
+                    ['iobroker.reminder', 'iobroker.write'].includes(String(r.kind)) &&
+                    String(Object(r.input).conversationId) === String(conversationId),
+            )
+            .map(r => {
+                const input = Object(r.input);
+                return r.kind === 'iobroker.reminder'
+                    ? {
+                          id: `t${r.id}`,
+                          taskId: r.id,
+                          kind: 'reminder',
+                          at: Number(input.at),
+                          text: String(input.text ?? ''),
+                      }
+                    : {
+                          id: `t${r.id}`,
+                          taskId: r.id,
+                          kind: 'scheduled write',
+                          at: Number(input.at),
+                          state: String(input.id),
+                          value: input.val,
+                      };
+            })
+            .sort((a, b) => a.at - b.at);
+    }
+
+    /**
+     * Cancel a reminder or a scheduled write of a conversation.
+     *
+     * @param {unknown} conversationId conversation
+     * @param {string} id id from list_scheduled, e.g. "t123"
+     * @returns {Promise<boolean>} true when it was planned in this conversation
+     */
+    async cancelPlanned(conversationId, id) {
+        const planned = (await this.plannedTasks(conversationId)).find(p => p.id === id);
+        if (!planned) {
+            return false;
+        }
+        await this.harness.abortTask(planned.taskId, this.context);
+        return true;
+    }
+
     /** Publish the token use and cost of all conversations in usage.*. */
     async updateUsage() {
         try {
@@ -1322,6 +1387,9 @@ class PiAgent extends utils.Adapter {
         const instance = id.endsWith('.communicate.request') ? id.slice(0, -'.communicate.request'.length) : '';
         if (this.channels.has(instance)) {
             return this.onChatMessage(instance, state);
+        }
+        if (this.watches.handles(id)) {
+            await this.watches.onState(id, state);
         }
         if (id === `${this.namespace}.memory.list` && state && !state.ack) {
             // the user edited the facts: take them over (invalid entries are dropped) and confirm with ack
@@ -1703,6 +1771,7 @@ class PiAgent extends utils.Adapter {
     onUnload(callback) {
         this.stopping = true;
         this.clearTimeout(this.backupTimer);
+        this.watches.stop();
         const done = async () => {
             try {
                 await this.harness?.close(this.context);

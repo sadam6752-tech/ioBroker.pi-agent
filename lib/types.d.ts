@@ -34,4 +34,34 @@ export interface Policy {
         add: (fact: string) => Promise<string>;
         remove: (query: string) => Promise<string>;
     };
+    /** Watches of notify_when (lib/watches.js). */
+    watches?: {
+        add: (request: {
+            conversationId: unknown;
+            stateId: string;
+            condition: string;
+            value?: unknown;
+            minutes?: number;
+            text: string;
+        }) => Promise<string>;
+        list: (conversationId: unknown) => Array<{
+            id: string;
+            stateId: string;
+            condition: string;
+            value: unknown;
+            forMs: number;
+            text: string;
+            until: number;
+        }>;
+        cancel: (conversationId: unknown, id: string) => Promise<boolean>;
+    };
+    /** Reminders and scheduled writes of a conversation (live tasks of the harness). */
+    scheduled?: {
+        tasks: (
+            conversationId: unknown,
+        ) => Promise<Array<{ id: string; kind: string; at: number; [key: string]: unknown }>>;
+        cancel: (conversationId: unknown, id: string) => Promise<boolean>;
+    };
+    /** Path of the ioBroker log file, or null. */
+    logFile?: () => string | null;
 }

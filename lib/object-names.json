@@ -181,6 +181,32 @@
 		"uk": "Кількість запамʼятованих фактів",
 		"zh-cn": "已记住的事实数量"
 	},
+	"scheduled": {
+		"en": "Planned",
+		"de": "Geplant",
+		"ru": "Запланировано",
+		"pt": "Planeado",
+		"nl": "Gepland",
+		"fr": "Planifié",
+		"it": "Pianificato",
+		"es": "Planificado",
+		"pl": "Zaplanowane",
+		"uk": "Заплановано",
+		"zh-cn": "已计划"
+	},
+	"scheduled.watches": {
+		"en": "Watches of notify_when (JSON)",
+		"de": "Beobachtungen von notify_when (JSON)",
+		"ru": "Наблюдения notify_when (JSON)",
+		"pt": "Observações de notify_when (JSON)",
+		"nl": "Bewakingen van notify_when (JSON)",
+		"fr": "Surveillances de notify_when (JSON)",
+		"it": "Osservazioni di notify_when (JSON)",
+		"es": "Observaciones de notify_when (JSON)",
+		"pl": "Obserwacje notify_when (JSON)",
+		"uk": "Спостереження notify_when (JSON)",
+		"zh-cn": "notify_when 的监视（JSON）"
+	},
 	"telegram": {
 		"en": "Messenger chats",
 		"de": "Messenger-Chats",

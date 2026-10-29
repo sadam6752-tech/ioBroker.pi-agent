@@ -205,6 +205,22 @@ Select **OpenAI-compatible (own URL)** for any server with the OpenAI chat compl
   SQLite at the first start without pending requests; the old folder is renamed to `session.jsonl-<date>` and kept.
   Earlier history is not carried over, and the messenger chats start new conversations.
 
+## Notifications, scheduled writes, diagnostics
+
+- `notify_when` tells the user in the chat of the conversation when a state meets a condition: `==`, `!=`, `>`,
+  `<`, `>=`, `<=` or `changes`, optionally for some minutes, e.g. "the washing machine is done" (power below 5 W
+  for 3 minutes) or "the window is open for more than 10 minutes". Only values reported by the device (ack=true)
+  count, not commands. A watch fires once and ends after 7 days at the latest; at most 20 at a time. The watches are
+  kept in `scheduled.watches` and go on after a restart.
+- `schedule_set_state` writes a state later ("switch the heater off at 23:00"), at most 7 days ahead. The write
+  permissions and the confirmation are checked when it is planned; the permission is checked again when it is due,
+  so a permission taken away in the meantime stops it. The user gets a message when it is done. It survives restarts.
+- `list_scheduled` shows the reminders, scheduled writes and watches of the conversation, `cancel_scheduled` cancels
+  one of them.
+- `get_logs` reads the newest lines of the ioBroker log file (filtered by instance, level and a word, at most 50);
+  `list_notifications` shows the notifications of ioBroker (the bell in admin). Both only read.
+- A message from a conversation of a `sendTo` caller (e.g. ioBroker.assistant) goes to `chat.answer`.
+
 ## Restart of instances
 
 The tool `restart_instance` restarts an adapter instance, e.g. "telegram does not answer, restart it":
@@ -274,6 +290,13 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.6.3 (2026-10-29)
+
+- Tool `notify_when`: a message in the chat when a state meets a condition, also for some minutes
+- Tool `schedule_set_state`: a write later; the permission is checked again when it is due
+- Tools `list_scheduled` and `cancel_scheduled` for reminders, scheduled writes and watches
+- Tools `get_logs` and `list_notifications` (read only)
+
 ### 0.6.2 (2026-10-29)
 
 - Tools `list_rooms`, `list_functions` and `find_states`: the states of a room and/or a function as set up in
@@ -297,10 +320,6 @@ the last copy.
 ### 0.5.2 (2026-10-28)
 
 - Settings: the base URL and the notes on the system-wide AI settings are not wider on a large display than on a small one (repository checker E5509)
-
-### 0.5.1 (2026-10-28)
-
-- Timers of the adapter instead of the ones of Node.js (repository checker E5005)
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

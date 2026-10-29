@@ -73,6 +73,9 @@ function fakeAdapterCore(hooks) {
         async subscribeForeignStatesAsync(pattern) {
             this.foreignSubscriptions = [...(this.foreignSubscriptions || []), pattern];
         }
+        async unsubscribeForeignStatesAsync(pattern) {
+            this.foreignSubscriptions = (this.foreignSubscriptions || []).filter(p => p !== pattern);
+        }
         async getForeignStateAsync(id) {
             await hooks.getForeignState?.(id);
             return this.db.states[id] ?? null;
@@ -173,7 +176,12 @@ function fakeAdapterCore(hooks) {
             return hooks.sendToAsync ? hooks.sendToAsync(instance, command, message) : undefined;
         }
     }
-    return { Adapter, getAbsoluteInstanceDataDir: adapter => adapter.dataDir };
+    return {
+        Adapter,
+        getAbsoluteInstanceDataDir: adapter => adapter.dataDir,
+        // iobroker-data; the log folder is next to it (tests of get_logs set it)
+        getAbsoluteDefaultDataDir: () => process.env.PI_AGENT_TEST_DATA_DIR || path.join(require('node:os').tmpdir(), 'no-iobroker-data'),
+    };
 }
 
 /**

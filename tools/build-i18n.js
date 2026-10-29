@@ -1127,6 +1127,19 @@ const DESC = [
 ];
 /** common.news per version, newest first; the repository builder keeps at most seven. */
 const NEWS = {};
+NEWS['0.6.3'] = [
+    'Tools notify_when (a message when a state meets a condition, also for some minutes), schedule_set_state (a write later, checked again when due), list_scheduled and cancel_scheduled, get_logs and list_notifications',
+    'Werkzeuge notify_when (eine Nachricht, wenn ein Datenpunkt eine Bedingung erfüllt, auch für einige Minuten), schedule_set_state (ein späterer Schreibvorgang, bei Fälligkeit erneut geprüft), list_scheduled und cancel_scheduled, get_logs und list_notifications',
+    'Инструменты notify_when (сообщение, когда состояние выполняет условие, в том числе в течение нескольких минут), schedule_set_state (запись позже, при наступлении времени проверяется снова), list_scheduled и cancel_scheduled, get_logs и list_notifications',
+    'Ferramentas notify_when (uma mensagem quando um estado cumpre uma condição, também durante alguns minutos), schedule_set_state (uma escrita mais tarde, verificada de novo na hora), list_scheduled e cancel_scheduled, get_logs e list_notifications',
+    'Tools notify_when (een bericht wanneer een state aan een voorwaarde voldoet, ook gedurende enkele minuten), schedule_set_state (een latere schrijfactie, opnieuw gecontroleerd als ze aan de beurt is), list_scheduled en cancel_scheduled, get_logs en list_notifications',
+    "Outils notify_when (un message quand un état remplit une condition, aussi pendant quelques minutes), schedule_set_state (une écriture plus tard, vérifiée à nouveau à l'échéance), list_scheduled et cancel_scheduled, get_logs et list_notifications",
+    'Strumenti notify_when (un messaggio quando uno stato soddisfa una condizione, anche per alcuni minuti), schedule_set_state (una scrittura più tardi, verificata di nuovo alla scadenza), list_scheduled e cancel_scheduled, get_logs e list_notifications',
+    'Herramientas notify_when (un mensaje cuando un estado cumple una condición, también durante unos minutos), schedule_set_state (una escritura más tarde, comprobada de nuevo al vencer), list_scheduled y cancel_scheduled, get_logs y list_notifications',
+    'Narzędzia notify_when (wiadomość, gdy stan spełnia warunek, także przez kilka minut), schedule_set_state (zapis później, sprawdzany ponownie w chwili wykonania), list_scheduled i cancel_scheduled, get_logs i list_notifications',
+    'Інструменти notify_when (повідомлення, коли стан виконує умову, зокрема протягом кількох хвилин), schedule_set_state (запис пізніше, перевіряється знову в момент виконання), list_scheduled і cancel_scheduled, get_logs і list_notifications',
+    '工具 notify_when（状态满足条件时发送消息，也可要求持续几分钟）、schedule_set_state（稍后写入，到时再次检查）、list_scheduled 和 cancel_scheduled、get_logs 和 list_notifications',
+];
 NEWS['0.6.2'] = [
     'Tools list_rooms, list_functions and find_states: the states of a room and/or a function as set up in ioBroker ("the lights in the kitchen"); search_objects and get_state also show min, max and the allowed values of a state',
     'Werkzeuge list_rooms, list_functions und find_states: die Datenpunkte eines Raums und/oder einer Funktion, wie in ioBroker eingerichtet („das Licht in der Küche“); search_objects und get_state zeigen auch Minimum, Maximum und die erlaubten Werte eines Datenpunkts',
@@ -1506,6 +1519,32 @@ const OBJECT_NAMES = {
         'Liczba zapamiętanych faktów',
         'Кількість запамʼятованих фактів',
         '已记住的事实数量',
+    ],
+    scheduled: [
+        'Planned',
+        'Geplant',
+        'Запланировано',
+        'Planeado',
+        'Gepland',
+        'Planifié',
+        'Pianificato',
+        'Planificado',
+        'Zaplanowane',
+        'Заплановано',
+        '已计划',
+    ],
+    'scheduled.watches': [
+        'Watches of notify_when (JSON)',
+        'Beobachtungen von notify_when (JSON)',
+        'Наблюдения notify_when (JSON)',
+        'Observações de notify_when (JSON)',
+        'Bewakingen van notify_when (JSON)',
+        'Surveillances de notify_when (JSON)',
+        'Osservazioni di notify_when (JSON)',
+        'Observaciones de notify_when (JSON)',
+        'Obserwacje notify_when (JSON)',
+        'Спостереження notify_when (JSON)',
+        'notify_when 的监视（JSON）',
     ],
     // the id stays "telegram" (stored since 0.0.1); it holds the chats of every messenger
     telegram: [

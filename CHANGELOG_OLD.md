@@ -1,5 +1,9 @@
 # Older Changelog
 
+### 0.5.1 (2026-10-28)
+
+- Timers of the adapter instead of the ones of Node.js (repository checker E5005)
+
 ### 0.5.0 (2026-10-28)
 
 - The system-wide AI settings of admin (System settings, tab "AI") can be used: new key source; an instance without a key of its own takes them too

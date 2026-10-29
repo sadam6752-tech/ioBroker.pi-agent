@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.6.2",
+		"version": "0.6.3",
 		"news": {
+			"0.6.3": {
+				"en": "Tools notify_when (a message when a state meets a condition, also for some minutes), schedule_set_state (a write later, checked again when due), list_scheduled and cancel_scheduled, get_logs and list_notifications",
+				"de": "Werkzeuge notify_when (eine Nachricht, wenn ein Datenpunkt eine Bedingung erfüllt, auch für einige Minuten), schedule_set_state (ein späterer Schreibvorgang, bei Fälligkeit erneut geprüft), list_scheduled und cancel_scheduled, get_logs und list_notifications",
+				"ru": "Инструменты notify_when (сообщение, когда состояние выполняет условие, в том числе в течение нескольких минут), schedule_set_state (запись позже, при наступлении времени проверяется снова), list_scheduled и cancel_scheduled, get_logs и list_notifications",
+				"pt": "Ferramentas notify_when (uma mensagem quando um estado cumpre uma condição, também durante alguns minutos), schedule_set_state (uma escrita mais tarde, verificada de novo na hora), list_scheduled e cancel_scheduled, get_logs e list_notifications",
+				"nl": "Tools notify_when (een bericht wanneer een state aan een voorwaarde voldoet, ook gedurende enkele minuten), schedule_set_state (een latere schrijfactie, opnieuw gecontroleerd als ze aan de beurt is), list_scheduled en cancel_scheduled, get_logs en list_notifications",
+				"fr": "Outils notify_when (un message quand un état remplit une condition, aussi pendant quelques minutes), schedule_set_state (une écriture plus tard, vérifiée à nouveau à l'échéance), list_scheduled et cancel_scheduled, get_logs et list_notifications",
+				"it": "Strumenti notify_when (un messaggio quando uno stato soddisfa una condizione, anche per alcuni minuti), schedule_set_state (una scrittura più tardi, verificata di nuovo alla scadenza), list_scheduled e cancel_scheduled, get_logs e list_notifications",
+				"es": "Herramientas notify_when (un mensaje cuando un estado cumple una condición, también durante unos minutos), schedule_set_state (una escritura más tarde, comprobada de nuevo al vencer), list_scheduled y cancel_scheduled, get_logs y list_notifications",
+				"pl": "Narzędzia notify_when (wiadomość, gdy stan spełnia warunek, także przez kilka minut), schedule_set_state (zapis później, sprawdzany ponownie w chwili wykonania), list_scheduled i cancel_scheduled, get_logs i list_notifications",
+				"uk": "Інструменти notify_when (повідомлення, коли стан виконує умову, зокрема протягом кількох хвилин), schedule_set_state (запис пізніше, перевіряється знову в момент виконання), list_scheduled і cancel_scheduled, get_logs і list_notifications",
+				"zh-cn": "工具 notify_when（状态满足条件时发送消息，也可要求持续几分钟）、schedule_set_state（稍后写入，到时再次检查）、list_scheduled 和 cancel_scheduled、get_logs 和 list_notifications"
+			},
 			"0.6.2": {
 				"en": "Tools list_rooms, list_functions and find_states: the states of a room and/or a function as set up in ioBroker (\"the lights in the kitchen\"); search_objects and get_state also show min, max and the allowed values of a state",
 				"de": "Werkzeuge list_rooms, list_functions und find_states: die Datenpunkte eines Raums und/oder einer Funktion, wie in ioBroker eingerichtet („das Licht in der Küche“); search_objects und get_state zeigen auch Minimum, Maximum und die erlaubten Werte eines Datenpunkts",
@@ -80,19 +93,6 @@
 				"pl": "Ogólnosystemowe ustawienia AI w adminie jako źródło klucza, Google Gemini i OpenRouter, własne rozmowy dla wywołań sendTo, np. ioBroker.assistant (od GermanBluefox); czat admina: przełącznik „Szczegóły” z narzędziami, wynikami, czasami i tokenami, a administratorzy mogą czytać rozmowy komunikatorów i ioBroker.assistant; „Nowa rozmowa” usuwa poprzednią z magazynu przy następnym uruchomieniu",
 				"uk": "Загальносистемні налаштування ШІ в admin як джерело ключа, Google Gemini і OpenRouter, окремі розмови для викликів sendTo, наприклад ioBroker.assistant (від GermanBluefox); чат admin: перемикач «Подробиці» з інструментами, результатами, часом і токенами, а адміністратори можуть читати розмови месенджерів та ioBroker.assistant; «Нова розмова» видаляє попередню зі сховища під час наступного запуску",
 				"zh-cn": "admin 系统级 AI 设置作为密钥来源，Google Gemini 和 OpenRouter，为 ioBroker.assistant 等 sendTo 调用方提供独立对话（由 GermanBluefox 提供）；管理聊天：“详情”开关显示工具、结果、时间和令牌，管理员可阅读即时通讯和 ioBroker.assistant 的对话；“新对话”会在下次启动时从存储中删除旧对话"
-			},
-			"0.4.0": {
-				"en": "Tab \"Backup\": backups of the conversations by hand and automatic (daily or weekly) in the storage folder, which the ioBroker backup contains; copy to an external server over SFTP; restore from both",
-				"de": "Reiter „Backup“: Backups der Unterhaltungen manuell und automatisch (täglich oder wöchentlich) im Speicherordner, der im ioBroker-Backup enthalten ist; Kopie auf einen externen Server per SFTP; Wiederherstellung aus beiden",
-				"ru": "Вкладка «Backup»: бэкапы бесед вручную и автоматически (ежедневно или еженедельно) в папке хранилища, которая входит в бэкап ioBroker; копия на внешний сервер по SFTP; восстановление из обоих",
-				"pt": "Separador \"Backup\": backups das conversas manuais e automáticos (diários ou semanais) na pasta de armazenamento, incluída no backup do ioBroker; cópia para um servidor externo por SFTP; restauro a partir de ambos",
-				"nl": "Tabblad \"Backup\": back-ups van de gesprekken handmatig en automatisch (dagelijks of wekelijks) in de opslagmap, die in de ioBroker-back-up zit; kopie naar een externe server via SFTP; herstellen uit beide",
-				"fr": "Onglet « Backup » : sauvegardes des conversations manuelles et automatiques (quotidiennes ou hebdomadaires) dans le dossier de stockage, inclus dans la sauvegarde ioBroker ; copie vers un serveur externe par SFTP ; restauration depuis les deux",
-				"it": "Scheda «Backup»: backup delle conversazioni manuali e automatici (giornalieri o settimanali) nella cartella di archiviazione, inclusa nel backup di ioBroker; copia su un server esterno via SFTP; ripristino da entrambi",
-				"es": "Pestaña «Backup»: copias de seguridad de las conversaciones manuales y automáticas (diarias o semanales) en la carpeta de almacenamiento, incluida en la copia de ioBroker; copia a un servidor externo por SFTP; restauración desde ambos",
-				"pl": "Zakładka „Backup”: kopie zapasowe rozmów ręczne i automatyczne (codziennie lub co tydzień) w folderze magazynu, który jest w kopii zapasowej ioBroker; kopia na serwer zewnętrzny przez SFTP; przywracanie z obu",
-				"uk": "Вкладка «Backup»: бекапи розмов вручну та автоматично (щодня або щотижня) у папці сховища, яка входить до бекапу ioBroker; копія на зовнішній сервер через SFTP; відновлення з обох",
-				"zh-cn": "“Backup”选项卡：对话的手动和自动备份（每日或每周），保存在 ioBroker 备份所包含的存储文件夹中；通过 SFTP 复制到外部服务器；可从两者恢复"
 			}
 		},
 		"titleLang": {
