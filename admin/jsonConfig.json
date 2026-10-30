@@ -1,684 +1,690 @@
 {
-	"type": "tabs",
-	"i18n": true,
-	"items": {
-		"_generalTab": {
-			"type": "panel",
-			"label": "General",
-			"items": {
-				"keySource": {
-					"type": "select",
-					"label": "Key source",
-					"options": [
-						{
-							"label": "System-wide AI settings of admin",
-							"value": "system"
-						},
-						{
-							"label": "Store the key in the adapter",
-							"value": "adapter"
-						},
-						{
-							"label": "Central credential store",
-							"value": "central"
-						}
-					],
-					"default": "adapter",
-					"xs": 12,
-					"sm": 6,
-					"md": 4,
-					"lg": 4,
-					"xl": 4
-				},
-				"_systemAiInfo": {
-					"type": "staticText",
-					"text": "Provider, model and API key come from the system settings of admin, tab \"AI\". A change there restarts the instance.",
-					"hidden": "data.keySource !== 'system'",
-					"xs": 12,
-					"sm": 12,
-					"md": 8,
-					"lg": 8,
-					"xl": 8
-				},
-				"_systemAiFallback": {
-					"type": "staticText",
-					"text": "No API key entered: the system-wide AI settings of admin (System settings, tab \"AI\") are used.",
-					"hidden": "data.keySource !== 'adapter' || !!data.apiKey || data.provider === 'custom'",
-					"xs": 12,
-					"sm": 12,
-					"md": 8,
-					"lg": 8,
-					"xl": 8
-				},
-				"provider": {
-					"type": "select",
-					"label": "Provider",
-					"options": [
-						{
-							"label": "Anthropic",
-							"value": "anthropic"
-						},
-						{
-							"label": "OpenAI",
-							"value": "openai"
-						},
-						{
-							"label": "DeepSeek",
-							"value": "deepseek"
-						},
-						{
-							"label": "Google Gemini",
-							"value": "google"
-						},
-						{
-							"label": "OpenRouter",
-							"value": "openrouter"
-						},
-						{
-							"label": "OpenAI-compatible (own URL)",
-							"value": "custom"
-						}
-					],
-					"xs": 12,
-					"sm": 6,
-					"md": 4,
-					"lg": 4,
-					"xl": 4,
-					"hidden": "data.keySource === 'system'",
-					"newLine": true
-				},
-				"baseUrl": {
-					"type": "text",
-					"label": "Base URL",
-					"help": "Endpoint of the OpenAI-compatible server, e.g. http://192.168.1.10:11434/v1 (Ollama) or https://api.groq.com/openai/v1",
-					"hidden": "data.keySource === 'system' || data.provider !== 'custom'",
-					"xs": 12,
-					"sm": 12,
-					"md": 8,
-					"lg": 8,
-					"xl": 8
-				},
-				"apiKey": {
-					"type": "password",
-					"label": "API key",
-					"repeat": false,
-					"xs": 12,
-					"sm": 6,
-					"md": 4,
-					"lg": 4,
-					"xl": 4,
-					"help": "Not needed for a local server without a key (Ollama, LM Studio)",
-					"hidden": "data.keySource === 'system' || data.keySource === 'central'"
-				},
-				"credentialId": {
-					"type": "credential",
-					"credentialType": "ai",
-					"label": "API key credential",
-					"help": "A credential of the central credential store of admin (ioBroker 8)",
-					"hidden": "data.keySource !== 'central'",
-					"xs": 12,
-					"sm": 6,
-					"md": 4,
-					"lg": 4,
-					"xl": 4
-				},
-				"modelId": {
-					"type": "autocompleteSendTo",
-					"command": "listModels",
-					"jsonData": "{\"provider\": ${JSON.stringify(data.provider || '')}, \"modelId\": ${JSON.stringify(data.modelId || '')}, \"baseUrl\": ${JSON.stringify(data.baseUrl || '')}, \"keySource\": ${JSON.stringify(data.keySource || 'adapter')}, \"apiKey\": ${JSON.stringify(data.apiKey || '')}, \"credentialId\": ${JSON.stringify(data.credentialId || '')}}",
-					"alsoDependsOn": [
-						"provider",
-						"baseUrl",
-						"keySource",
-						"apiKey",
-						"credentialId"
-					],
-					"freeSolo": true,
-					"label": "Model",
-					"help": "Choose a model of the provider or type any model ID. Empty: the default model of the provider (required for an OpenAI-compatible server)",
-					"xs": 12,
-					"sm": 6,
-					"md": 4,
-					"lg": 4,
-					"xl": 4,
-					"hidden": "data.keySource === 'system'"
-				},
-				"testConnection": {
-					"type": "sendTo",
-					"command": "testConnection",
-					"label": "Test connection",
-					"jsonData": "{\"provider\": ${JSON.stringify(data.provider || '')}, \"modelId\": ${JSON.stringify(data.modelId || '')}, \"baseUrl\": ${JSON.stringify(data.baseUrl || '')}, \"keySource\": ${JSON.stringify(data.keySource || 'adapter')}, \"apiKey\": ${JSON.stringify(data.apiKey || '')}, \"credentialId\": ${JSON.stringify(data.credentialId || '')}}",
-					"variant": "outlined",
-					"showProcess": true,
-					"xs": 12,
-					"sm": 6,
-					"md": 4,
-					"lg": 4,
-					"xl": 4
-				},
-				"dryRun": {
-					"type": "checkbox",
-					"label": "Simulation mode (nothing is switched)",
-					"help": "The agent says what it would switch, but does not write any state",
-					"newLine": true,
-					"xs": 12,
-					"sm": 12,
-					"md": 12,
-					"lg": 12,
-					"xl": 12
-				},
-				"longTermMemory": {
-					"type": "checkbox",
-					"label": "Long-term memory",
-					"help": "The agent keeps facts you tell it to remember (tools remember and forget) across all conversations, in the state memory.list",
-					"default": true,
-					"xs": 12,
-					"sm": 12,
-					"md": 12,
-					"lg": 12,
-					"xl": 12
-				},
-				"instructions": {
-					"type": "text",
-					"label": "Instructions",
-					"help": "Additional instructions for the agent",
-					"minRows": 3,
-					"xs": 12,
-					"sm": 12,
-					"md": 12,
-					"lg": 12,
-					"xl": 12,
-					"maxRows": 12
-				},
-				"historyInstance": {
-					"type": "instance",
-					"adapter": "_dataSources",
-					"allowDeactivate": true,
-					"label": "History instance",
-					"help": "Empty: the default history of the system settings",
-					"newLine": true,
-					"xs": 12,
-					"sm": 6,
-					"md": 4,
-					"lg": 4,
-					"xl": 4
-				},
-				"timeZone": {
-					"type": "autocompleteSendTo",
-					"command": "listTimeZones",
-					"freeSolo": true,
-					"label": "Time zone",
-					"help": "Choose or type an IANA name such as Europe/Berlin. Empty: the time zone of the ioBroker server",
-					"xs": 12,
-					"sm": 6,
-					"md": 4,
-					"lg": 4,
-					"xl": 4
-				}
-			}
-		},
-		"_writeTab": {
-			"type": "panel",
-			"label": "Write permissions",
-			"items": {
-				"writeRulesHelp": {
-					"type": "staticText",
-					"text": "One row per scope: an instance (hm-rpc.0) or an object ID with everything below it, or a pattern with * (hm-rpc.0.*.STATE). States that match no row can only be read. \"Confirmation required\" counts only where writing is allowed. \"Restart allowed\" counts only for a whole instance (not pi-agent or admin); every restart is confirmed in the chat.",
-					"newLine": true,
-					"xs": 12,
-					"sm": 12,
-					"md": 12,
-					"lg": 12,
-					"xl": 12
-				},
-				"importInstances": {
-					"type": "sendTo",
-					"command": "importInstances",
-					"label": "Add installed instances",
-					"jsonData": "{\"writeRules\": ${JSON.stringify(data.writeRules || [])}}",
-					"useNative": true,
-					"variant": "outlined",
-					"showProcess": true,
-					"newLine": true,
-					"xs": 12,
-					"sm": 6,
-					"md": 4,
-					"lg": 3,
-					"xl": 3
-				},
-				"writeRules": {
-					"type": "table",
-					"newLine": true,
-					"xs": 12,
-					"sm": 12,
-					"md": 12,
-					"lg": 12,
-					"xl": 12,
-					"items": [
-						{
-							"type": "text",
-							"attr": "scope",
-							"title": "Scope",
-							"width": "40%",
-							"default": ""
-						},
-						{
-							"type": "checkbox",
-							"attr": "write",
-							"title": "Write allowed",
-							"width": "20%",
-							"default": false
-						},
-						{
-							"type": "checkbox",
-							"attr": "confirm",
-							"title": "Confirmation required",
-							"width": "20%",
-							"default": false,
-							"disabled": "!data.write"
-						},
-						{
-							"type": "checkbox",
-							"attr": "restart",
-							"title": "Restart allowed",
-							"width": "20%",
-							"default": false,
-							"disabled": "!/^[a-z0-9][a-z0-9_-]*\\.\\d+$/i.test(String(data.scope || '').trim()) || /^(pi-agent|admin)\\./i.test(String(data.scope || '').trim())"
-						}
-					]
-				},
-				"expertHeader": {
-					"type": "header",
-					"text": "Advanced: regular expressions",
-					"size": 4,
-					"newLine": true,
-					"xs": 12,
-					"sm": 12,
-					"md": 12,
-					"lg": 12,
-					"xl": 12
-				},
-				"writeAllow": {
-					"type": "text",
-					"label": "Write allowlist",
-					"help": "In addition to the table: one regular expression per line. A state whose ID matches one may be written.",
-					"minRows": 4,
-					"xs": 12,
-					"sm": 12,
-					"md": 12,
-					"lg": 12,
-					"xl": 12,
-					"maxRows": 12,
-					"newLine": true
-				},
-				"confirmRequired": {
-					"type": "text",
-					"label": "Confirmation required",
-					"help": "In addition to the table: one regular expression per line. A write to a matching state (it must also be allowed) happens only after the user confirms it with a button in the messenger chat.",
-					"minRows": 2,
-					"maxRows": 10,
-					"xs": 12,
-					"sm": 12,
-					"md": 12,
-					"lg": 12,
-					"xl": 12,
-					"newLine": true
-				}
-			}
-		},
-		"_messengersTab": {
-			"type": "panel",
-			"label": "Messengers",
-			"items": {
-				"messengersHelp": {
-					"type": "staticText",
-					"text": "One row per bot of a telegram or max instance. Users: user ID, user name or first name (as in the messenger adapter), separated by commas; messages from anyone else are ignored. Prefix: only messages that start with it go to the agent, e.g. /ai; empty: every message of an allowed user.",
-					"newLine": true,
-					"xs": 12,
-					"sm": 12,
-					"md": 12,
-					"lg": 12,
-					"xl": 12
-				},
-				"messengers": {
-					"type": "table",
-					"newLine": true,
-					"xs": 12,
-					"sm": 12,
-					"md": 12,
-					"lg": 12,
-					"xl": 12,
-					"items": [
-						{
-							"type": "checkbox",
-							"attr": "enabled",
-							"title": "Active",
-							"width": "8%",
-							"default": true
-						},
-						{
-							"type": "autocompleteSendTo",
-							"attr": "instance",
-							"title": "Instance",
-							"width": "27%",
-							"command": "listMessengerInstances",
-							"freeSolo": true,
-							"default": ""
-						},
-						{
-							"type": "text",
-							"attr": "users",
-							"title": "Allowed users",
-							"width": "45%",
-							"default": ""
-						},
-						{
-							"type": "text",
-							"attr": "prefix",
-							"title": "Prefix",
-							"width": "20%",
-							"default": ""
-						}
-					]
-				}
-			}
-		},
-		"_backupTab": {
-			"type": "panel",
-			"label": "Backup",
-			"items": {
-				"_backupHeader": {
-					"type": "header",
-					"text": "Backup & Restore",
-					"size": 3
-				},
-				"_backupInfo": {
-					"type": "staticText",
-					"text": "A backup stores all conversations of the agent (the store session.sqlite, compressed) together with the assignment of the messenger chats as a file in the storage folder pi-agent.0.storage/backups. You find it in the admin under Files, where it can be downloaded and uploaded; ioBroker and BackItUp backups take it along. Restore replaces the conversations by the chosen backup and restarts the instance; the current conversations are saved first as a safety copy.",
-					"xs": 12,
-					"sm": 12,
-					"md": 12,
-					"lg": 12,
-					"xl": 12
-				},
-				"backupButton": {
-					"type": "sendTo",
-					"label": "Create backup",
-					"command": "createBackup",
-					"variant": "contained",
-					"color": "primary",
-					"xs": 12,
-					"sm": 6,
-					"md": 4,
-					"lg": 3,
-					"xl": 3
-				},
-				"_restoreFile": {
-					"type": "selectSendTo",
-					"label": "Backup to restore",
-					"command": "listBackups",
-					"jsonData": "{}",
-					"noTranslation": true,
-					"doNotSave": true,
-					"help": "The backups in the storage folder, newest first. Reopen the settings to refresh the list.",
-					"newLine": true,
-					"xs": 12,
-					"sm": 8,
-					"md": 6,
-					"lg": 5,
-					"xl": 5
-				},
-				"restoreButton": {
-					"type": "sendTo",
-					"label": "Restore the selected backup",
-					"command": "restoreBackup",
-					"jsonData": "{ \"file\": \"${data._restoreFile}\" }",
-					"disabled": "!data._restoreFile",
-					"variant": "outlined",
-					"color": "secondary",
-					"confirm": {
-						"type": "warning",
-						"title": "Restore conversations",
-						"text": "The conversations of the agent are replaced by the chosen backup and the instance restarts. The current conversations are saved first as a safety copy. Continue?",
-						"ok": "Restore",
-						"cancel": "Cancel"
-					},
-					"xs": 12,
-					"sm": 4,
-					"md": 4,
-					"lg": 3,
-					"xl": 3
-				},
-				"_autoHeader": {
-					"type": "header",
-					"text": "Automatic backup",
-					"size": 3
-				},
-				"_autoInfo": {
-					"type": "staticText",
-					"text": "Saves a backup of the conversations at the chosen interval as a new file in the storage folder. The interval counts from the last backup, also after a restart; a backup that is due runs five minutes after the start.",
-					"xs": 12,
-					"sm": 12,
-					"md": 12,
-					"lg": 12,
-					"xl": 12
-				},
-				"autoBackupInterval": {
-					"type": "select",
-					"label": "Automatic backup",
-					"options": [
-						{
-							"value": 0,
-							"label": "Off"
-						},
-						{
-							"value": 24,
-							"label": "Daily"
-						},
-						{
-							"value": 168,
-							"label": "Weekly"
-						}
-					],
-					"default": 24,
-					"newLine": true,
-					"xs": 12,
-					"sm": 6,
-					"md": 4,
-					"lg": 3,
-					"xl": 3
-				},
-				"backupKeep": {
-					"type": "number",
-					"label": "Automatic backups to keep",
-					"help": "In the storage folder, the oldest first; 0 = keep all. Backups made by hand and safety copies are never deleted.",
-					"min": 0,
-					"max": 1000,
-					"default": 7,
-					"xs": 12,
-					"sm": 6,
-					"md": 4,
-					"lg": 3,
-					"xl": 3
-				},
-				"_remoteHeader": {
-					"type": "header",
-					"text": "Copy to an external server (SFTP)",
-					"size": 3
-				},
-				"_remoteHint": {
-					"type": "staticText",
-					"text": "Every backup (by hand and automatic) is also copied to another computer over SFTP, for example a NAS, so it survives the loss of this host. Use a user that may only write into the target directory, not an administrator. The copy needs no mount and no sudo. The file contains the full text of the conversations and the values the agent read, and it is not encrypted on the server: keep it on a volume only you can read.",
-					"xs": 12,
-					"sm": 12,
-					"md": 12,
-					"lg": 12,
-					"xl": 12
-				},
-				"remoteEnabled": {
-					"type": "checkbox",
-					"label": "Copy backups to an external server (SFTP)",
-					"newLine": true,
-					"xs": 12,
-					"sm": 12,
-					"md": 12,
-					"lg": 12,
-					"xl": 12
-				},
-				"remoteHost": {
-					"type": "text",
-					"label": "Server address",
-					"help": "IP address or host name of the server",
-					"disabled": "!data.remoteEnabled",
-					"newLine": true,
-					"xs": 12,
-					"sm": 12,
-					"md": 4,
-					"lg": 4,
-					"xl": 4
-				},
-				"remotePort": {
-					"type": "number",
-					"label": "SSH port",
-					"min": 1,
-					"max": 65535,
-					"default": 22,
-					"disabled": "!data.remoteEnabled",
-					"xs": 12,
-					"sm": 12,
-					"md": 4,
-					"lg": 4,
-					"xl": 4
-				},
-				"remoteUser": {
-					"type": "text",
-					"label": "User name",
-					"disabled": "!data.remoteEnabled",
-					"newLine": true,
-					"xs": 12,
-					"sm": 12,
-					"md": 4,
-					"lg": 4,
-					"xl": 4
-				},
-				"remotePassword": {
-					"type": "password",
-					"label": "Password of the user",
-					"repeat": false,
-					"visible": true,
-					"disabled": "!data.remoteEnabled",
-					"xs": 12,
-					"sm": 12,
-					"md": 4,
-					"lg": 4,
-					"xl": 4
-				},
-				"remoteDirectory": {
-					"type": "text",
-					"label": "Directory on the server",
-					"help": "e.g. /backups/pi-agent, created when it is missing",
-					"disabled": "!data.remoteEnabled",
-					"newLine": true,
-					"xs": 12,
-					"sm": 12,
-					"md": 4,
-					"lg": 4,
-					"xl": 4
-				},
-				"remoteHostKey": {
-					"type": "text",
-					"label": "Server fingerprint (optional)",
-					"help": "SHA256:… as the server shows it. Empty: the server is not verified, the log shows its fingerprint.",
-					"disabled": "!data.remoteEnabled",
-					"xs": 12,
-					"sm": 12,
-					"md": 8,
-					"lg": 8,
-					"xl": 8
-				},
-				"remoteKeep": {
-					"type": "number",
-					"label": "Copies to keep on the server",
-					"help": "Only automatic copies are deleted, the oldest first; 0 = keep all. Backups made by hand and other files are never deleted.",
-					"min": 0,
-					"max": 1000,
-					"default": 0,
-					"disabled": "!data.remoteEnabled",
-					"newLine": true,
-					"xs": 12,
-					"sm": 12,
-					"md": 4,
-					"lg": 4,
-					"xl": 4
-				},
-				"_remoteTest": {
-					"type": "sendTo",
-					"command": "testRemoteBackup",
-					"label": "Test connection",
-					"variant": "outlined",
-					"showProcess": true,
-					"disabled": "!data.remoteEnabled",
-					"newLine": true,
-					"xs": 12,
-					"sm": 12,
-					"md": 4,
-					"lg": 4,
-					"xl": 4,
-					"jsonData": "{\"remoteHost\": ${JSON.stringify(data.remoteHost || '')}, \"remotePort\": ${Number(data.remotePort) || 22}, \"remoteUser\": ${JSON.stringify(data.remoteUser || '')}, \"remotePassword\": ${JSON.stringify(data.remotePassword || '')}, \"remoteDirectory\": ${JSON.stringify(data.remoteDirectory || '')}, \"remoteHostKey\": ${JSON.stringify(data.remoteHostKey || '')}}"
-				},
-				"_remoteRestoreHeader": {
-					"type": "header",
-					"text": "Restore from the external server",
-					"size": 3
-				},
-				"_remoteRestoreInfo": {
-					"type": "staticText",
-					"text": "After a new installation of ioBroker: enter the SFTP settings above, switch the copy on and save. Then choose a backup on the server and restore it. The file is fetched into the storage folder and the conversations are replaced; the current conversations are saved first as a safety copy.",
-					"xs": 12,
-					"sm": 12,
-					"md": 12,
-					"lg": 12,
-					"xl": 12
-				},
-				"_remoteRestoreFile": {
-					"type": "selectSendTo",
-					"label": "Backup on the server",
-					"command": "listRemoteBackups",
-					"jsonData": "{}",
-					"noTranslation": true,
-					"doNotSave": true,
-					"disabled": "!data.remoteEnabled",
-					"help": "Loaded from the server with the saved settings, newest first.",
-					"newLine": true,
-					"xs": 12,
-					"sm": 8,
-					"md": 6,
-					"lg": 5,
-					"xl": 5
-				},
-				"remoteRestoreButton": {
-					"type": "sendTo",
-					"label": "Fetch from the server and restore",
-					"command": "restoreFromRemote",
-					"jsonData": "{ \"file\": \"${data._remoteRestoreFile}\" }",
-					"disabled": "!data.remoteEnabled || !data._remoteRestoreFile",
-					"variant": "outlined",
-					"color": "secondary",
-					"showProcess": true,
-					"confirm": {
-						"type": "warning",
-						"title": "Restore conversations",
-						"text": "The conversations of the agent are replaced by the chosen backup from the server and the instance restarts. The current conversations are saved first as a safety copy. Continue?",
-						"ok": "Restore",
-						"cancel": "Cancel"
-					},
-					"xs": 12,
-					"sm": 4,
-					"md": 4,
-					"lg": 3,
-					"xl": 3
-				}
-			}
-		}
-	}
+    "type": "tabs",
+    "i18n": true,
+    "items": {
+        "_generalTab": {
+            "type": "panel",
+            "label": "General",
+            "items": {
+                "keySource": {
+                    "type": "select",
+                    "label": "Key source",
+                    "options": [
+                        {
+                            "label": "System-wide AI settings of admin",
+                            "value": "system"
+                        },
+                        {
+                            "label": "Store the key in the adapter",
+                            "value": "adapter"
+                        },
+                        {
+                            "label": "Central credential store",
+                            "value": "central"
+                        }
+                    ],
+                    "default": "adapter",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "_systemAiInfo": {
+                    "type": "staticText",
+                    "text": "Provider, model and API key come from the system settings of admin, tab \"AI\". A change there restarts the instance.",
+                    "hidden": "data.keySource !== 'system'",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 8,
+                    "xl": 8
+                },
+                "_systemAiFallback": {
+                    "type": "staticText",
+                    "text": "No API key entered: the system-wide AI settings of admin (System settings, tab \"AI\") are used.",
+                    "hidden": "data.keySource !== 'adapter' || !!data.apiKey || data.provider === 'custom'",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 8,
+                    "xl": 8
+                },
+                "provider": {
+                    "type": "select",
+                    "label": "Provider",
+                    "options": [
+                        {
+                            "label": "Anthropic",
+                            "value": "anthropic"
+                        },
+                        {
+                            "label": "OpenAI",
+                            "value": "openai"
+                        },
+                        {
+                            "label": "DeepSeek",
+                            "value": "deepseek"
+                        },
+                        {
+                            "label": "Google Gemini",
+                            "value": "google"
+                        },
+                        {
+                            "label": "OpenRouter",
+                            "value": "openrouter"
+                        },
+                        {
+                            "label": "OpenAI-compatible (own URL)",
+                            "value": "custom"
+                        }
+                    ],
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4,
+                    "hidden": "data.keySource === 'system'",
+                    "newLine": true
+                },
+                "baseUrl": {
+                    "type": "text",
+                    "label": "Base URL",
+                    "help": "Endpoint of the OpenAI-compatible server, e.g. http://192.168.1.10:11434/v1 (Ollama) or https://api.groq.com/openai/v1",
+                    "hidden": "data.keySource === 'system' || data.provider !== 'custom'",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 8,
+                    "xl": 8
+                },
+                "apiKey": {
+                    "type": "password",
+                    "label": "API key",
+                    "repeat": false,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4,
+                    "help": "Not needed for a local server without a key (Ollama, LM Studio)",
+                    "hidden": "data.keySource === 'system' || data.keySource === 'central'"
+                },
+                "credentialId": {
+                    "type": "credential",
+                    "credentialType": "ai",
+                    "label": "API key credential",
+                    "help": "A credential of the central credential store of admin (ioBroker 8)",
+                    "hidden": "data.keySource !== 'central'",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "modelId": {
+                    "type": "autocompleteSendTo",
+                    "command": "listModels",
+                    "jsonData": "{\"provider\": ${JSON.stringify(data.provider || '')}, \"modelId\": ${JSON.stringify(data.modelId || '')}, \"baseUrl\": ${JSON.stringify(data.baseUrl || '')}, \"keySource\": ${JSON.stringify(data.keySource || 'adapter')}, \"apiKey\": ${JSON.stringify(data.apiKey || '')}, \"credentialId\": ${JSON.stringify(data.credentialId || '')}}",
+                    "alsoDependsOn": ["provider", "baseUrl", "keySource", "apiKey", "credentialId"],
+                    "freeSolo": true,
+                    "label": "Model",
+                    "help": "Choose a model of the provider or type any model ID. Empty: the default model of the provider (required for an OpenAI-compatible server)",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4,
+                    "hidden": "data.keySource === 'system'"
+                },
+                "testConnection": {
+                    "type": "sendTo",
+                    "command": "testConnection",
+                    "label": "Test connection",
+                    "jsonData": "{\"provider\": ${JSON.stringify(data.provider || '')}, \"modelId\": ${JSON.stringify(data.modelId || '')}, \"baseUrl\": ${JSON.stringify(data.baseUrl || '')}, \"keySource\": ${JSON.stringify(data.keySource || 'adapter')}, \"apiKey\": ${JSON.stringify(data.apiKey || '')}, \"credentialId\": ${JSON.stringify(data.credentialId || '')}}",
+                    "variant": "outlined",
+                    "showProcess": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "dryRun": {
+                    "type": "checkbox",
+                    "label": "Simulation mode (nothing is switched)",
+                    "help": "The agent says what it would switch, but does not write any state",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "longTermMemory": {
+                    "type": "checkbox",
+                    "label": "Long-term memory",
+                    "help": "The agent keeps facts you tell it to remember (tools remember and forget) across all conversations, in the state memory.list",
+                    "default": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "instructions": {
+                    "type": "text",
+                    "label": "Instructions",
+                    "help": "Additional instructions for the agent",
+                    "minRows": 3,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12,
+                    "maxRows": 12
+                },
+                "historyInstance": {
+                    "type": "instance",
+                    "adapter": "_dataSources",
+                    "allowDeactivate": true,
+                    "label": "History instance",
+                    "help": "Empty: the default history of the system settings",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "timeZone": {
+                    "type": "autocompleteSendTo",
+                    "command": "listTimeZones",
+                    "freeSolo": true,
+                    "label": "Time zone",
+                    "help": "Choose or type an IANA name such as Europe/Berlin. Empty: the time zone of the ioBroker server",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
+                }
+            }
+        },
+        "_writeTab": {
+            "type": "panel",
+            "label": "Write permissions",
+            "items": {
+                "writeRulesHelp": {
+                    "type": "staticText",
+                    "text": "One row per scope: an instance (hm-rpc.0) or an object ID with everything below it, or a pattern with * (hm-rpc.0.*.STATE). States that match no row can only be read. \"Confirmation required\" counts only where writing is allowed. \"Restart allowed\" counts only for a whole instance (not pi-agent or admin); every restart is confirmed in the chat.",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "importInstances": {
+                    "type": "sendTo",
+                    "command": "importInstances",
+                    "label": "Add installed instances",
+                    "jsonData": "{\"writeRules\": ${JSON.stringify(data.writeRules || [])}}",
+                    "useNative": true,
+                    "variant": "outlined",
+                    "showProcess": true,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "writeRules": {
+                    "type": "table",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12,
+                    "items": [
+                        {
+                            "type": "text",
+                            "attr": "scope",
+                            "title": "Scope",
+                            "width": "40%",
+                            "default": ""
+                        },
+                        {
+                            "type": "checkbox",
+                            "attr": "write",
+                            "title": "Write allowed",
+                            "width": "20%",
+                            "default": false
+                        },
+                        {
+                            "type": "checkbox",
+                            "attr": "confirm",
+                            "title": "Confirmation required",
+                            "width": "20%",
+                            "default": false,
+                            "disabled": "!data.write"
+                        },
+                        {
+                            "type": "checkbox",
+                            "attr": "restart",
+                            "title": "Restart allowed",
+                            "width": "20%",
+                            "default": false,
+                            "disabled": "!/^[a-z0-9][a-z0-9_-]*\\.\\d+$/i.test(String(data.scope || '').trim()) || /^(pi-agent|admin)\\./i.test(String(data.scope || '').trim())"
+                        }
+                    ]
+                },
+                "allowUpdates": {
+                    "type": "checkbox",
+                    "label": "Allow adapter updates",
+                    "help": "The agent may update adapters with an instance that has \"Write allowed\" (and itself), never admin or js-controller; every update is confirmed in the chat",
+                    "default": false,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "expertHeader": {
+                    "type": "header",
+                    "text": "Advanced: regular expressions",
+                    "size": 4,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "writeAllow": {
+                    "type": "text",
+                    "label": "Write allowlist",
+                    "help": "In addition to the table: one regular expression per line. A state whose ID matches one may be written.",
+                    "minRows": 4,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12,
+                    "maxRows": 12,
+                    "newLine": true
+                },
+                "confirmRequired": {
+                    "type": "text",
+                    "label": "Confirmation required",
+                    "help": "In addition to the table: one regular expression per line. A write to a matching state (it must also be allowed) happens only after the user confirms it with a button in the messenger chat.",
+                    "minRows": 2,
+                    "maxRows": 10,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12,
+                    "newLine": true
+                }
+            }
+        },
+        "_messengersTab": {
+            "type": "panel",
+            "label": "Messengers",
+            "items": {
+                "messengersHelp": {
+                    "type": "staticText",
+                    "text": "One row per bot of a telegram or max instance. Users: user ID, user name or first name (as in the messenger adapter), separated by commas; messages from anyone else are ignored. Prefix: only messages that start with it go to the agent, e.g. /ai; empty: every message of an allowed user.",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "messengers": {
+                    "type": "table",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12,
+                    "items": [
+                        {
+                            "type": "checkbox",
+                            "attr": "enabled",
+                            "title": "Active",
+                            "width": "8%",
+                            "default": true
+                        },
+                        {
+                            "type": "autocompleteSendTo",
+                            "attr": "instance",
+                            "title": "Instance",
+                            "width": "27%",
+                            "command": "listMessengerInstances",
+                            "freeSolo": true,
+                            "default": ""
+                        },
+                        {
+                            "type": "text",
+                            "attr": "users",
+                            "title": "Allowed users",
+                            "width": "45%",
+                            "default": ""
+                        },
+                        {
+                            "type": "text",
+                            "attr": "prefix",
+                            "title": "Prefix",
+                            "width": "20%",
+                            "default": ""
+                        }
+                    ]
+                }
+            }
+        },
+        "_backupTab": {
+            "type": "panel",
+            "label": "Backup",
+            "items": {
+                "_backupHeader": {
+                    "type": "header",
+                    "text": "Backup & Restore",
+                    "size": 3
+                },
+                "_backupInfo": {
+                    "type": "staticText",
+                    "text": "A backup stores all conversations of the agent (the store session.sqlite, compressed) together with the assignment of the messenger chats as a file in the storage folder pi-agent.0.storage/backups. You find it in the admin under Files, where it can be downloaded and uploaded; ioBroker and BackItUp backups take it along. Restore replaces the conversations by the chosen backup and restarts the instance; the current conversations are saved first as a safety copy.",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "backupButton": {
+                    "type": "sendTo",
+                    "label": "Create backup",
+                    "command": "createBackup",
+                    "variant": "contained",
+                    "color": "primary",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "_restoreFile": {
+                    "type": "selectSendTo",
+                    "label": "Backup to restore",
+                    "command": "listBackups",
+                    "jsonData": "{}",
+                    "noTranslation": true,
+                    "doNotSave": true,
+                    "help": "The backups in the storage folder, newest first. Reopen the settings to refresh the list.",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 8,
+                    "md": 6,
+                    "lg": 5,
+                    "xl": 5
+                },
+                "restoreButton": {
+                    "type": "sendTo",
+                    "label": "Restore the selected backup",
+                    "command": "restoreBackup",
+                    "jsonData": "{ \"file\": \"${data._restoreFile}\" }",
+                    "disabled": "!data._restoreFile",
+                    "variant": "outlined",
+                    "color": "secondary",
+                    "confirm": {
+                        "type": "warning",
+                        "title": "Restore conversations",
+                        "text": "The conversations of the agent are replaced by the chosen backup and the instance restarts. The current conversations are saved first as a safety copy. Continue?",
+                        "ok": "Restore",
+                        "cancel": "Cancel"
+                    },
+                    "xs": 12,
+                    "sm": 4,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "_autoHeader": {
+                    "type": "header",
+                    "text": "Automatic backup",
+                    "size": 3
+                },
+                "_autoInfo": {
+                    "type": "staticText",
+                    "text": "Saves a backup of the conversations at the chosen interval as a new file in the storage folder. The interval counts from the last backup, also after a restart; a backup that is due runs five minutes after the start.",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "autoBackupInterval": {
+                    "type": "select",
+                    "label": "Automatic backup",
+                    "options": [
+                        {
+                            "value": 0,
+                            "label": "Off"
+                        },
+                        {
+                            "value": 24,
+                            "label": "Daily"
+                        },
+                        {
+                            "value": 168,
+                            "label": "Weekly"
+                        }
+                    ],
+                    "default": 24,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "backupKeep": {
+                    "type": "number",
+                    "label": "Automatic backups to keep",
+                    "help": "In the storage folder, the oldest first; 0 = keep all. Backups made by hand and safety copies are never deleted.",
+                    "min": 0,
+                    "max": 1000,
+                    "default": 7,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "_remoteHeader": {
+                    "type": "header",
+                    "text": "Copy to an external server (SFTP)",
+                    "size": 3
+                },
+                "_remoteHint": {
+                    "type": "staticText",
+                    "text": "Every backup (by hand and automatic) is also copied to another computer over SFTP, for example a NAS, so it survives the loss of this host. Use a user that may only write into the target directory, not an administrator. The copy needs no mount and no sudo. The file contains the full text of the conversations and the values the agent read, and it is not encrypted on the server: keep it on a volume only you can read.",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "remoteEnabled": {
+                    "type": "checkbox",
+                    "label": "Copy backups to an external server (SFTP)",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "remoteHost": {
+                    "type": "text",
+                    "label": "Server address",
+                    "help": "IP address or host name of the server",
+                    "disabled": "!data.remoteEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "remotePort": {
+                    "type": "number",
+                    "label": "SSH port",
+                    "min": 1,
+                    "max": 65535,
+                    "default": 22,
+                    "disabled": "!data.remoteEnabled",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "remoteUser": {
+                    "type": "text",
+                    "label": "User name",
+                    "disabled": "!data.remoteEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "remotePassword": {
+                    "type": "password",
+                    "label": "Password of the user",
+                    "repeat": false,
+                    "visible": true,
+                    "disabled": "!data.remoteEnabled",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "remoteDirectory": {
+                    "type": "text",
+                    "label": "Directory on the server",
+                    "help": "e.g. /backups/pi-agent, created when it is missing",
+                    "disabled": "!data.remoteEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "remoteHostKey": {
+                    "type": "text",
+                    "label": "Server fingerprint (optional)",
+                    "help": "SHA256:… as the server shows it. Empty: the server is not verified, the log shows its fingerprint.",
+                    "disabled": "!data.remoteEnabled",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 8,
+                    "xl": 8
+                },
+                "remoteKeep": {
+                    "type": "number",
+                    "label": "Copies to keep on the server",
+                    "help": "Only automatic copies are deleted, the oldest first; 0 = keep all. Backups made by hand and other files are never deleted.",
+                    "min": 0,
+                    "max": 1000,
+                    "default": 0,
+                    "disabled": "!data.remoteEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "_remoteTest": {
+                    "type": "sendTo",
+                    "command": "testRemoteBackup",
+                    "label": "Test connection",
+                    "variant": "outlined",
+                    "showProcess": true,
+                    "disabled": "!data.remoteEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4,
+                    "jsonData": "{\"remoteHost\": ${JSON.stringify(data.remoteHost || '')}, \"remotePort\": ${Number(data.remotePort) || 22}, \"remoteUser\": ${JSON.stringify(data.remoteUser || '')}, \"remotePassword\": ${JSON.stringify(data.remotePassword || '')}, \"remoteDirectory\": ${JSON.stringify(data.remoteDirectory || '')}, \"remoteHostKey\": ${JSON.stringify(data.remoteHostKey || '')}}"
+                },
+                "_remoteRestoreHeader": {
+                    "type": "header",
+                    "text": "Restore from the external server",
+                    "size": 3
+                },
+                "_remoteRestoreInfo": {
+                    "type": "staticText",
+                    "text": "After a new installation of ioBroker: enter the SFTP settings above, switch the copy on and save. Then choose a backup on the server and restore it. The file is fetched into the storage folder and the conversations are replaced; the current conversations are saved first as a safety copy.",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "_remoteRestoreFile": {
+                    "type": "selectSendTo",
+                    "label": "Backup on the server",
+                    "command": "listRemoteBackups",
+                    "jsonData": "{}",
+                    "noTranslation": true,
+                    "doNotSave": true,
+                    "disabled": "!data.remoteEnabled",
+                    "help": "Loaded from the server with the saved settings, newest first.",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 8,
+                    "md": 6,
+                    "lg": 5,
+                    "xl": 5
+                },
+                "remoteRestoreButton": {
+                    "type": "sendTo",
+                    "label": "Fetch from the server and restore",
+                    "command": "restoreFromRemote",
+                    "jsonData": "{ \"file\": \"${data._remoteRestoreFile}\" }",
+                    "disabled": "!data.remoteEnabled || !data._remoteRestoreFile",
+                    "variant": "outlined",
+                    "color": "secondary",
+                    "showProcess": true,
+                    "confirm": {
+                        "type": "warning",
+                        "title": "Restore conversations",
+                        "text": "The conversations of the agent are replaced by the chosen backup from the server and the instance restarts. The current conversations are saved first as a safety copy. Continue?",
+                        "ok": "Restore",
+                        "cancel": "Cancel"
+                    },
+                    "xs": 12,
+                    "sm": 4,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                }
+            }
+        }
+    }
 }

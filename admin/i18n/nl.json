@@ -81,5 +81,7 @@
 	"Restart allowed": "Herstart toegestaan",
 	"Long-term memory": "Langetermijngeheugen",
 	"The agent keeps facts you tell it to remember (tools remember and forget) across all conversations, in the state memory.list": "De agent bewaart feiten die hij moet onthouden (tools remember en forget) over alle gesprekken heen, in de state memory.list",
+	"Allow adapter updates": "Adapter-updates toestaan",
+	"The agent may update adapters with an instance that has \"Write allowed\" (and itself), never admin or js-controller; every update is confirmed in the chat": "De agent mag adapters bijwerken met een instantie die \"Schrijven toegestaan\" heeft (en zichzelf), nooit admin of js-controller; elke update wordt in de chat bevestigd",
 	"Allowed users": "Toegestane gebruikers"
 }

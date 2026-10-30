@@ -1,5 +1,12 @@
 # Older Changelog
 
+### 0.6.0 (2026-10-28)
+
+- Tool `restart_instance`: restarts adapter instances with "Restart allowed" in the write permissions, after a
+  confirmation in the chat; never pi-agent or admin
+- Long-term memory: facts kept across all conversations (tools `remember` and `forget`, state `memory.list`, part
+  of the backups); switch "Long-term memory" in the settings
+
 ### 0.5.2 (2026-10-28)
 
 - Settings: the base URL and the notes on the system-wide AI settings are not wider on a large display than on a small one (repository checker E5509)

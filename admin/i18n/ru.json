@@ -81,5 +81,7 @@
 	"Restart allowed": "Перезапуск разрешён",
 	"Long-term memory": "Долгосрочная память",
 	"The agent keeps facts you tell it to remember (tools remember and forget) across all conversations, in the state memory.list": "Агент хранит факты, которые вы просите запомнить (инструменты remember и forget), для всех бесед, в состоянии memory.list",
+	"Allow adapter updates": "Разрешить обновление адаптеров",
+	"The agent may update adapters with an instance that has \"Write allowed\" (and itself), never admin or js-controller; every update is confirmed in the chat": "Агент может обновлять адаптеры, у которых есть инстанс с «Запись разрешена» (и себя), но никогда admin и js-controller; каждое обновление подтверждается в чате",
 	"Allowed users": "Разрешённые пользователи"
 }

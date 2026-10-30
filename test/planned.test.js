@@ -20,8 +20,14 @@ const POWER = 'shelly.0.washer.power';
 const HEATER = 'hm-rpc.0.heater.STATE';
 const SEED = () => ({
     objects: {
-        [POWER]: { type: 'state', common: { name: 'Washer power', type: 'number', role: 'value.power', unit: 'W', read: true, write: false } },
-        [HEATER]: { type: 'state', common: { name: 'Heater', type: 'boolean', role: 'switch', read: true, write: true } },
+        [POWER]: {
+            type: 'state',
+            common: { name: 'Washer power', type: 'number', role: 'value.power', unit: 'W', read: true, write: false },
+        },
+        [HEATER]: {
+            type: 'state',
+            common: { name: 'Heater', type: 'boolean', role: 'switch', read: true, write: true },
+        },
     },
     states: { [POWER]: { val: 400, ack: true, ts: 1 }, [HEATER]: { val: true, ack: true, ts: 1 } },
 });
@@ -35,7 +41,13 @@ function page(agent) {
                 agent.sendTo = sendTo;
                 resolve(answer);
             };
-            agent.onMessage({ command, message, user: 'system.user.admin', from: 'system.adapter.admin.0', callback: { id: 1 } });
+            agent.onMessage({
+                command,
+                message,
+                user: 'system.user.admin',
+                from: 'system.adapter.admin.0',
+                callback: { id: 1 },
+            });
         });
 }
 
@@ -58,7 +70,10 @@ async function ask(agent, text) {
 const notices = agent => agent.adminChat.notices('system.user.admin').map(n => n.html);
 
 /** A tool call turn and a closing answer, as faux responses. */
-const turn = (f, name, args) => [f.fauxAssistantMessage(f.fauxToolCall(name, args), { stopReason: 'toolUse' }), f.fauxAssistantMessage('ok')];
+const turn = (f, name, args) => [
+    f.fauxAssistantMessage(f.fauxToolCall(name, args), { stopReason: 'toolUse' }),
+    f.fauxAssistantMessage('ok'),
+];
 
 test('meets: numbers, text and true/false', () => {
     assert.equal(meets(3, '<', 5), true);
@@ -138,7 +153,10 @@ test('schedule_set_state: written when due, the user is told; no write before', 
         seed: SEED(),
         responses: turn(f, 'schedule_set_state', { id: HEATER, val: false, minutes: 0.09 }),
     });
-    assert.match(await ask(agent, 'switch the heater off in 5 seconds'), /^Planned: hm-rpc\.0\.heater\.STATE = false at /);
+    assert.match(
+        await ask(agent, 'switch the heater off in 5 seconds'),
+        /^Planned: hm-rpc\.0\.heater\.STATE = false at /,
+    );
     assert.deepEqual(db.writes, []);
     await waitFor(async () => db.writes.length === 1, 'the write', 15000);
     assert.deepEqual(db.writes, [[HEATER, false]]);
@@ -255,7 +273,10 @@ test('get_logs: the newest lines of the log file, by instance, level and word', 
     process.env.PI_AGENT_TEST_DATA_DIR = dataDir;
     try {
         const f = await faux();
-        const { agent } = await startAgent({ dataDir: tmp(), responses: turn(f, 'get_logs', { instance: 'zigbee.0', level: 'error' }) });
+        const { agent } = await startAgent({
+            dataDir: tmp(),
+            responses: turn(f, 'get_logs', { instance: 'zigbee.0', level: 'error' }),
+        });
         const result = JSON.parse(await ask(agent, 'why does zigbee not work?'));
         assert.equal(result.lines.length, 1);
         assert.match(result.lines[0].message, /ttyACM0/);
@@ -265,24 +286,28 @@ test('get_logs: the newest lines of the log file, by instance, level and word', 
     }
 });
 
-test('list_notifications: the messages of the notification states of the host', async () => {
+test('list_notifications: the notifications the host reports (getNotifications)', async () => {
     const value = {
         categories: {
-            accessErrors: { instances: { 'system.adapter.zigbee.0': { messages: [{ message: 'No access to the port', ts: 5 }] } } },
+            accessErrors: {
+                instances: { 'system.adapter.zigbee.0': { messages: [{ message: 'No access to the port', ts: 5 }] } },
+            },
         },
     };
     assert.deepEqual(flattenNotifications('system', value), [
         { scope: 'system', category: 'accessErrors', instance: 'zigbee.0', message: 'No access to the port', ts: 5 },
     ]);
     const f = await faux();
-    const id = 'system.host.iobroker.notifications.system';
     const { agent } = await startAgent({
         dataDir: tmp(),
-        seed: {
-            objects: { [id]: { type: 'state', common: { name: 'notifications', type: 'string', read: true, write: false } } },
-            states: { [id]: { val: JSON.stringify(value), ack: true, ts: 1 } },
-        },
         responses: turn(f, 'list_notifications', {}),
+        hooks: {
+            sendToHost: (host, command, message, callback) => {
+                if (host === 'system.host.iobroker' && command === 'getNotifications') {
+                    callback({ result: { system: value } });
+                }
+            },
+        },
     });
     const result = JSON.parse(await ask(agent, 'any problems?'));
     assert.equal(result.total, 1);

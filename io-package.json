@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.6.4",
+		"version": "0.7.0",
 		"news": {
+			"0.7.0": {
+				"en": "Adapter updates: tools list_updates, check_npm and update_adapter (repository or npm), only with \"Allow adapter updates\", for adapters with \"Write allowed\" and pi-agent itself, always confirmed in the chat; list_notifications reads the notifications from the host",
+				"de": "Adapter-Updates: Werkzeuge list_updates, check_npm und update_adapter (Repository oder npm), nur mit „Adapter-Updates erlauben“, für Adapter mit „Schreiben erlaubt“ und pi-agent selbst, immer im Chat bestätigt; list_notifications liest die Benachrichtigungen vom Host",
+				"ru": "Обновление адаптеров: инструменты list_updates, check_npm и update_adapter (репозиторий или npm), только при «Разрешить обновление адаптеров», для адаптеров с «Запись разрешена» и самого pi-agent, всегда с подтверждением в чате; list_notifications читает уведомления с хоста",
+				"pt": "Atualizações de adaptadores: ferramentas list_updates, check_npm e update_adapter (repositório ou npm), só com \"Permitir atualizações de adaptadores\", para adaptadores com \"Escrita permitida\" e o próprio pi-agent, sempre confirmadas no chat; list_notifications lê as notificações do host",
+				"nl": "Adapter-updates: tools list_updates, check_npm en update_adapter (repository of npm), alleen met \"Adapter-updates toestaan\", voor adapters met \"Schrijven toegestaan\" en pi-agent zelf, altijd bevestigd in de chat; list_notifications leest de meldingen van de host",
+				"fr": "Mises à jour des adaptateurs : outils list_updates, check_npm et update_adapter (dépôt ou npm), uniquement avec « Autoriser les mises à jour des adaptateurs », pour les adaptateurs avec « Écriture autorisée » et pi-agent lui-même, toujours confirmées dans le chat ; list_notifications lit les notifications de l'hôte",
+				"it": "Aggiornamenti degli adattatori: strumenti list_updates, check_npm e update_adapter (repository o npm), solo con «Consenti aggiornamenti degli adattatori», per adattatori con «Scrittura consentita» e pi-agent stesso, sempre confermati nella chat; list_notifications legge le notifiche dall'host",
+				"es": "Actualizaciones de adaptadores: herramientas list_updates, check_npm y update_adapter (repositorio o npm), solo con «Permitir actualizaciones de adaptadores», para adaptadores con «Escritura permitida» y el propio pi-agent, siempre confirmadas en el chat; list_notifications lee las notificaciones del host",
+				"pl": "Aktualizacje adapterów: narzędzia list_updates, check_npm i update_adapter (repozytorium lub npm), tylko z „Zezwalaj na aktualizacje adapterów”, dla adapterów z „Zapis dozwolony” i samego pi-agent, zawsze potwierdzane w czacie; list_notifications odczytuje powiadomienia z hosta",
+				"uk": "Оновлення адаптерів: інструменти list_updates, check_npm і update_adapter (репозиторій або npm), лише з «Дозволити оновлення адаптерів», для адаптерів із «Запис дозволено» і самого pi-agent, завжди з підтвердженням у чаті; list_notifications читає сповіщення з хоста",
+				"zh-cn": "适配器更新：工具 list_updates、check_npm 和 update_adapter（仓库或 npm），仅在启用“允许更新适配器”时，适用于具有“允许写入”的适配器和 pi-agent 本身，始终需在聊天中确认；list_notifications 从主机读取通知"
+			},
 			"0.6.4": {
 				"en": "Scheduler fullcalendar: repeating, longer and timed actions go to fullcalendar through send_to, but only for states pi-agent may write (also asked where \"Confirmation required\" is set); when fullcalendar is not installed or not allowed, the agent tells the user",
 				"de": "Planer fullcalendar: wiederkehrende, längere und zeitlich begrenzte Aktionen gehen per send_to an fullcalendar, aber nur für Datenpunkte, die pi-agent schreiben darf (bei „Bestätigung erforderlich“ mit Rückfrage); ist fullcalendar nicht installiert oder nicht erlaubt, sagt der Agent das dem Benutzer",
@@ -80,19 +93,6 @@
 				"pl": "Ustawienia: bazowy URL i uwagi o ogólnosystemowych ustawieniach AI nie są szersze na dużym ekranie niż na małym (sprawdzanie repozytorium E5509)",
 				"uk": "Налаштування: базовий URL і підказки до загальносистемних налаштувань ШІ на великих екранах не ширші, ніж на малих (перевірка репозиторію E5509)",
 				"zh-cn": "设置：基础 URL 和系统级 AI 设置的说明在大屏幕上不比小屏幕更宽（仓库检查 E5509）"
-			},
-			"0.5.1": {
-				"en": "Timers of the adapter instead of the ones of Node.js (repository checker E5005)",
-				"de": "Timer des Adapters statt der von Node.js (Repository-Checker E5005)",
-				"ru": "Таймеры адаптера вместо таймеров Node.js (проверка репозитория E5005)",
-				"pt": "Temporizadores do adaptador em vez dos do Node.js (verificador do repositório E5005)",
-				"nl": "Timers van de adapter in plaats van die van Node.js (repository-checker E5005)",
-				"fr": "Minuteries de l'adaptateur au lieu de celles de Node.js (vérificateur du dépôt E5005)",
-				"it": "Timer dell'adattatore invece di quelli di Node.js (controllo del repository E5005)",
-				"es": "Temporizadores del adaptador en lugar de los de Node.js (comprobador del repositorio E5005)",
-				"pl": "Timery adaptera zamiast timerów Node.js (sprawdzanie repozytorium E5005)",
-				"uk": "Таймери адаптера замість таймерів Node.js (перевірка репозиторію E5005)",
-				"zh-cn": "使用适配器的计时器代替 Node.js 的计时器（仓库检查 E5005）"
 			}
 		},
 		"titleLang": {
@@ -193,6 +193,7 @@
 		"apiKey": "",
 		"credentialId": "",
 		"writeRules": [],
+		"allowUpdates": false,
 		"writeAllow": "",
 		"instructions": "",
 		"dryRun": true,

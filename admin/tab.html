@@ -297,6 +297,7 @@
                 no: ['No', 'Nein', 'Нет', 'Não', 'Nee', 'Non', 'No', 'No', 'Nie', 'Ні', '否'],
                 question: ['Set %id to %val?', '%id auf %val setzen?', 'Установить %id в %val?', 'Definir %id como %val?', '%id op %val zetten?', 'Mettre %id à %val ?', 'Impostare %id a %val?', '¿Poner %id a %val?', 'Ustawić %id na %val?', 'Встановити %id у %val?', '将 %id 设置为 %val？'],
                 questionRestart: ['Restart instance %id?', 'Instanz %id neu starten?', 'Перезапустить инстанс %id?', 'Reiniciar a instância %id?', 'Instantie %id herstarten?', "Redémarrer l'instance %id ?", "Riavviare l'istanza %id?", '¿Reiniciar la instancia %id?', 'Zrestartować instancję %id?', 'Перезапустити інстанс %id?', '重启实例 %id？'],
+                questionUpdate: ['Update the adapter %id: %val?', 'Adapter %id aktualisieren: %val?', 'Обновить адаптер %id: %val?', 'Atualizar o adaptador %id: %val?', 'Adapter %id bijwerken: %val?', "Mettre à jour l'adaptateur %id : %val ?", "Aggiornare l'adattatore %id: %val?", '¿Actualizar el adaptador %id: %val?', 'Zaktualizować adapter %id: %val?', 'Оновити адаптер %id: %val?', '更新适配器 %id：%val？'],
                 questionSendTo: ['Send the command %val to %id?', 'Den Befehl %val an %id senden?', 'Отправить команду %val в %id?', 'Enviar o comando %val para %id?', 'De opdracht %val naar %id sturen?', 'Envoyer la commande %val à %id ?', 'Inviare il comando %val a %id?', '¿Enviar el comando %val a %id?', 'Wysłać polecenie %val do %id?', 'Надіслати команду %val до %id?', '向 %id 发送命令 %val？'],
                 simulation: ['Simulation mode', 'Simulationsmodus', 'Режим симуляции', 'Modo de simulação', 'Simulatiemodus', 'Mode simulation', 'Modalità simulazione', 'Modo de simulación', 'Tryb symulacji', 'Режим симуляції', '模拟模式'],
                 notRunning: [
@@ -520,9 +521,9 @@
                 }
                 if (state.question) {
                     const q = state.question;
-                    const text = t(q.action === 'restart' ? 'questionRestart' : q.action === 'sendTo' ? 'questionSendTo' : 'question')
+                    const text = t(q.action === 'restart' ? 'questionRestart' : q.action === 'sendTo' ? 'questionSendTo' : q.action === 'update' ? 'questionUpdate' : 'question')
                         .replace('%id', `<code>${escapeHtml(q.id)}</code>`)
-                        .replace('%val', `<code>${escapeHtml(q.action === 'sendTo' ? String(q.val) : JSON.stringify(q.val))}</code>`);
+                        .replace('%val', `<code>${escapeHtml(q.action === 'sendTo' || q.action === 'update' ? String(q.val) : JSON.stringify(q.val))}</code>`);
                     const box = item('msg question', `⚠️ ${text}<div class="buttons"></div>`);
                     for (const answer of ['yes', 'no']) {
                         const button = document.createElement('button');

@@ -3,7 +3,7 @@
 const utils = require('@iobroker/adapter-core');
 const crypto = require('node:crypto');
 const path = require('node:path');
-const { parseAllowlist, parseWriteRules, requestIdFor } = require('./lib/guard');
+const { parseAllowlist, parseWriteRules, requestIdFor, isWriteAllowed } = require('./lib/guard');
 const { createIoBrokerExtension } = require('./lib/tools');
 const { createModelsWithKey, listModels, testModel } = require('./lib/providers');
 const {
@@ -34,6 +34,17 @@ const { queuedPurges, queuePurge, purgeQueued } = require('./lib/purge');
 const { createMemory } = require('./lib/memory');
 const { createWatches } = require('./lib/watches');
 const { findLogFile } = require('./lib/diagnostics');
+const {
+    OUTPUT_LINES,
+    VERSION,
+    compareVersions,
+    adapterNameOf,
+    repositoryJson,
+    installedAdapters,
+    updateRefusal,
+    npmLatest,
+    createHostCommands,
+} = require('./lib/updates');
 const {
     copyBackupToRemote,
     settingsForConnectionTest,
@@ -187,6 +198,10 @@ class PiAgent extends utils.Adapter {
         this.restartWaitMs = 45_000;
         /** Enabled instances of the scheduler adapter fullcalendar, e.g. ["fullcalendar.0"]. */
         this.schedulers = [];
+        /** Commands on the host (updates of adapters) and their output. */
+        this.hostCommands = createHostCommands(this);
+        /** fetch for the npm registry, replaceable in tests. */
+        this.fetch = globalThis.fetch;
         /** Users of the admin tab whose request runs now (requests resumed after a restart are in this.pending). */
         this.adminRunning = new Set();
         /** "<instance>/<chat id>" -> conversation id, persisted in telegram.chats. */
@@ -262,6 +277,8 @@ class PiAgent extends utils.Adapter {
             await this.startMessengers();
             // after the chats: a watch that fires at once tells its chat
             await this.watches.load();
+            // an update of pi-agent itself restarted the instance: tell the chat that asked for it
+            await this.reportSelfUpdate();
             await this.scheduleAutoBackup();
             await this.setStateAsync('info.connection', { val: true, ack: true });
             this.markReady();
@@ -553,6 +570,12 @@ class PiAgent extends utils.Adapter {
                 },
                 logFile: () => findLogFile(utils.getAbsoluteDefaultDataDir()),
                 schedulers: () => this.schedulers,
+                updates: {
+                    list: () => this.listUpdates(),
+                    npm: name => this.npmVersions(name),
+                    plan: (name, version, source) => this.planUpdate(name, version, source),
+                    run: (plan, conversationId) => this.runUpdate(plan, conversationId),
+                },
             })),
         );
 
@@ -1117,6 +1140,197 @@ class PiAgent extends utils.Adapter {
         this.log.info(
             `Conversations restored from a backup (${Object.keys(restored.chats).length} chat(s)); waiting requests were dropped`,
         );
+    }
+
+    // ── Updates of adapters (lib/updates.js) ──────────────────────────────────────────────────────────
+
+    /**
+     * The installed adapters that have a newer version in the active repositories.
+     *
+     * @returns {Promise<{ repositories: string[], updates: Array<Record<string, unknown>> }>} updates for the model
+     */
+    async listUpdates() {
+        const { names, json } = await repositoryJson(this);
+        const updates = [];
+        for (const installed of await installedAdapters(this)) {
+            const available = String(Object(json[installed.name]).version || '');
+            if (available && installed.version && compareVersions(available, installed.version) > 0) {
+                const refusal = this.updateRefusalOf(installed);
+                updates.push({
+                    adapter: installed.name,
+                    title: installed.title,
+                    installed: installed.version,
+                    available,
+                    allowed: !refusal,
+                    ...(refusal ? { reason: refusal } : {}),
+                });
+            }
+        }
+        return { repositories: names, updates };
+    }
+
+    /**
+     * Why the agent may not update an installed adapter, or "".
+     *
+     * @param {{ name: string, instances: string[], hosts: string[] }} installed the installed adapter
+     * @returns {string} reason, "" when allowed
+     */
+    updateRefusalOf(installed) {
+        const refusal = updateRefusal(installed.name, installed, {
+            enabled: this.config.allowUpdates === true,
+            own: this.name,
+            isAllowed: instance => isWriteAllowed(instance, this.allowlist),
+        });
+        if (refusal) {
+            return refusal;
+        }
+        if (installed.hosts.length && !installed.hosts.includes(this.host)) {
+            return `${installed.name} runs on another host (${installed.hosts.join(', ')}); update it there in admin`;
+        }
+        return '';
+    }
+
+    /**
+     * Installed, repository and npm version of an adapter.
+     *
+     * @param {unknown} value adapter name as the model wrote it
+     * @returns {Promise<{ adapter: string, installed: string, repository: string | null, npm: string, newer: boolean }>} versions
+     */
+    async npmVersions(value) {
+        const name = adapterNameOf(value);
+        const installed = (await installedAdapters(this)).find(a => a.name === name);
+        const { json } = await repositoryJson(this);
+        const npm = await npmLatest(name, this.fetch);
+        return {
+            adapter: name,
+            installed: installed?.version || 'not installed',
+            repository: String(Object(json[name]).version || '') || null,
+            npm,
+            newer: Boolean(installed && compareVersions(npm, installed.version) > 0),
+        };
+    }
+
+    /**
+     * What an update would do, or why it may not be done.
+     *
+     * @param {unknown} value adapter name as the model wrote it
+     * @param {unknown} version wanted version, or empty for the one of the source
+     * @param {unknown} sourceArg "repository" (default) or "npm"
+     * @returns {Promise<{ name: string, from: string, to: string, source: string, refusal: string }>} plan
+     */
+    async planUpdate(value, version, sourceArg) {
+        const name = adapterNameOf(value);
+        const source = String(sourceArg || 'repository').toLowerCase() === 'npm' ? 'npm' : 'repository';
+        const plan = { name, from: '', to: '', source, refusal: '' };
+        const installed = (await installedAdapters(this)).find(a => a.name === name);
+        if (!installed) {
+            return { ...plan, refusal: `${name} is not installed` };
+        }
+        plan.from = installed.version;
+        const refusal = this.updateRefusalOf(installed);
+        if (refusal) {
+            return { ...plan, refusal };
+        }
+        let to = String(version || '').trim();
+        if (to && !VERSION.test(to)) {
+            return { ...plan, refusal: `"${to}" is no version` };
+        }
+        if (!to && source === 'repository') {
+            to = String(Object((await repositoryJson(this)).json[name]).version || '');
+            if (!to) {
+                return { ...plan, refusal: `${name} is not in the repository; check_npm shows the version on npm` };
+            }
+        }
+        if (!to) {
+            try {
+                to = await npmLatest(name, this.fetch);
+            } catch (e) {
+                return { ...plan, refusal: e.message };
+            }
+        }
+        if (compareVersions(to, installed.version) <= 0) {
+            return {
+                ...plan,
+                to,
+                refusal: `${name} ${installed.version} is installed; ${source === 'npm' ? 'npm' : 'the repository'} has no newer version (${to})${source === 'repository' ? '; check_npm shows the version on npm' : ''}`,
+            };
+        }
+        return { ...plan, to };
+    }
+
+    /**
+     * Run an update on the host and wait for it. An update of pi-agent itself stops this instance: what was asked is
+     * kept in update.pending, and the next start tells the chat.
+     *
+     * @param {{ name: string, from: string, to: string, source: string }} plan checked plan
+     * @param {unknown} conversationId conversation that asked
+     * @returns {Promise<string>} what happened, for the model
+     */
+    async runUpdate(plan, conversationId) {
+        const self = plan.name === this.name;
+        if (self) {
+            await this.setStateAsync('update.pending', {
+                val: JSON.stringify({ ...plan, conversationId: String(conversationId), ts: Date.now() }),
+                ack: true,
+            });
+        }
+        const command =
+            plan.source === 'npm' ? `url iobroker.${plan.name}@${plan.to}` : `upgrade ${plan.name}@${plan.to}`;
+        const result = await this.hostCommands.run(this.host, command);
+        const tail = result.output.filter(Boolean).slice(-OUTPUT_LINES).join('\n');
+        if (!result.finished) {
+            return `The update of ${plan.name} to ${plan.to} is still running after 10 minutes; it goes on on the host. Tell the user to look at the log. Last output:\n${tail}`;
+        }
+        if (result.exitCode !== 0) {
+            if (self) {
+                await this.setStateAsync('update.pending', { val: '', ack: true });
+            }
+            return `The update of ${plan.name} to ${plan.to} failed (exit code ${result.exitCode}). Last output:\n${tail}`;
+        }
+        if (plan.source === 'npm' && !self) {
+            await this.restartInstancesOf(plan.name);
+        }
+        const now = (await installedAdapters(this)).find(a => a.name === plan.name)?.version || '?';
+        return `${plan.name} was updated from ${plan.from} to ${now} (${plan.source}); its instances restart. Last output:\n${tail}`;
+    }
+
+    /**
+     * Restart the enabled instances of an adapter after an installation from npm, like admin does.
+     *
+     * @param {string} name adapter name
+     */
+    async restartInstancesOf(name) {
+        const view = await this.getObjectViewAsync('system', 'instance', {
+            startkey: `system.adapter.${name}.`,
+            endkey: `system.adapter.${name}.香`,
+        });
+        for (const row of view.rows) {
+            if (row.value?.common?.enabled) {
+                await this.extendForeignObjectAsync(row.id, { common: { enabled: true } });
+            }
+        }
+    }
+
+    /** After an update of pi-agent itself: tell the chat that asked for it whether it worked. */
+    async reportSelfUpdate() {
+        const stored = (await this.getStateAsync('update.pending'))?.val;
+        if (!stored) {
+            return;
+        }
+        await this.setStateAsync('update.pending', { val: '', ack: true });
+        let plan;
+        try {
+            plan = JSON.parse(String(stored));
+        } catch {
+            return;
+        }
+        const now = String(this.version || '');
+        const done = compareVersions(now, String(plan.to)) >= 0;
+        const text = done
+            ? `✅ pi-agent was updated from ${plan.from} to ${now} and runs again.`
+            : `⚠️ The update of pi-agent to ${plan.to} did not work: version ${now || plan.from} runs. Look at the log of the host.`;
+        this.log.info(text);
+        await this.deliverReminder(plan.conversationId, text);
     }
 
     /** Read the enabled instances of the scheduler adapter fullcalendar (the prompt tells the model what it can plan). */
@@ -1690,6 +1904,10 @@ class PiAgent extends utils.Adapter {
 
     /** @param {ioBroker.Message} obj message from a script or another adapter */
     async onMessage(obj) {
+        // output and end of a command on the host (an update of an adapter)
+        if (this.hostCommands.onMessage(obj)) {
+            return;
+        }
         if (obj?.command === 'listModels') {
             // model field of the admin page; needs no running agent, and an API key only for a custom server
             let options = [];

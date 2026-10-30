@@ -27,6 +27,8 @@ declare global {
             confirmRequired: string;
             historyInstance: string;
             timeZone: string;
+            /** Updates of adapters by the agent since 0.7.0 (tab "Write permissions"). */
+            allowUpdates: boolean;
             /** Tab "Backup" since 0.4.0: automatic backup every so many hours (0 off, 24, 168) and how many to keep. */
             autoBackupInterval: number;
             backupKeep: number;

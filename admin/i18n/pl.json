@@ -81,5 +81,7 @@
 	"Restart allowed": "Restart dozwolony",
 	"Long-term memory": "Pamięć długotrwała",
 	"The agent keeps facts you tell it to remember (tools remember and forget) across all conversations, in the state memory.list": "Agent zachowuje fakty, które ma zapamiętać (narzędzia remember i forget), we wszystkich rozmowach, w stanie memory.list",
+	"Allow adapter updates": "Zezwalaj na aktualizacje adapterów",
+	"The agent may update adapters with an instance that has \"Write allowed\" (and itself), never admin or js-controller; every update is confirmed in the chat": "Agent może aktualizować adaptery, które mają instancję z „Zapis dozwolony” (oraz siebie), nigdy admina ani js-controllera; każda aktualizacja jest potwierdzana w czacie",
 	"Allowed users": "Dozwoleni użytkownicy"
 }

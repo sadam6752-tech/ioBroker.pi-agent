@@ -81,5 +81,7 @@
 	"Restart allowed": "允许重启",
 	"Long-term memory": "长期记忆",
 	"The agent keeps facts you tell it to remember (tools remember and forget) across all conversations, in the state memory.list": "代理会在所有对话中保留你让它记住的事实（工具 remember 和 forget），保存在状态 memory.list 中",
+	"Allow adapter updates": "允许更新适配器",
+	"The agent may update adapters with an instance that has \"Write allowed\" (and itself), never admin or js-controller; every update is confirmed in the chat": "代理可以更新具有“允许写入”实例的适配器（以及它自己），但绝不更新 admin 或 js-controller；每次更新都需在聊天中确认",
 	"Allowed users": "允许的用户"
 }

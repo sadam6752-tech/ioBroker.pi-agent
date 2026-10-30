@@ -45,6 +45,8 @@ function fakeAdapterCore(hooks) {
             super();
             this.name = options.name;
             this.namespace = NAMESPACE;
+            this.host = 'iobroker';
+            this.version = options.version || '0.0.0';
             this.config = options.config;
             this.dataDir = options.dataDir;
             this.db = options.db;
@@ -167,6 +169,11 @@ function fakeAdapterCore(hooks) {
         restart() {
             this.restarted = (this.restarted || 0) + 1;
         }
+        // Messages to the host (cmdExec, getNotifications) go through the hook; without one nobody answers.
+        sendToHost(host, command, message, callback) {
+            this.hostMessages = [...(this.hostMessages || []), [host, command, message]];
+            hooks.sendToHost?.(host, command, message, callback, this);
+        }
         sendTo(...args) {
             this.sent.push(args);
         }
@@ -180,7 +187,8 @@ function fakeAdapterCore(hooks) {
         Adapter,
         getAbsoluteInstanceDataDir: adapter => adapter.dataDir,
         // iobroker-data; the log folder is next to it (tests of get_logs set it)
-        getAbsoluteDefaultDataDir: () => process.env.PI_AGENT_TEST_DATA_DIR || path.join(require('node:os').tmpdir(), 'no-iobroker-data'),
+        getAbsoluteDefaultDataDir: () =>
+            process.env.PI_AGENT_TEST_DATA_DIR || path.join(require('node:os').tmpdir(), 'no-iobroker-data'),
     };
 }
 
@@ -196,7 +204,7 @@ function fakeAdapterCore(hooks) {
  * @returns {Promise<{ agent: object, adapter: object, db: FakeDb, faux: object, providerCalls: Array }>} running
  *   instance; providerCalls are the arguments of each createModelsWithKey (provider, key, options)
  */
-async function startAgent({ dataDir, config = {}, seed, responses, hooks = {} }) {
+async function startAgent({ dataDir, config = {}, seed, responses, hooks = {}, version }) {
     const fauxModule = await import('@earendil-works/pi-ai/providers/faux');
     const { createModels } = await import('@earendil-works/pi-ai/models');
     const faux = fauxModule.fauxProvider({ provider: 'faux' });
@@ -229,6 +237,7 @@ async function startAgent({ dataDir, config = {}, seed, responses, hooks = {} })
         const agent = createAgent({
             dataDir,
             db,
+            version,
             config: { provider: 'faux', modelId: '', apiKey: 'test', writeAllow: '', dryRun: true, ...config },
         });
         agent.emit('ready');

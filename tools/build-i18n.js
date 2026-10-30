@@ -1096,6 +1096,33 @@ Object.assign(ADMIN, {
             'Агент зберігає факти, які ви просите запамʼятати (інструменти remember і forget), для всіх розмов, у стані memory.list',
             '代理会在所有对话中保留你让它记住的事实（工具 remember 和 forget），保存在状态 memory.list 中',
         ],
+    'Allow adapter updates': [
+        'Allow adapter updates',
+        'Adapter-Updates erlauben',
+        'Разрешить обновление адаптеров',
+        'Permitir atualizações de adaptadores',
+        'Adapter-updates toestaan',
+        'Autoriser les mises à jour des adaptateurs',
+        'Consenti aggiornamenti degli adattatori',
+        'Permitir actualizaciones de adaptadores',
+        'Zezwalaj na aktualizacje adapterów',
+        'Дозволити оновлення адаптерів',
+        '允许更新适配器',
+    ],
+    'The agent may update adapters with an instance that has "Write allowed" (and itself), never admin or js-controller; every update is confirmed in the chat':
+        [
+            'The agent may update adapters with an instance that has "Write allowed" (and itself), never admin or js-controller; every update is confirmed in the chat',
+            'Der Agent darf Adapter aktualisieren, die eine Instanz mit „Schreiben erlaubt“ haben (und sich selbst), nie Admin oder js-controller; jedes Update wird im Chat bestätigt',
+            'Агент может обновлять адаптеры, у которых есть инстанс с «Запись разрешена» (и себя), но никогда admin и js-controller; каждое обновление подтверждается в чате',
+            'O agente pode atualizar adaptadores com uma instância que tenha "Escrita permitida" (e a si próprio), nunca o admin nem o js-controller; cada atualização é confirmada no chat',
+            'De agent mag adapters bijwerken met een instantie die "Schrijven toegestaan" heeft (en zichzelf), nooit admin of js-controller; elke update wordt in de chat bevestigd',
+            "L'agent peut mettre à jour les adaptateurs ayant une instance avec « Écriture autorisée » (et lui-même), jamais admin ni js-controller ; chaque mise à jour est confirmée dans le chat",
+            "L'agente può aggiornare gli adattatori con un'istanza che ha «Scrittura consentita» (e sé stesso), mai admin né js-controller; ogni aggiornamento viene confermato nella chat",
+            'El agente puede actualizar adaptadores con una instancia que tenga «Escritura permitida» (y a sí mismo), nunca admin ni js-controller; cada actualización se confirma en el chat',
+            'Agent może aktualizować adaptery, które mają instancję z „Zapis dozwolony” (oraz siebie), nigdy admina ani js-controllera; każda aktualizacja jest potwierdzana w czacie',
+            'Агент може оновлювати адаптери, що мають інстанс із «Запис дозволено» (і себе), але ніколи admin і js-controller; кожне оновлення підтверджується в чаті',
+            '代理可以更新具有“允许写入”实例的适配器（以及它自己），但绝不更新 admin 或 js-controller；每次更新都需在聊天中确认',
+        ],
     'Allowed users': [
         'Allowed users',
         'Erlaubte Nutzer',
@@ -1127,6 +1154,19 @@ const DESC = [
 ];
 /** common.news per version, newest first; the repository builder keeps at most seven. */
 const NEWS = {};
+NEWS['0.7.0'] = [
+    'Adapter updates: tools list_updates, check_npm and update_adapter (repository or npm), only with "Allow adapter updates", for adapters with "Write allowed" and pi-agent itself, always confirmed in the chat; list_notifications reads the notifications from the host',
+    'Adapter-Updates: Werkzeuge list_updates, check_npm und update_adapter (Repository oder npm), nur mit „Adapter-Updates erlauben“, für Adapter mit „Schreiben erlaubt“ und pi-agent selbst, immer im Chat bestätigt; list_notifications liest die Benachrichtigungen vom Host',
+    'Обновление адаптеров: инструменты list_updates, check_npm и update_adapter (репозиторий или npm), только при «Разрешить обновление адаптеров», для адаптеров с «Запись разрешена» и самого pi-agent, всегда с подтверждением в чате; list_notifications читает уведомления с хоста',
+    'Atualizações de adaptadores: ferramentas list_updates, check_npm e update_adapter (repositório ou npm), só com "Permitir atualizações de adaptadores", para adaptadores com "Escrita permitida" e o próprio pi-agent, sempre confirmadas no chat; list_notifications lê as notificações do host',
+    'Adapter-updates: tools list_updates, check_npm en update_adapter (repository of npm), alleen met "Adapter-updates toestaan", voor adapters met "Schrijven toegestaan" en pi-agent zelf, altijd bevestigd in de chat; list_notifications leest de meldingen van de host',
+    "Mises à jour des adaptateurs : outils list_updates, check_npm et update_adapter (dépôt ou npm), uniquement avec « Autoriser les mises à jour des adaptateurs », pour les adaptateurs avec « Écriture autorisée » et pi-agent lui-même, toujours confirmées dans le chat ; list_notifications lit les notifications de l'hôte",
+    "Aggiornamenti degli adattatori: strumenti list_updates, check_npm e update_adapter (repository o npm), solo con «Consenti aggiornamenti degli adattatori», per adattatori con «Scrittura consentita» e pi-agent stesso, sempre confermati nella chat; list_notifications legge le notifiche dall'host",
+    'Actualizaciones de adaptadores: herramientas list_updates, check_npm y update_adapter (repositorio o npm), solo con «Permitir actualizaciones de adaptadores», para adaptadores con «Escritura permitida» y el propio pi-agent, siempre confirmadas en el chat; list_notifications lee las notificaciones del host',
+    'Aktualizacje adapterów: narzędzia list_updates, check_npm i update_adapter (repozytorium lub npm), tylko z „Zezwalaj na aktualizacje adapterów”, dla adapterów z „Zapis dozwolony” i samego pi-agent, zawsze potwierdzane w czacie; list_notifications odczytuje powiadomienia z hosta',
+    'Оновлення адаптерів: інструменти list_updates, check_npm і update_adapter (репозиторій або npm), лише з «Дозволити оновлення адаптерів», для адаптерів із «Запис дозволено» і самого pi-agent, завжди з підтвердженням у чаті; list_notifications читає сповіщення з хоста',
+    '适配器更新：工具 list_updates、check_npm 和 update_adapter（仓库或 npm），仅在启用“允许更新适配器”时，适用于具有“允许写入”的适配器和 pi-agent 本身，始终需在聊天中确认；list_notifications 从主机读取通知',
+];
 NEWS['0.6.4'] = [
     'Scheduler fullcalendar: repeating, longer and timed actions go to fullcalendar through send_to, but only for states pi-agent may write (also asked where "Confirmation required" is set); when fullcalendar is not installed or not allowed, the agent tells the user',
     'Planer fullcalendar: wiederkehrende, längere und zeitlich begrenzte Aktionen gehen per send_to an fullcalendar, aber nur für Datenpunkte, die pi-agent schreiben darf (bei „Bestätigung erforderlich“ mit Rückfrage); ist fullcalendar nicht installiert oder nicht erlaubt, sagt der Agent das dem Benutzer',
@@ -1558,6 +1598,32 @@ const OBJECT_NAMES = {
         'Obserwacje notify_when (JSON)',
         'Спостереження notify_when (JSON)',
         'notify_when 的监视（JSON）',
+    ],
+    update: [
+        'Update of pi-agent',
+        'Update von pi-agent',
+        'Обновление pi-agent',
+        'Atualização do pi-agent',
+        'Update van pi-agent',
+        'Mise à jour de pi-agent',
+        'Aggiornamento di pi-agent',
+        'Actualización de pi-agent',
+        'Aktualizacja pi-agent',
+        'Оновлення pi-agent',
+        'pi-agent 的更新',
+    ],
+    'update.pending': [
+        'Update of itself in progress (JSON)',
+        'Laufendes Update von sich selbst (JSON)',
+        'Идущее обновление самого себя (JSON)',
+        'Atualização de si próprio em curso (JSON)',
+        'Lopende update van zichzelf (JSON)',
+        'Mise à jour de soi-même en cours (JSON)',
+        'Aggiornamento di sé in corso (JSON)',
+        'Actualización de sí mismo en curso (JSON)',
+        'Trwająca aktualizacja samego siebie (JSON)',
+        'Поточне оновлення самого себе (JSON)',
+        '自身更新进行中（JSON）',
     ],
     // the id stays "telegram" (stored since 0.0.1); it holds the chats of every messenger
     telegram: [

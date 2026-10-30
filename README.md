@@ -264,6 +264,22 @@ documents.
 - The agent waits up to 30 seconds for the answer; many adapters do not answer, then the command may still have worked.
   A command is never sent a second time after an interruption. In simulation mode nothing is sent.
 
+## Updates of adapters
+
+With **Allow adapter updates** (tab "Write permissions", off by default) the agent can update adapters, e.g. "are
+there updates?" or "update telegram":
+
+- `list_updates` shows the installed adapters with a newer version in the repository chosen in ioBroker (as admin
+  shows it), and whether the agent may update them. `check_npm` shows the newest version on npm, for an adapter
+  whose update is not in the repository yet; the agent then offers the update from npm.
+- Only adapters with an instance that has **Write allowed** in the write permissions, and pi-agent itself. Never
+  admin or js-controller, and only adapters on the host of pi-agent.
+- Every update is confirmed with ✅/❌ in the chat of the conversation, also without "Confirmation required". A
+  `sendTo` caller cannot confirm, so an update from there is blocked. In simulation mode nothing is installed.
+- The update runs on the host like the update button of admin (`iobroker upgrade`, or `iobroker url` for npm); the
+  agent waits up to 10 minutes and reports the result. When pi-agent updates itself it restarts and tells the chat
+  afterwards whether the new version runs (state `update.pending` in the meantime).
+
 ## Long-term memory
 
 A conversation remembers everything said in it, but the conversations do not know each other. Facts that should
@@ -308,6 +324,12 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.7.0 (2026-10-30)
+
+- Adapter updates: tools `list_updates`, `check_npm` and `update_adapter` (repository or npm), only with "Allow
+  adapter updates", for adapters with "Write allowed" and pi-agent itself, always confirmed in the chat
+- `list_notifications` reads the notifications from the host, as admin shows them
+
 ### 0.6.4 (2026-10-29)
 
 - Scheduler fullcalendar: repeating, longer and timed actions go to fullcalendar through `send_to`, but only for
@@ -333,13 +355,6 @@ the last copy.
   confirmed where "Confirmation required" is set
 - The agent answers in the language of the question, unless the instructions (of the user or of the calling adapter)
   name a language
-
-### 0.6.0 (2026-10-28)
-
-- Tool `restart_instance`: restarts adapter instances with "Restart allowed" in the write permissions, after a
-  confirmation in the chat; never pi-agent or admin
-- Long-term memory: facts kept across all conversations (tools `remember` and `forget`, state `memory.list`, part
-  of the backups); switch "Long-term memory" in the settings
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

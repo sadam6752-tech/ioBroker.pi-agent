@@ -66,4 +66,20 @@ export interface Policy {
     logFile?: () => string | null;
     /** Enabled instances of the scheduler adapter fullcalendar, e.g. ["fullcalendar.0"]. */
     schedulers?: () => string[];
+    /** Updates of adapters (lib/updates.js, main.js). */
+    updates?: {
+        list: () => Promise<{ repositories: string[]; updates: Array<Record<string, unknown>> }>;
+        npm: (
+            adapter: unknown,
+        ) => Promise<{ adapter: string; installed: string; repository: string | null; npm: string; newer: boolean }>;
+        plan: (
+            adapter: unknown,
+            version: unknown,
+            source: unknown,
+        ) => Promise<{ name: string; from: string; to: string; source: string; refusal: string }>;
+        run: (
+            plan: { name: string; from: string; to: string; source: string },
+            conversationId: unknown,
+        ) => Promise<string>;
+    };
 }

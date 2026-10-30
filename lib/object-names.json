@@ -207,6 +207,32 @@
 		"uk": "Спостереження notify_when (JSON)",
 		"zh-cn": "notify_when 的监视（JSON）"
 	},
+	"update": {
+		"en": "Update of pi-agent",
+		"de": "Update von pi-agent",
+		"ru": "Обновление pi-agent",
+		"pt": "Atualização do pi-agent",
+		"nl": "Update van pi-agent",
+		"fr": "Mise à jour de pi-agent",
+		"it": "Aggiornamento di pi-agent",
+		"es": "Actualización de pi-agent",
+		"pl": "Aktualizacja pi-agent",
+		"uk": "Оновлення pi-agent",
+		"zh-cn": "pi-agent 的更新"
+	},
+	"update.pending": {
+		"en": "Update of itself in progress (JSON)",
+		"de": "Laufendes Update von sich selbst (JSON)",
+		"ru": "Идущее обновление самого себя (JSON)",
+		"pt": "Atualização de si próprio em curso (JSON)",
+		"nl": "Lopende update van zichzelf (JSON)",
+		"fr": "Mise à jour de soi-même en cours (JSON)",
+		"it": "Aggiornamento di sé in corso (JSON)",
+		"es": "Actualización de sí mismo en curso (JSON)",
+		"pl": "Trwająca aktualizacja samego siebie (JSON)",
+		"uk": "Поточне оновлення самого себе (JSON)",
+		"zh-cn": "自身更新进行中（JSON）"
+	},
 	"telegram": {
 		"en": "Messenger chats",
 		"de": "Messenger-Chats",
