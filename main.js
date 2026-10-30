@@ -68,6 +68,7 @@ const { channelsFromConfig, legacyRows, chatKey, parseChatKey, migrateChats } = 
 const { createDrivers, messengerType, MESSENGER_ADAPTERS } = require('./lib/messengers');
 const { ADMIN, ADMIN_INSTRUCTIONS, historyOf, withNotices, createAdminChat } = require('./lib/admin-chat');
 const { isAllowedUser, stripPrefix, telegramRequestId } = require('./lib/telegram');
+const { TextConfirmations, isYes, confirmationQuestion } = require('./lib/text-confirmation');
 
 /**
  * Text blocks of the model messages of one transcript entry.
@@ -188,6 +189,8 @@ class PiAgent extends utils.Adapter {
         this.channels = new Map();
         /** Sending, reading and confirming per messenger adapter (telegram, max). */
         this.drivers = createDrivers(this);
+        /** Confirmations by text in the conversations of sendTo callers (setting "textConfirmation"). */
+        this.textConfirmations = new TextConfirmations(this);
         /** Questions, errors and reminders of the chat in the admin tab, per ioBroker user. */
         this.adminChat = createAdminChat(this);
         /** Long-term memory shared by all conversations (lib/memory.js). */
@@ -713,6 +716,43 @@ class PiAgent extends utils.Adapter {
     }
 
     /**
+     * @param {unknown} conversationId conversation id
+     * @returns {string | undefined} its key in telegram.chats, e.g. "sendTo:assistant.0/kitchen"
+     */
+    keyOfConversation(conversationId) {
+        return Object.keys(this.chats).find(k => String(this.chats[k]) === String(conversationId));
+    }
+
+    /** @returns {Promise<string>} language of the ioBroker system, e.g. "de" */
+    async systemLanguage() {
+        const system = await this.getForeignObjectAsync('system.config').catch(() => null);
+        return String(system?.common?.language || 'en');
+    }
+
+    /**
+     * Ask the caller of a sendTo conversation by text (setting "textConfirmation"): the question is the answer of
+     * its waiting "ask", its next "ask" decides.
+     *
+     * @param {string} key conversation key
+     * @param {{ id: string, val: unknown, action?: string }} request what to confirm
+     * @returns {Promise<string>} "yes", "no", "timeout", or "unavailable" when the caller does not wait for an answer
+     */
+    async requestTextConfirmation(key, { id, val, action }) {
+        const language = await this.systemLanguage();
+        let what = id;
+        if (!action) {
+            // a state is spoken by its name, if it has one
+            const name = (await this.getForeignObjectAsync(id).catch(() => null))?.common?.name;
+            what = String((name && typeof name === 'object' ? name[language] || name.en : name) || id);
+        }
+        const answer = await this.textConfirmations.request(key, confirmationQuestion(language, { what, val, action }));
+        if (answer !== 'unavailable') {
+            this.log.info(`Confirmation by text for ${id} in ${key}: ${answer}`);
+        }
+        return answer;
+    }
+
+    /**
      * ioBroker user of the admin tab whose conversation this is.
      *
      * @param {unknown} conversationId conversation id
@@ -750,6 +790,13 @@ class PiAgent extends utils.Adapter {
         const user = this.adminUserOf(conversationId);
         if (user) {
             return this.adminChat.confirm(user, id, val, action);
+        }
+        const key = this.keyOfConversation(conversationId);
+        if (key?.startsWith('sendTo:') && this.config.textConfirmation === true) {
+            const answer = await this.requestTextConfirmation(key, { id, val, action });
+            if (answer !== 'unavailable') {
+                return answer;
+            }
         }
         const chat = this.chatOf(conversationId);
         if (!chat) {
@@ -2016,7 +2063,16 @@ class PiAgent extends utils.Adapter {
             }
             const requestId = message.requestId || requestIdFor(crypto, Date.now(), message.text);
             const target = sendToTarget(obj.from, message);
-            result = { answer: await this.ask(String(message.text), String(requestId), target) };
+            const key = this.chatKeyOf(target);
+            let run;
+            if (key && this.textConfirmations.has(key)) {
+                // the answer to a question of the agent: decided here, not by the model
+                run = this.textConfirmations.decide(key, isYes(message.text));
+            } else {
+                run = this.ask(String(message.text), String(requestId), target);
+            }
+            // a conversation of its own may get a question to confirm before the answer
+            result = { answer: key ? await this.textConfirmations.answerOf(key, run) : await run };
         } catch (e) {
             result = {
                 error: this.stopping
@@ -2034,6 +2090,7 @@ class PiAgent extends utils.Adapter {
         this.stopping = true;
         this.clearTimeout(this.backupTimer);
         this.watches.stop();
+        this.textConfirmations.stop();
         const done = async () => {
             try {
                 await this.harness?.close(this.context);

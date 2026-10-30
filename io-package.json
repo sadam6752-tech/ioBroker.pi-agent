@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.7.1",
+		"version": "0.7.2",
 		"news": {
+			"0.7.2": {
+				"en": "Confirmation by text in sendTo conversations (e.g. ioBroker.assistant), off by default: the question is the answer of the request, the next request decides; only \"yes\" confirms, anything else or 2 minutes of silence is no",
+				"de": "Bestätigung per Text in sendTo-Unterhaltungen (z. B. ioBroker.assistant), ab Werk aus: Die Frage ist die Antwort der Anfrage, die nächste Anfrage entscheidet; nur „Ja“ bestätigt, alles andere oder 2 Minuten Stille ist ein Nein",
+				"ru": "Подтверждение текстом в sendTo-разговорах (например, ioBroker.assistant), по умолчанию выключено: вопрос приходит как ответ на запрос, следующий запрос решает; подтверждает только «да», всё остальное или 2 минуты тишины означают нет",
+				"pt": "Confirmação por texto em conversas sendTo (p. ex. ioBroker.assistant), desligada por defeito: a pergunta é a resposta do pedido, o pedido seguinte decide; só \"sim\" confirma, qualquer outra coisa ou 2 minutos de silêncio é não",
+				"nl": "Bevestiging per tekst in sendTo-gesprekken (bijv. ioBroker.assistant), standaard uit: de vraag is het antwoord op het verzoek, het volgende verzoek beslist; alleen \"ja\" bevestigt, al het andere of 2 minuten stilte is nee",
+				"fr": "Confirmation par texte dans les conversations sendTo (p. ex. ioBroker.assistant), désactivée par défaut : la question est la réponse de la requête, la requête suivante décide ; seul « oui » confirme, tout le reste ou 2 minutes de silence vaut non",
+				"it": "Conferma via testo nelle conversazioni sendTo (ad es. ioBroker.assistant), disattivata di default: la domanda è la risposta della richiesta, la richiesta successiva decide; solo «sì» conferma, qualsiasi altra cosa o 2 minuti di silenzio è no",
+				"es": "Confirmación por texto en conversaciones sendTo (p. ej. ioBroker.assistant), desactivada por defecto: la pregunta es la respuesta de la solicitud, la siguiente solicitud decide; solo «sí» confirma, cualquier otra cosa o 2 minutos de silencio es no",
+				"pl": "Potwierdzenie tekstem w rozmowach sendTo (np. ioBroker.assistant), domyślnie wyłączone: pytanie jest odpowiedzią na żądanie, następne żądanie decyduje; potwierdza tylko „tak”, wszystko inne lub 2 minuty ciszy oznacza nie",
+				"uk": "Підтвердження текстом у sendTo-розмовах (наприклад, ioBroker.assistant), типово вимкнено: питання надходить як відповідь на запит, наступний запит вирішує; підтверджує лише «так», усе інше або 2 хвилини тиші означають ні",
+				"zh-cn": "sendTo 对话中的文字确认（例如 ioBroker.assistant），默认关闭：问题作为请求的回答返回，下一个请求决定；只有“是”才算确认，其他任何内容或 2 分钟无响应均视为否"
+			},
 			"0.7.1": {
 				"en": "Review: the migrations of old settings change only their own attribute of the instance object; one handler for all watched objects",
 				"de": "Review: die Migrationen alter Einstellungen ändern nur ihr eigenes Attribut des Instanzobjekts; ein Handler für alle überwachten Objekte",
@@ -80,19 +93,6 @@
 				"pl": "Narzędzie send_to: polecenia do innych adapterów (np. wiadomość w Telegramie), tylko do instancji z „Zapis dozwolony”, z potwierdzeniem tam, gdzie ustawiono „Wymagane potwierdzenie”; agent odpowiada w języku pytania, chyba że instrukcje podają język",
 				"uk": "Інструмент send_to: команди іншим адаптерам (наприклад, повідомлення в Telegram), лише інстансам із «Запис дозволено», з підтвердженням там, де встановлено «Потрібне підтвердження»; агент відповідає мовою питання, якщо інструкції не задають мову",
 				"zh-cn": "工具 send_to：向其他适配器发送命令（例如 Telegram 消息），仅限具有“允许写入”的实例，设置了“需要确认”的需先确认；代理使用提问的语言回答，除非指令指定了语言"
-			},
-			"0.6.0": {
-				"en": "Tool restart_instance: the agent restarts adapter instances with \"Restart allowed\" in the write permissions, after a confirmation in the chat; long-term memory: facts kept across all conversations (tools remember and forget, state memory.list, part of the backups)",
-				"de": "Werkzeug restart_instance: der Agent startet Adapterinstanzen mit „Neustart erlaubt“ in den Schreibrechten neu, nach einer Bestätigung im Chat; Langzeitgedächtnis: Fakten über alle Unterhaltungen hinweg (Werkzeuge remember und forget, Datenpunkt memory.list, Teil der Backups)",
-				"ru": "Инструмент restart_instance: агент перезапускает инстансы адаптеров с «Перезапуск разрешён» в правах записи после подтверждения в чате; долгосрочная память: факты для всех бесед (инструменты remember и forget, состояние memory.list, входит в бэкапы)",
-				"pt": "Ferramenta restart_instance: o agente reinicia instâncias de adaptadores com \"Reinício permitido\" nas permissões de escrita, após confirmação no chat; memória de longo prazo: factos em todas as conversas (ferramentas remember e forget, estado memory.list, incluída nos backups)",
-				"nl": "Tool restart_instance: de agent herstart adapterinstanties met \"Herstart toegestaan\" in de schrijfrechten, na een bevestiging in de chat; langetermijngeheugen: feiten over alle gesprekken heen (tools remember en forget, state memory.list, onderdeel van de back-ups)",
-				"fr": "Outil restart_instance : l'agent redémarre les instances d'adaptateur avec « Redémarrage autorisé » dans les droits d'écriture, après une confirmation dans le chat ; mémoire à long terme : des faits pour toutes les conversations (outils remember et forget, état memory.list, inclus dans les sauvegardes)",
-				"it": "Strumento restart_instance: l'agente riavvia le istanze degli adattatori con «Riavvio consentito» nei permessi di scrittura, dopo una conferma nella chat; memoria a lungo termine: fatti per tutte le conversazioni (strumenti remember e forget, stato memory.list, inclusa nei backup)",
-				"es": "Herramienta restart_instance: el agente reinicia instancias de adaptadores con «Reinicio permitido» en los permisos de escritura, tras una confirmación en el chat; memoria a largo plazo: datos para todas las conversaciones (herramientas remember y forget, estado memory.list, incluida en las copias de seguridad)",
-				"pl": "Narzędzie restart_instance: agent restartuje instancje adapterów z „Restart dozwolony” w uprawnieniach zapisu, po potwierdzeniu w czacie; pamięć długotrwała: fakty dla wszystkich rozmów (narzędzia remember i forget, stan memory.list, część kopii zapasowych)",
-				"uk": "Інструмент restart_instance: агент перезапускає інстанси адаптерів із «Перезапуск дозволено» в правах запису після підтвердження в чаті; довготривала памʼять: факти для всіх розмов (інструменти remember і forget, стан memory.list, входить до бекапів)",
-				"zh-cn": "工具 restart_instance：代理在聊天中确认后，重启写入权限中“允许重启”的适配器实例；长期记忆：在所有对话中保留的事实（工具 remember 和 forget，状态 memory.list，包含在备份中）"
 			}
 		},
 		"titleLang": {
@@ -194,6 +194,7 @@
 		"credentialId": "",
 		"writeRules": [],
 		"allowUpdates": false,
+		"textConfirmation": false,
 		"writeAllow": "",
 		"instructions": "",
 		"dryRun": true,

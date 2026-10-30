@@ -83,5 +83,7 @@
 	"The agent keeps facts you tell it to remember (tools remember and forget) across all conversations, in the state memory.list": "De agent bewaart feiten die hij moet onthouden (tools remember en forget) over alle gesprekken heen, in de state memory.list",
 	"Allow adapter updates": "Adapter-updates toestaan",
 	"The agent may update adapters with an instance that has \"Write allowed\" (and itself), never admin or js-controller; every update is confirmed in the chat": "De agent mag adapters bijwerken met een instantie die \"Schrijven toegestaan\" heeft (en zichzelf), nooit admin of js-controller; elke update wordt in de chat bevestigd",
+	"Confirmation by text in sendTo conversations": "Bevestiging per tekst in sendTo-gesprekken",
+	"For callers with a conversation of their own, e.g. ioBroker.assistant: the question is the answer, the next message decides. Only a plain \"yes\" confirms; anything else or 2 minutes of silence is no. By voice anyone in the room can say yes.": "Voor aanroepers met een eigen gesprek, bijv. ioBroker.assistant: de vraag is het antwoord, het volgende bericht beslist. Alleen een eenvoudig \"ja\" bevestigt; al het andere of 2 minuten stilte is nee. Met spraak kan iedereen in de kamer ja zeggen.",
 	"Allowed users": "Toegestane gebruikers"
 }

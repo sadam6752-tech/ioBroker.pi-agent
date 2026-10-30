@@ -83,5 +83,7 @@
 	"The agent keeps facts you tell it to remember (tools remember and forget) across all conversations, in the state memory.list": "El agente guarda los datos que le pide recordar (herramientas remember y forget) en todas las conversaciones, en el estado memory.list",
 	"Allow adapter updates": "Permitir actualizaciones de adaptadores",
 	"The agent may update adapters with an instance that has \"Write allowed\" (and itself), never admin or js-controller; every update is confirmed in the chat": "El agente puede actualizar adaptadores con una instancia que tenga «Escritura permitida» (y a sí mismo), nunca admin ni js-controller; cada actualización se confirma en el chat",
+	"Confirmation by text in sendTo conversations": "Confirmación por texto en conversaciones sendTo",
+	"For callers with a conversation of their own, e.g. ioBroker.assistant: the question is the answer, the next message decides. Only a plain \"yes\" confirms; anything else or 2 minutes of silence is no. By voice anyone in the room can say yes.": "Para llamantes con una conversación propia, p. ej. ioBroker.assistant: la pregunta es la respuesta, el mensaje siguiente decide. Solo un simple «sí» confirma; cualquier otra cosa o 2 minutos de silencio es no. Por voz, cualquiera en la habitación puede decir sí.",
 	"Allowed users": "Usuarios permitidos"
 }

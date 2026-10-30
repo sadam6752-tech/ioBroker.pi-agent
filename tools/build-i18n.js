@@ -1123,6 +1123,33 @@ Object.assign(ADMIN, {
             'Агент може оновлювати адаптери, що мають інстанс із «Запис дозволено» (і себе), але ніколи admin і js-controller; кожне оновлення підтверджується в чаті',
             '代理可以更新具有“允许写入”实例的适配器（以及它自己），但绝不更新 admin 或 js-controller；每次更新都需在聊天中确认',
         ],
+    'Confirmation by text in sendTo conversations': [
+        'Confirmation by text in sendTo conversations',
+        'Bestätigung per Text in sendTo-Unterhaltungen',
+        'Подтверждение текстом в sendTo-разговорах',
+        'Confirmação por texto em conversas sendTo',
+        'Bevestiging per tekst in sendTo-gesprekken',
+        'Confirmation par texte dans les conversations sendTo',
+        'Conferma via testo nelle conversazioni sendTo',
+        'Confirmación por texto en conversaciones sendTo',
+        'Potwierdzenie tekstem w rozmowach sendTo',
+        'Підтвердження текстом у sendTo-розмовах',
+        'sendTo 对话中的文字确认',
+    ],
+    'For callers with a conversation of their own, e.g. ioBroker.assistant: the question is the answer, the next message decides. Only a plain "yes" confirms; anything else or 2 minutes of silence is no. By voice anyone in the room can say yes.':
+        [
+            'For callers with a conversation of their own, e.g. ioBroker.assistant: the question is the answer, the next message decides. Only a plain "yes" confirms; anything else or 2 minutes of silence is no. By voice anyone in the room can say yes.',
+            'Für Aufrufer mit eigener Unterhaltung, z. B. ioBroker.assistant: Die Frage ist die Antwort, die nächste Nachricht entscheidet. Nur ein einfaches „Ja“ bestätigt; alles andere oder 2 Minuten Stille ist ein Nein. Per Sprache kann jeder im Raum Ja sagen.',
+            'Для вызывающих со своим разговором, например ioBroker.assistant: вопрос приходит как ответ, следующее сообщение решает. Подтверждает только простое «да»; всё остальное или 2 минуты тишины означают нет. Голосом «да» может сказать любой в комнате.',
+            'Para chamadores com uma conversa própria, p. ex. ioBroker.assistant: a pergunta é a resposta, a mensagem seguinte decide. Só um simples "sim" confirma; qualquer outra coisa ou 2 minutos de silêncio é não. Por voz, qualquer pessoa na sala pode dizer sim.',
+            'Voor aanroepers met een eigen gesprek, bijv. ioBroker.assistant: de vraag is het antwoord, het volgende bericht beslist. Alleen een eenvoudig "ja" bevestigt; al het andere of 2 minuten stilte is nee. Met spraak kan iedereen in de kamer ja zeggen.',
+            "Pour les appelants ayant leur propre conversation, p. ex. ioBroker.assistant : la question est la réponse, le message suivant décide. Seul un simple « oui » confirme ; tout le reste ou 2 minutes de silence vaut non. À la voix, n'importe qui dans la pièce peut dire oui.",
+            'Per i chiamanti con una conversazione propria, ad es. ioBroker.assistant: la domanda è la risposta, il messaggio successivo decide. Solo un semplice «sì» conferma; qualsiasi altra cosa o 2 minuti di silenzio è no. A voce chiunque nella stanza può dire sì.',
+            'Para llamantes con una conversación propia, p. ej. ioBroker.assistant: la pregunta es la respuesta, el mensaje siguiente decide. Solo un simple «sí» confirma; cualquier otra cosa o 2 minutos de silencio es no. Por voz, cualquiera en la habitación puede decir sí.',
+            'Dla wywołujących z własną rozmową, np. ioBroker.assistant: pytanie jest odpowiedzią, następna wiadomość decyduje. Potwierdza tylko proste „tak”; wszystko inne lub 2 minuty ciszy oznacza nie. Głosem każdy w pokoju może powiedzieć tak.',
+            'Для викликачів із власною розмовою, наприклад ioBroker.assistant: питання надходить як відповідь, наступне повідомлення вирішує. Підтверджує лише просте «так»; усе інше або 2 хвилини тиші означають ні. Голосом «так» може сказати будь-хто в кімнаті.',
+            '适用于拥有自己对话的调用方，例如 ioBroker.assistant：问题作为回答返回，下一条消息决定。只有简单的“是”才算确认；其他任何内容或 2 分钟无响应均视为否。通过语音，房间里的任何人都可以说“是”。',
+        ],
     'Allowed users': [
         'Allowed users',
         'Erlaubte Nutzer',
@@ -1154,6 +1181,19 @@ const DESC = [
 ];
 /** common.news per version, newest first; the repository builder keeps at most seven. */
 const NEWS = {};
+NEWS['0.7.2'] = [
+    'Confirmation by text in sendTo conversations (e.g. ioBroker.assistant), off by default: the question is the answer of the request, the next request decides; only "yes" confirms, anything else or 2 minutes of silence is no',
+    'Bestätigung per Text in sendTo-Unterhaltungen (z. B. ioBroker.assistant), ab Werk aus: Die Frage ist die Antwort der Anfrage, die nächste Anfrage entscheidet; nur „Ja“ bestätigt, alles andere oder 2 Minuten Stille ist ein Nein',
+    'Подтверждение текстом в sendTo-разговорах (например, ioBroker.assistant), по умолчанию выключено: вопрос приходит как ответ на запрос, следующий запрос решает; подтверждает только «да», всё остальное или 2 минуты тишины означают нет',
+    'Confirmação por texto em conversas sendTo (p. ex. ioBroker.assistant), desligada por defeito: a pergunta é a resposta do pedido, o pedido seguinte decide; só "sim" confirma, qualquer outra coisa ou 2 minutos de silêncio é não',
+    'Bevestiging per tekst in sendTo-gesprekken (bijv. ioBroker.assistant), standaard uit: de vraag is het antwoord op het verzoek, het volgende verzoek beslist; alleen "ja" bevestigt, al het andere of 2 minuten stilte is nee',
+    'Confirmation par texte dans les conversations sendTo (p. ex. ioBroker.assistant), désactivée par défaut : la question est la réponse de la requête, la requête suivante décide ; seul « oui » confirme, tout le reste ou 2 minutes de silence vaut non',
+    'Conferma via testo nelle conversazioni sendTo (ad es. ioBroker.assistant), disattivata di default: la domanda è la risposta della richiesta, la richiesta successiva decide; solo «sì» conferma, qualsiasi altra cosa o 2 minuti di silenzio è no',
+    'Confirmación por texto en conversaciones sendTo (p. ej. ioBroker.assistant), desactivada por defecto: la pregunta es la respuesta de la solicitud, la siguiente solicitud decide; solo «sí» confirma, cualquier otra cosa o 2 minutos de silencio es no',
+    'Potwierdzenie tekstem w rozmowach sendTo (np. ioBroker.assistant), domyślnie wyłączone: pytanie jest odpowiedzią na żądanie, następne żądanie decyduje; potwierdza tylko „tak”, wszystko inne lub 2 minuty ciszy oznacza nie',
+    'Підтвердження текстом у sendTo-розмовах (наприклад, ioBroker.assistant), типово вимкнено: питання надходить як відповідь на запит, наступний запит вирішує; підтверджує лише «так», усе інше або 2 хвилини тиші означають ні',
+    'sendTo 对话中的文字确认（例如 ioBroker.assistant），默认关闭：问题作为请求的回答返回，下一个请求决定；只有“是”才算确认，其他任何内容或 2 分钟无响应均视为否',
+];
 NEWS['0.7.1'] = [
     'Review: the migrations of old settings change only their own attribute of the instance object; one handler for all watched objects',
     'Review: die Migrationen alter Einstellungen ändern nur ihr eigenes Attribut des Instanzobjekts; ein Handler für alle überwachten Objekte',

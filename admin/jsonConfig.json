@@ -293,6 +293,18 @@
                     "lg": 12,
                     "xl": 12
                 },
+                "textConfirmation": {
+                    "type": "checkbox",
+                    "label": "Confirmation by text in sendTo conversations",
+                    "help": "For callers with a conversation of their own, e.g. ioBroker.assistant: the question is the answer, the next message decides. Only a plain \"yes\" confirms; anything else or 2 minutes of silence is no. By voice anyone in the room can say yes.",
+                    "default": false,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
                 "expertHeader": {
                     "type": "header",
                     "text": "Advanced: regular expressions",

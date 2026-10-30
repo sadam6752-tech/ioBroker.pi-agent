@@ -83,5 +83,7 @@
 	"The agent keeps facts you tell it to remember (tools remember and forget) across all conversations, in the state memory.list": "The agent keeps facts you tell it to remember (tools remember and forget) across all conversations, in the state memory.list",
 	"Allow adapter updates": "Allow adapter updates",
 	"The agent may update adapters with an instance that has \"Write allowed\" (and itself), never admin or js-controller; every update is confirmed in the chat": "The agent may update adapters with an instance that has \"Write allowed\" (and itself), never admin or js-controller; every update is confirmed in the chat",
+	"Confirmation by text in sendTo conversations": "Confirmation by text in sendTo conversations",
+	"For callers with a conversation of their own, e.g. ioBroker.assistant: the question is the answer, the next message decides. Only a plain \"yes\" confirms; anything else or 2 minutes of silence is no. By voice anyone in the room can say yes.": "For callers with a conversation of their own, e.g. ioBroker.assistant: the question is the answer, the next message decides. Only a plain \"yes\" confirms; anything else or 2 minutes of silence is no. By voice anyone in the room can say yes.",
 	"Allowed users": "Allowed users"
 }

@@ -83,5 +83,7 @@
 	"The agent keeps facts you tell it to remember (tools remember and forget) across all conversations, in the state memory.list": "Агент зберігає факти, які ви просите запамʼятати (інструменти remember і forget), для всіх розмов, у стані memory.list",
 	"Allow adapter updates": "Дозволити оновлення адаптерів",
 	"The agent may update adapters with an instance that has \"Write allowed\" (and itself), never admin or js-controller; every update is confirmed in the chat": "Агент може оновлювати адаптери, що мають інстанс із «Запис дозволено» (і себе), але ніколи admin і js-controller; кожне оновлення підтверджується в чаті",
+	"Confirmation by text in sendTo conversations": "Підтвердження текстом у sendTo-розмовах",
+	"For callers with a conversation of their own, e.g. ioBroker.assistant: the question is the answer, the next message decides. Only a plain \"yes\" confirms; anything else or 2 minutes of silence is no. By voice anyone in the room can say yes.": "Для викликачів із власною розмовою, наприклад ioBroker.assistant: питання надходить як відповідь, наступне повідомлення вирішує. Підтверджує лише просте «так»; усе інше або 2 хвилини тиші означають ні. Голосом «так» може сказати будь-хто в кімнаті.",
 	"Allowed users": "Дозволені користувачі"
 }

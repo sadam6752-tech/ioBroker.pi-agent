@@ -129,8 +129,20 @@ sendTo('pi-agent.0', 'ask', {
 ```
 
 The conversations are kept per sending instance (`pi-agent.0.telegram.chats` lists them as
-`sendTo:<instance>/<conversation>`). Changed instructions apply from the next request of the conversation on. Writes on
-the "Confirmation required" list cannot be confirmed in such a conversation and are blocked.
+`sendTo:<instance>/<conversation>`). Changed instructions apply from the next request of the conversation on.
+
+Such a conversation has no buttons, so by default a write with "Confirmation required", a restart and an update are
+blocked there. With **Confirmation by text in sendTo conversations** (tab "Write permissions", off by default) the
+agent asks by text instead:
+
+- The question comes back as the answer of the request, in the language of the ioBroker system and followed by
+  `[[LISTEN]]` (ioBroker.assistant opens the microphone again), e.g. "Restart the instance telegram.0? Say yes or no.".
+- The next request of the same conversation is the answer. pi-agent checks it itself, not the model: only "yes" (or
+  the word for it in one of the languages of the adapter, e.g. "ja", "да", "oui") as the whole answer confirms, apart
+  from case and punctuation. Context a caller puts in front, separated by an empty line (ioBroker.assistant sends time,
+  weather and presence first), does not count. Anything else is no, and so are 2 minutes without an answer.
+- The answer of that next request is the result: what the agent says after the action, or the next question.
+- By voice anyone in the room can say yes. Only switch it on where that is acceptable.
 
 `pi-agent.0.chat.pending` lists the requests that were accepted but not answered yet. If the adapter stops in the
 middle, they continue on the next start. The answer of a request from `chat.input` or `sendTo` is then written to
@@ -248,7 +260,7 @@ The tool `restart_instance` restarts an adapter instance, e.g. "telegram does no
   Writing and restarting are allowed separately.
 - Every restart is confirmed with ✅/❌ in the chat of the conversation (messenger or admin chat), also without
   "Confirmation required". A `sendTo` caller (e.g. ioBroker.assistant) cannot confirm, so a restart from there is
-  blocked.
+  blocked, unless "Confirmation by text in sendTo conversations" is on.
 - The restart works like the restart button of admin. The agent then waits up to 45 seconds until the instance runs
   again and says so. A switched-off instance is not switched on. In simulation mode nothing is restarted.
 
@@ -275,7 +287,8 @@ there updates?" or "update telegram":
 - Only adapters with an instance that has **Write allowed** in the write permissions, and pi-agent itself. Never
   admin or js-controller, and only adapters on the host of pi-agent.
 - Every update is confirmed with ✅/❌ in the chat of the conversation, also without "Confirmation required". A
-  `sendTo` caller cannot confirm, so an update from there is blocked. In simulation mode nothing is installed.
+  `sendTo` caller cannot confirm, so an update from there is blocked, unless "Confirmation by text in sendTo
+  conversations" is on. In simulation mode nothing is installed.
 - The update runs on the host like the update button of admin (`iobroker upgrade`, or `iobroker url` for npm); the
   agent waits up to 10 minutes and reports the result. When pi-agent updates itself it restarts and tells the chat
   afterwards whether the new version runs (state `update.pending` in the meantime).
@@ -323,6 +336,11 @@ the last copy.
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+
+### 0.7.2 (2026-10-30)
+
+- Confirmation by text in sendTo conversations (e.g. ioBroker.assistant), off by default: the question is the answer
+  of the request, the next request decides; only "yes" confirms, anything else or 2 minutes of silence is no
 
 ### 0.7.1 (2026-10-30)
 

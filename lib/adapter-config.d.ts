@@ -29,6 +29,8 @@ declare global {
             timeZone: string;
             /** Updates of adapters by the agent since 0.7.0 (tab "Write permissions"). */
             allowUpdates: boolean;
+            /** Confirmations by text in the conversations of sendTo callers since 0.7.2 (tab "Write permissions"). */
+            textConfirmation: boolean;
             /** Tab "Backup" since 0.4.0: automatic backup every so many hours (0 off, 24, 168) and how many to keep. */
             autoBackupInterval: number;
             backupKeep: number;
