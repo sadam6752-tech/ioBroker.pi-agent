@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.7.0",
+		"version": "0.7.1",
 		"news": {
+			"0.7.1": {
+				"en": "Review: the migrations of old settings change only their own attribute of the instance object; one handler for all watched objects",
+				"de": "Review: die Migrationen alter Einstellungen ändern nur ihr eigenes Attribut des Instanzobjekts; ein Handler für alle überwachten Objekte",
+				"ru": "Ревью: миграции старых настроек меняют только своё поле объекта инстанса; один обработчик для всех отслеживаемых объектов",
+				"pt": "Revisão: as migrações de definições antigas alteram só o seu próprio atributo do objeto da instância; um único handler para todos os objetos observados",
+				"nl": "Review: de migraties van oude instellingen wijzigen alleen hun eigen attribuut van het instantieobject; één handler voor alle bewaakte objecten",
+				"fr": "Revue : les migrations d'anciens paramètres ne modifient que leur propre attribut de l'objet d'instance ; un seul gestionnaire pour tous les objets surveillés",
+				"it": "Revisione: le migrazioni delle vecchie impostazioni modificano solo il proprio attributo dell'oggetto istanza; un unico handler per tutti gli oggetti osservati",
+				"es": "Revisión: las migraciones de ajustes antiguos cambian solo su propio atributo del objeto de instancia; un único manejador para todos los objetos observados",
+				"pl": "Przegląd: migracje starych ustawień zmieniają tylko własny atrybut obiektu instancji; jeden handler dla wszystkich obserwowanych obiektów",
+				"uk": "Рев’ю: міграції старих налаштувань змінюють лише своє поле об’єкта інстансу; один обробник для всіх відстежуваних об’єктів",
+				"zh-cn": "审查：旧设置的迁移只修改实例对象中自己的属性；所有被监视的对象只用一个处理程序"
+			},
 			"0.7.0": {
 				"en": "Adapter updates: tools list_updates, check_npm and update_adapter (repository or npm), only with \"Allow adapter updates\", for adapters with \"Write allowed\" and pi-agent itself, always confirmed in the chat; list_notifications reads the notifications from the host",
 				"de": "Adapter-Updates: Werkzeuge list_updates, check_npm und update_adapter (Repository oder npm), nur mit „Adapter-Updates erlauben“, für Adapter mit „Schreiben erlaubt“ und pi-agent selbst, immer im Chat bestätigt; list_notifications liest die Benachrichtigungen vom Host",
@@ -80,19 +93,6 @@
 				"pl": "Narzędzie restart_instance: agent restartuje instancje adapterów z „Restart dozwolony” w uprawnieniach zapisu, po potwierdzeniu w czacie; pamięć długotrwała: fakty dla wszystkich rozmów (narzędzia remember i forget, stan memory.list, część kopii zapasowych)",
 				"uk": "Інструмент restart_instance: агент перезапускає інстанси адаптерів із «Перезапуск дозволено» в правах запису після підтвердження в чаті; довготривала памʼять: факти для всіх розмов (інструменти remember і forget, стан memory.list, входить до бекапів)",
 				"zh-cn": "工具 restart_instance：代理在聊天中确认后，重启写入权限中“允许重启”的适配器实例；长期记忆：在所有对话中保留的事实（工具 remember 和 forget，状态 memory.list，包含在备份中）"
-			},
-			"0.5.2": {
-				"en": "Settings: the base URL and the notes on the system-wide AI settings are not wider on a large display than on a small one (repository checker E5509)",
-				"de": "Einstellungen: die Basis-URL und die Hinweise zu den systemweiten KI-Einstellungen sind auf großen Bildschirmen nicht breiter als auf kleinen (Repository-Checker E5509)",
-				"ru": "Настройки: базовый URL и подсказки к общесистемным настройкам ИИ на больших экранах не шире, чем на маленьких (проверка репозитория E5509)",
-				"pt": "Definições: o URL base e as notas sobre as definições de IA de todo o sistema não são mais largos num ecrã grande do que num pequeno (verificador do repositório E5509)",
-				"nl": "Instellingen: de basis-URL en de opmerkingen over de systeembrede AI-instellingen zijn op een groot scherm niet breder dan op een klein (repository-checker E5509)",
-				"fr": "Paramètres : l'URL de base et les notes sur les paramètres d'IA du système ne sont pas plus larges sur un grand écran que sur un petit (vérificateur du dépôt E5509)",
-				"it": "Impostazioni: l'URL di base e le note sulle impostazioni IA di sistema non sono più larghe su uno schermo grande che su uno piccolo (controllo del repository E5509)",
-				"es": "Ajustes: la URL base y las notas sobre los ajustes de IA del sistema no son más anchas en una pantalla grande que en una pequeña (comprobador del repositorio E5509)",
-				"pl": "Ustawienia: bazowy URL i uwagi o ogólnosystemowych ustawieniach AI nie są szersze na dużym ekranie niż na małym (sprawdzanie repozytorium E5509)",
-				"uk": "Налаштування: базовий URL і підказки до загальносистемних налаштувань ШІ на великих екранах не ширші, ніж на малих (перевірка репозиторію E5509)",
-				"zh-cn": "设置：基础 URL 和系统级 AI 设置的说明在大屏幕上不比小屏幕更宽（仓库检查 E5509）"
 			}
 		},
 		"titleLang": {

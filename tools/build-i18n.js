@@ -1154,6 +1154,19 @@ const DESC = [
 ];
 /** common.news per version, newest first; the repository builder keeps at most seven. */
 const NEWS = {};
+NEWS['0.7.1'] = [
+    'Review: the migrations of old settings change only their own attribute of the instance object; one handler for all watched objects',
+    'Review: die Migrationen alter Einstellungen ändern nur ihr eigenes Attribut des Instanzobjekts; ein Handler für alle überwachten Objekte',
+    'Ревью: миграции старых настроек меняют только своё поле объекта инстанса; один обработчик для всех отслеживаемых объектов',
+    'Revisão: as migrações de definições antigas alteram só o seu próprio atributo do objeto da instância; um único handler para todos os objetos observados',
+    'Review: de migraties van oude instellingen wijzigen alleen hun eigen attribuut van het instantieobject; één handler voor alle bewaakte objecten',
+    "Revue : les migrations d'anciens paramètres ne modifient que leur propre attribut de l'objet d'instance ; un seul gestionnaire pour tous les objets surveillés",
+    "Revisione: le migrazioni delle vecchie impostazioni modificano solo il proprio attributo dell'oggetto istanza; un unico handler per tutti gli oggetti osservati",
+    'Revisión: las migraciones de ajustes antiguos cambian solo su propio atributo del objeto de instancia; un único manejador para todos los objetos observados',
+    'Przegląd: migracje starych ustawień zmieniają tylko własny atrybut obiektu instancji; jeden handler dla wszystkich obserwowanych obiektów',
+    'Рев’ю: міграції старих налаштувань змінюють лише своє поле об’єкта інстансу; один обробник для всіх відстежуваних об’єктів',
+    '审查：旧设置的迁移只修改实例对象中自己的属性；所有被监视的对象只用一个处理程序',
+];
 NEWS['0.7.0'] = [
     'Adapter updates: tools list_updates, check_npm and update_adapter (repository or npm), only with "Allow adapter updates", for adapters with "Write allowed" and pi-agent itself, always confirmed in the chat; list_notifications reads the notifications from the host',
     'Adapter-Updates: Werkzeuge list_updates, check_npm und update_adapter (Repository oder npm), nur mit „Adapter-Updates erlauben“, für Adapter mit „Schreiben erlaubt“ und pi-agent selbst, immer im Chat bestätigt; list_notifications liest die Benachrichtigungen vom Host',

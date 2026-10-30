@@ -324,6 +324,11 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.7.1 (2026-10-30)
+
+- Review: the migrations of old settings change the own instance object with a partial update (extendForeignObject)
+- One objectChange handler for all watched objects, registered once
+
 ### 0.7.0 (2026-10-30)
 
 - Adapter updates: tools `list_updates`, `check_npm` and `update_adapter` (repository or npm), only with "Allow

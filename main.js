@@ -168,6 +168,8 @@ class PiAgent extends utils.Adapter {
         this.on('stateChange', this.onStateChange.bind(this));
         this.on('message', this.onMessage.bind(this));
         this.on('unload', this.onUnload.bind(this));
+        // one handler for all watched objects (system.ai, fullcalendar instances), registered once
+        this.on('objectChange', this.onObjectChange.bind(this));
 
         this.harness = null;
         this.root = null;
@@ -294,7 +296,8 @@ class PiAgent extends utils.Adapter {
     /**
      * Versions 0.0.1-0.0.4 declared "supportedMessages": {"custom": false}. When that object exists, js-controller
      * ignores common.messagebox and subscribes to messages only if one of its values is true - so sendTo never
-     * arrived. An update does not remove the key from an existing instance object, so it is removed here, once.
+     * arrived. An update does not remove the key from an existing instance object, so it is set to null here, once
+     * (a partial update: js-controller takes a supportedMessages that is no object as absent).
      *
      * @returns {Promise<boolean>} true when the instance object was changed (js-controller then restarts the instance)
      */
@@ -306,8 +309,7 @@ class PiAgent extends utils.Adapter {
             if (!supported || typeof supported !== 'object' || Object.values(supported).some(v => v !== false)) {
                 return false;
             }
-            delete Object(obj.common).supportedMessages;
-            await this.setForeignObjectAsync(id, obj);
+            await this.extendForeignObjectAsync(id, { common: { supportedMessages: null } });
             this.log.info(
                 'Message box enabled: removed an outdated "supportedMessages" from the instance; it restarts once',
             );
@@ -354,17 +356,13 @@ class PiAgent extends utils.Adapter {
      * @returns {Promise<boolean>} true when the instance object was changed (js-controller then restarts the instance)
      */
     async removeObsoleteSettings() {
-        if (!('telegramChannels' in Object(this.config))) {
+        // a partial update cannot remove a key: null marks it as removed
+        if (Object(this.config).telegramChannels === undefined || Object(this.config).telegramChannels === null) {
             return false;
         }
         const id = `system.adapter.${this.namespace}`;
         try {
-            const obj = await this.getForeignObjectAsync(id);
-            if (!obj?.native || !('telegramChannels' in obj.native)) {
-                return false;
-            }
-            delete obj.native.telegramChannels;
-            await this.setForeignObjectAsync(id, obj);
+            await this.extendForeignObjectAsync(id, { native: { telegramChannels: null } });
             this.log.info('Removed the unused setting "telegramChannels"; the instance restarts once');
             return true;
         } catch (e) {
@@ -457,14 +455,8 @@ class PiAgent extends utils.Adapter {
      * @param {ioBroker.Object | null} obj system.ai as it is now
      */
     async watchSystemAi(obj) {
-        const fingerprint = systemAiFingerprint(obj);
-        this.on('objectChange', (id, changed) => {
-            if (id !== SYSTEM_AI_OBJECT_ID || this.stopping || systemAiFingerprint(changed) === fingerprint) {
-                return;
-            }
-            this.log.info('The system-wide AI settings were changed; the instance restarts');
-            this.restart();
-        });
+        // onObjectChange compares the next version of system.ai with this one
+        this.systemAiFingerprint = systemAiFingerprint(obj);
         try {
             await this.subscribeForeignObjectsAsync(SYSTEM_AI_OBJECT_ID);
         } catch (e) {
@@ -1349,14 +1341,31 @@ class PiAgent extends utils.Adapter {
         }
     }
 
+    /**
+     * A watched object changed: system.ai (restart when the provider settings change) or a fullcalendar instance.
+     *
+     * @param {string} id object id
+     * @param {ioBroker.Object | null | undefined} changed the object as it is now, null when deleted
+     */
+    onObjectChange(id, changed) {
+        if (this.stopping) {
+            return;
+        }
+        if (id === SYSTEM_AI_OBJECT_ID) {
+            if (this.systemAiFingerprint !== undefined && systemAiFingerprint(changed) !== this.systemAiFingerprint) {
+                this.log.info('The system-wide AI settings were changed; the instance restarts');
+                this.restart();
+            }
+            return;
+        }
+        if (String(id).startsWith('system.adapter.fullcalendar.')) {
+            void this.refreshSchedulers();
+        }
+    }
+
     /** Keep the list of fullcalendar instances current when one is installed, removed, switched on or off. */
     async watchSchedulers() {
         await this.refreshSchedulers();
-        this.on('objectChange', id => {
-            if (String(id).startsWith('system.adapter.fullcalendar.') && !this.stopping) {
-                void this.refreshSchedulers();
-            }
-        });
         try {
             await this.subscribeForeignObjectsAsync('system.adapter.fullcalendar.*');
         } catch (e) {

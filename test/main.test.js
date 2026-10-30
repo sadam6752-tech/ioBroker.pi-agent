@@ -57,9 +57,7 @@ test('a shutdown in the middle of a run is no error, and the next start finishes
     const first = await startAgent({
         dataDir,
         seed: CRASH_SEED,
-        responses: [
-            f.fauxAssistantMessage(f.fauxToolCall('get_state', { id: 'x.0.lamp' }), { stopReason: 'toolUse' }),
-        ],
+        responses: [f.fauxAssistantMessage(f.fauxToolCall('get_state', { id: 'x.0.lamp' }), { stopReason: 'toolUse' })],
         hooks: {
             getForeignState: async () => {
                 reads++;
@@ -123,7 +121,12 @@ test('a crash during set_state: the write is not repeated and the model is told 
 
 test('own objects are created with translated names; an ACL set by the user survives the start', async () => {
     const dataDir = tmp();
-    const userAcl = { owner: 'system.user.mcp-user', ownerGroup: 'system.group.administrator', object: 1636, state: 1636 };
+    const userAcl = {
+        owner: 'system.user.mcp-user',
+        ownerGroup: 'system.group.administrator',
+        object: 1636,
+        state: 1636,
+    };
     const { agent, db } = await startAgent({
         dataDir,
         config: { apiKey: '' },
@@ -159,7 +162,10 @@ test('the model field of the admin page lists the catalog models of the chosen p
     };
     const deepseek = await ask('deepseek');
     assert.deepEqual(deepseek[0], { value: '', label: 'Default (deepseek-flash)', noTranslation: true });
-    assert.ok(deepseek.some(o => o.value === 'deepseek-v4-pro'), JSON.stringify(deepseek));
+    assert.ok(
+        deepseek.some(o => o.value === 'deepseek-v4-pro'),
+        JSON.stringify(deepseek),
+    );
     const anthropic = await ask('anthropic');
     assert.equal(anthropic[0].label, 'Default (claude-sonnet-5-5)');
     assert.ok(!anthropic.some(o => o.value.startsWith('deepseek')), 'switching the provider switches the list');
@@ -184,9 +190,9 @@ test('an outdated "supportedMessages" of 0.0.1-0.0.4 is removed from the instanc
         },
     });
     const migrated = first.db.objects[instanceId];
-    assert.equal('supportedMessages' in migrated.common, false);
+    assert.equal(migrated.common.supportedMessages, null, 'a partial update; js-controller takes null as absent');
     assert.equal(migrated.common.messagebox, true);
-    assert.equal(migrated.native.apiKey, 'kept-as-stored', 'the rest of the object is written back unchanged');
+    assert.equal(migrated.native.apiKey, 'kept-as-stored', 'the rest of the object is kept');
     assert.ok(first.agent.logs.some(([, m]) => m.startsWith('Message box enabled')));
     assert.equal(first.db.states[`${NAMESPACE}.info.connection`].val, false, 'no agent start before the restart');
     await stopAgent(first.agent);
@@ -195,6 +201,7 @@ test('an outdated "supportedMessages" of 0.0.1-0.0.4 is removed from the instanc
     const second = await startAgent({ dataDir, responses: [] });
     assert.ok(!second.agent.logs.some(([, m]) => m.startsWith('Message box enabled')));
     assert.equal(second.db.states[`${NAMESPACE}.info.connection`].val, true);
+    assert.equal(second.agent.listenerCount('objectChange'), 1, 'one handler for all watched objects');
     await stopAgent(second.agent);
 });
 

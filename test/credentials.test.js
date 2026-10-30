@@ -68,7 +68,10 @@ test('central key: the agent starts with the key of the credential and restarts 
     });
     assert.equal(providerCalls.length, 1);
     assert.equal(providerCalls[0][1], 'sk-central');
-    assert.deepEqual(agent.objectSubscriptions.filter(id => !id.startsWith('system.adapter.')), [CREDENTIAL]);
+    assert.deepEqual(
+        agent.objectSubscriptions.filter(id => !id.startsWith('system.adapter.')),
+        [CREDENTIAL],
+    );
     assert.equal(agent.db.states[`${NAMESPACE}.info.connection`].val, true);
 
     agent.emit('objectChange', 'system.credentials.other', credentialObject('x'));
@@ -150,6 +153,7 @@ test('the unused setting "telegramChannels" of a development build is removed on
         responses: [f.fauxAssistantMessage('hi')],
     });
     assert.equal(providerCalls.length, 0, 'js-controller restarts the instance');
-    assert.deepEqual(db.objects[id].native, { apiKey: 'test' });
+    // a partial update of the instance object, like js-controller merges it: the key stays as null
+    assert.deepEqual(db.objects[id].native, { telegramChannels: null, apiKey: 'test' });
     await stopAgent(agent);
 });
