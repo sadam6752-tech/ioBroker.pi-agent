@@ -56,7 +56,7 @@ The settings have four tabs: **General**, **Write permissions**, **Messengers** 
 | Test connection | Asks the model one short question with the values of the form, saved or not, and shows the answer or the error. The instance must be running. |
 | Simulation mode (nothing is switched) | On by default. The agent says what it would switch, but no state is written and no instance is restarted. |
 | Long-term memory | On by default: the agent keeps facts across all conversations, see below. |
-| Write permissions | Table, one row per scope: an instance or object ID (`hm-rpc.0` covers everything below it) or a pattern with `*` (`hm-rpc.0.*.STATE`), with the checkboxes "Write allowed", "Confirmation required" and "Restart allowed" (only for a row with a whole instance, see below). **Add installed instances** adds a row for every installed instance that has none, with nothing allowed yet. States that match no row can only be read. |
+| Write permissions | Table, one row per scope: an instance or object ID (`hm-rpc.0` covers everything below it) or a pattern with `*` (`hm-rpc.0.*.STATE`), with the checkboxes "Write allowed", "Confirmation required" and "Restart allowed" (only for a row with a whole instance, see below). **Add installed instances** adds a row for every installed instance that has none, with nothing allowed yet. The buttons **… all on/off** above the table switch one checkbox column for all rows: when every row has it set, it is cleared, otherwise it is set; "Confirmation required" only in rows where writing is allowed, "Restart allowed" only in rows with a whole instance. Like the import, they change the table only; save it as usual. States that match no row can only be read. |
 | Write allowlist, Confirmation required | Under "Advanced": regular expressions, one per line, in addition to the table (the settings of 0.0.5 and earlier keep working). |
 | Time zone       | IANA name such as `Europe/Berlin` for reminders, `get_time` and history times, chosen from a list with the current UTC offsets (the instance must be running for the list) or typed in. Empty: the time zone of the ioBroker server. |
 | History instance | `history`, `sql` or `influxdb` instance for `get_history`. Empty: the default history of the system settings. |
@@ -337,6 +337,11 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.7.3 (2026-11-01)
+
+- Write permissions: buttons above the table switch the column "Write allowed", "Confirmation required" or
+  "Restart allowed" for all rows at once
+
 ### 0.7.2 (2026-10-30)
 
 - Confirmation by text in sendTo conversations (e.g. ioBroker.assistant), off by default: the question is the answer
@@ -371,13 +376,6 @@ the last copy.
 - Tools `list_rooms`, `list_functions` and `find_states`: the states of a room and/or a function as set up in
   ioBroker ("the lights in the kitchen")
 - `search_objects` and `get_state` also show min, max and the allowed values of a state
-
-### 0.6.1 (2026-10-29)
-
-- Tool `send_to`: commands to other adapters (e.g. a Telegram message), only to instances with "Write allowed",
-  confirmed where "Confirmation required" is set
-- The agent answers in the language of the question, unless the instructions (of the user or of the calling adapter)
-  name a language
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

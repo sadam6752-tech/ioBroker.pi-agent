@@ -168,7 +168,12 @@ test('history comes from the default history instance of the system settings', a
         hooks: {
             sendToAsync: (to, command) =>
                 to === 'history.0' && command === 'getHistory'
-                    ? { result: [{ val: 20.5, ts: 1 }, { val: 21, ts: 2 }] }
+                    ? {
+                          result: [
+                              { val: 20.5, ts: 1 },
+                              { val: 21, ts: 2 },
+                          ],
+                      }
                     : undefined,
         },
     });
@@ -256,6 +261,48 @@ test('the table "Write permissions" allows and asks like the regular expressions
     await receive(agent, db, 1, 'switch the lamp on');
     assert.equal(agent.asked.length, 1, 'asked because of "confirm"');
     assert.deepEqual(db.writes, [['x.0.lamp', true]]);
+    await stopAgent(agent);
+});
+
+test('sendTo "toggleColumn" switches one checkbox column for all rows where it counts', async () => {
+    const { agent } = await startAgent({ dataDir: tmp(), seed: { objects: {} }, responses: [] });
+    const toggle = (column, writeRules) =>
+        new Promise(resolve => {
+            agent.sendTo = (to, command, message) => resolve(message);
+            agent.onMessage({
+                command: 'toggleColumn',
+                message: { column, writeRules },
+                from: 'system.adapter.admin.0',
+                callback: {},
+            });
+        });
+    const rows = [
+        { scope: 'hm-rpc.0', write: true, confirm: false, restart: false },
+        { scope: 'shelly.0.*.Switch', write: false, confirm: false, restart: false },
+        { scope: 'admin.0', write: false, confirm: false, restart: false },
+    ];
+    const write = (await toggle('write', rows)).native.writeRules;
+    assert.deepEqual(
+        write.map(r => r.write),
+        [true, true, true],
+        'not all set: all on',
+    );
+    assert.deepEqual(
+        (await toggle('write', write)).native.writeRules.map(r => r.write),
+        [false, false, false],
+        'all set: all off',
+    );
+    assert.deepEqual(
+        (await toggle('confirm', rows)).native.writeRules.map(r => r.confirm),
+        [true, false, false],
+        'only where writing is allowed',
+    );
+    assert.deepEqual(
+        (await toggle('restart', rows)).native.writeRules.map(r => r.restart),
+        [true, false, false],
+        'only a whole instance, never admin',
+    );
+    assert.match((await toggle('scope', rows)).error, /Unknown column scope/);
     await stopAgent(agent);
 });
 

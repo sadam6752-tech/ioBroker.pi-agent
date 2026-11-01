@@ -240,6 +240,46 @@
                     "lg": 3,
                     "xl": 3
                 },
+                "toggle_write": {
+                    "type": "sendTo",
+                    "command": "toggleColumn",
+                    "label": "Write allowed: all on/off",
+                    "jsonData": "{\"column\": \"write\", \"writeRules\": ${JSON.stringify(data.writeRules || [])}}",
+                    "useNative": true,
+                    "variant": "outlined",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 4,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "toggle_confirm": {
+                    "type": "sendTo",
+                    "command": "toggleColumn",
+                    "label": "Confirmation required: all on/off",
+                    "jsonData": "{\"column\": \"confirm\", \"writeRules\": ${JSON.stringify(data.writeRules || [])}}",
+                    "useNative": true,
+                    "variant": "outlined",
+                    "xs": 12,
+                    "sm": 4,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "toggle_restart": {
+                    "type": "sendTo",
+                    "command": "toggleColumn",
+                    "label": "Restart allowed: all on/off",
+                    "jsonData": "{\"column\": \"restart\", \"writeRules\": ${JSON.stringify(data.writeRules || [])}}",
+                    "useNative": true,
+                    "variant": "outlined",
+                    "xs": 12,
+                    "sm": 4,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
                 "writeRules": {
                     "type": "table",
                     "newLine": true,

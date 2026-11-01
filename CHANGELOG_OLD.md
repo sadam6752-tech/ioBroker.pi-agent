@@ -1,5 +1,12 @@
 # Older Changelog
 
+### 0.6.1 (2026-10-29)
+
+- Tool `send_to`: commands to other adapters (e.g. a Telegram message), only to instances with "Write allowed",
+  confirmed where "Confirmation required" is set
+- The agent answers in the language of the question, unless the instructions (of the user or of the calling adapter)
+  name a language
+
 ### 0.6.0 (2026-10-28)
 
 - Tool `restart_instance`: restarts adapter instances with "Restart allowed" in the write permissions, after a

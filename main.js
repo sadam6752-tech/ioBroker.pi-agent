@@ -3,7 +3,7 @@
 const utils = require('@iobroker/adapter-core');
 const crypto = require('node:crypto');
 const path = require('node:path');
-const { parseAllowlist, parseWriteRules, requestIdFor, isWriteAllowed } = require('./lib/guard');
+const { parseAllowlist, parseWriteRules, requestIdFor, isWriteAllowed, toggleColumn } = require('./lib/guard');
 const { createIoBrokerExtension } = require('./lib/tools');
 const { createModelsWithKey, listModels, testModel } = require('./lib/providers');
 const {
@@ -2001,6 +2001,20 @@ class PiAgent extends utils.Adapter {
                 const { rows, added } = await this.writeRulesWithInstances(Object(obj.message).writeRules);
                 answer = { native: { writeRules: rows } };
                 this.log.info(`Write permissions: ${added} installed instance(s) added to the table (not saved yet)`);
+            } catch (e) {
+                answer = { error: e.message };
+            }
+            if (obj.callback) {
+                this.sendTo(obj.from, obj.command, answer, obj.callback);
+            }
+            return;
+        }
+        if (obj?.command === 'toggleColumn') {
+            // buttons above the table "Write permissions": one checkbox column for all rows, like importInstances
+            let answer;
+            try {
+                const message = Object(obj.message);
+                answer = { native: { writeRules: toggleColumn(message.writeRules, String(message.column)) } };
             } catch (e) {
                 answer = { error: e.message };
             }
