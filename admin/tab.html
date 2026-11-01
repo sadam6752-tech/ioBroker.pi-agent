@@ -196,6 +196,10 @@
                 background: var(--panel);
                 border: 1px solid var(--warn);
             }
+            .question pre {
+                max-height: 50vh;
+                overflow: auto;
+            }
             .question .buttons {
                 display: flex;
                 gap: 8px;
@@ -299,6 +303,12 @@
                 questionRestart: ['Restart instance %id?', 'Instanz %id neu starten?', 'Перезапустить инстанс %id?', 'Reiniciar a instância %id?', 'Instantie %id herstarten?', "Redémarrer l'instance %id ?", "Riavviare l'istanza %id?", '¿Reiniciar la instancia %id?', 'Zrestartować instancję %id?', 'Перезапустити інстанс %id?', '重启实例 %id？'],
                 questionUpdate: ['Update the adapter %id: %val?', 'Adapter %id aktualisieren: %val?', 'Обновить адаптер %id: %val?', 'Atualizar o adaptador %id: %val?', 'Adapter %id bijwerken: %val?', "Mettre à jour l'adaptateur %id : %val ?", "Aggiornare l'adattatore %id: %val?", '¿Actualizar el adaptador %id: %val?', 'Zaktualizować adapter %id: %val?', 'Оновити адаптер %id: %val?', '更新适配器 %id：%val？'],
                 questionSendTo: ['Send the command %val to %id?', 'Den Befehl %val an %id senden?', 'Отправить команду %val в %id?', 'Enviar o comando %val para %id?', 'De opdracht %val naar %id sturen?', 'Envoyer la commande %val à %id ?', 'Inviare il comando %val a %id?', '¿Enviar el comando %val a %id?', 'Wysłać polecenie %val do %id?', 'Надіслати команду %val до %id?', '向 %id 发送命令 %val？'],
+                questionScriptNew: ['Save the new script %id? It stays stopped.', 'Das neue Skript %id speichern? Es bleibt gestoppt.', 'Сохранить новый скрипт %id? Он останется выключенным.', 'Guardar o novo script %id? Fica parado.', 'Het nieuwe script %id opslaan? Het blijft gestopt.', 'Enregistrer le nouveau script %id ? Il reste arrêté.', 'Salvare il nuovo script %id? Resta fermo.', '¿Guardar el nuevo script %id? Queda detenido.', 'Zapisać nowy skrypt %id? Pozostanie zatrzymany.', 'Зберегти новий скрипт %id? Він залишиться вимкненим.', '保存新脚本 %id？它将保持停止。'],
+                questionScriptChange: ['Save the change of the script %id?', 'Die Änderung am Skript %id speichern?', 'Сохранить изменения скрипта %id?', 'Guardar a alteração do script %id?', 'De wijziging van het script %id opslaan?', 'Enregistrer la modification du script %id ?', 'Salvare la modifica dello script %id?', '¿Guardar el cambio del script %id?', 'Zapisać zmianę skryptu %id?', 'Зберегти зміни скрипту %id?', '保存脚本 %id 的修改？'],
+                questionScriptRunning: ['The script is running and restarts with the new code at once.', 'Das Skript läuft und startet sofort mit dem neuen Code neu.', 'Скрипт сейчас работает и сразу перезапустится с новым кодом.', 'O script está a correr e reinicia de imediato com o novo código.', 'Het script draait en herstart meteen met de nieuwe code.', 'Le script tourne et redémarre aussitôt avec le nouveau code.', 'Lo script è in esecuzione e si riavvia subito con il nuovo codice.', 'El script está en marcha y se reinicia enseguida con el código nuevo.', 'Skrypt działa i od razu uruchomi się ponownie z nowym kodem.', 'Скрипт зараз працює і одразу перезапуститься з новим кодом.', '脚本正在运行，会立即以新代码重启。'],
+                questionScriptStart: ['Start the script %id?', 'Das Skript %id starten?', 'Запустить скрипт %id?', 'Iniciar o script %id?', 'Het script %id starten?', 'Démarrer le script %id ?', 'Avviare lo script %id?', '¿Iniciar el script %id?', 'Uruchomić skrypt %id?', 'Запустити скрипт %id?', '启动脚本 %id？'],
+                questionScriptStop: ['Stop the script %id?', 'Das Skript %id stoppen?', 'Остановить скрипт %id?', 'Parar o script %id?', 'Het script %id stoppen?', 'Arrêter le script %id ?', 'Fermare lo script %id?', '¿Detener el script %id?', 'Zatrzymać skrypt %id?', 'Зупинити скрипт %id?', '停止脚本 %id？'],
+                questionScriptRevert: ['Revert the script %id to its previous version? It is stopped afterwards.', 'Das Skript %id auf die vorige Version zurücksetzen? Danach ist es gestoppt.', 'Вернуть прошлую версию скрипта %id? После этого он будет выключен.', 'Repor a versão anterior do script %id? Depois fica parado.', 'Het script %id terugzetten naar de vorige versie? Daarna is het gestopt.', 'Rétablir la version précédente du script %id ? Il sera ensuite arrêté.', 'Ripristinare la versione precedente dello script %id? Dopo sarà fermo.', '¿Recuperar la versión anterior del script %id? Después quedará detenido.', 'Przywrócić poprzednią wersję skryptu %id? Potem będzie zatrzymany.', 'Повернути попередню версію скрипту %id? Після цього він буде вимкнений.', '恢复脚本 %id 的上一个版本？之后它将停止。'],
                 simulation: ['Simulation mode', 'Simulationsmodus', 'Режим симуляции', 'Modo de simulação', 'Simulatiemodus', 'Mode simulation', 'Modalità simulazione', 'Modo de simulación', 'Tryb symulacji', 'Режим симуляції', '模拟模式'],
                 notRunning: [
                     'The agent is not running. Enter the API key in the instance settings.',
@@ -521,9 +531,24 @@
                 }
                 if (state.question) {
                     const q = state.question;
-                    const text = t(q.action === 'restart' ? 'questionRestart' : q.action === 'sendTo' ? 'questionSendTo' : q.action === 'update' ? 'questionUpdate' : 'question')
-                        .replace('%id', `<code>${escapeHtml(q.id)}</code>`)
-                        .replace('%val', `<code>${escapeHtml(q.action === 'sendTo' || q.action === 'update' ? String(q.val) : JSON.stringify(q.val))}</code>`);
+                    let text;
+                    if (String(q.action).startsWith('script')) {
+                        // a script: the question, what pi-agent found in the code, and the change line by line
+                        const v = q.val || {};
+                        const key = q.action === 'scriptEnable' ? (v.enabled ? 'questionScriptStart' : 'questionScriptStop') : q.action === 'scriptRevert' ? 'questionScriptRevert' : v.isNew ? 'questionScriptNew' : 'questionScriptChange';
+                        text = [
+                            t(key).replace('%id', `<code>${escapeHtml(q.id)}</code>`),
+                            ...(q.action === 'scriptSave' && v.running ? [escapeHtml(t('questionScriptRunning'))] : []),
+                            ...(v.warnings || []).map(w => `⚠ ${escapeHtml(w)}`),
+                        ].join('<br>');
+                        if (v.diff) {
+                            text += `<pre>${escapeHtml(v.diff)}</pre>`;
+                        }
+                    } else {
+                        text = t(q.action === 'restart' ? 'questionRestart' : q.action === 'sendTo' ? 'questionSendTo' : q.action === 'update' ? 'questionUpdate' : 'question')
+                            .replace('%id', `<code>${escapeHtml(q.id)}</code>`)
+                            .replace('%val', `<code>${escapeHtml(q.action === 'sendTo' || q.action === 'update' ? String(q.val) : JSON.stringify(q.val))}</code>`);
+                    }
                     const box = item('msg question', `⚠️ ${text}<div class="buttons"></div>`);
                     for (const answer of ['yes', 'no']) {
                         const button = document.createElement('button');

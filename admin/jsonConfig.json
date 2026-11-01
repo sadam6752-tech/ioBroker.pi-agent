@@ -345,6 +345,78 @@
                     "lg": 12,
                     "xl": 12
                 },
+                "scriptsHeader": {
+                    "type": "header",
+                    "text": "Scripts of the javascript adapter",
+                    "size": 4,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "scriptsHelp": {
+                    "type": "staticText",
+                    "text": "A script runs with the rights of the javascript adapter: the write permissions of pi-agent do not reach it. Every save and every start is confirmed separately, with the change line by line.",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "allowScripts": {
+                    "type": "checkbox",
+                    "label": "The agent may create and change scripts (folder pi-agent)",
+                    "help": "Scripts of the javascript adapter in the folder script.js.pi-agent; new ones stay stopped until a start is confirmed",
+                    "default": false,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "scriptInstance": {
+                    "type": "instance",
+                    "adapter": "javascript",
+                    "label": "javascript instance of new scripts",
+                    "default": "javascript.0",
+                    "disabled": "!data.allowScripts",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "allowForeignScripts": {
+                    "type": "checkbox",
+                    "label": "Also change other scripts",
+                    "help": "Scripts outside the folder pi-agent, including global scripts; Blockly and Rules stay read-only",
+                    "default": false,
+                    "disabled": "!data.allowScripts",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "scriptVoice": {
+                    "type": "checkbox",
+                    "label": "Confirm scripts by voice (sendTo conversations)",
+                    "help": "The code is not read out, only what the script does and what pi-agent found in it. Needs \"Confirmation by text in sendTo conversations\".",
+                    "default": false,
+                    "disabled": "!data.allowScripts || !data.textConfirmation",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
                 "expertHeader": {
                     "type": "header",
                     "text": "Advanced: regular expressions",

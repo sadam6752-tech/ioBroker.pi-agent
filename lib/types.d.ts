@@ -34,6 +34,24 @@ export interface Policy {
         add: (fact: string) => Promise<string>;
         remove: (query: string) => Promise<string>;
     };
+    /** Scripts of the javascript adapter the agent may change (lib/scripts.js). */
+    scripts?: {
+        /** Setting "The agent may create and change scripts". */
+        allowed: () => boolean;
+        /** Setting "Also change other scripts". */
+        foreign: () => boolean;
+        /** javascript instance of new scripts, e.g. "javascript.0". */
+        instance: () => string;
+        /** How long the log is watched after a start, in ms. */
+        checkMs: () => number;
+        /** Previous versions for revert_script. */
+        history: {
+            count: (id: string) => number;
+            push: (id: string, source: string) => void;
+            peek: (id: string) => string | undefined;
+            pop: (id: string) => void;
+        };
+    };
     /** Watches of notify_when (lib/watches.js). */
     watches?: {
         add: (request: {

@@ -69,6 +69,7 @@ const { createDrivers, messengerType, MESSENGER_ADAPTERS } = require('./lib/mess
 const { ADMIN, ADMIN_INSTRUCTIONS, historyOf, withNotices, createAdminChat } = require('./lib/admin-chat');
 const { isAllowedUser, stripPrefix, telegramRequestId } = require('./lib/telegram');
 const { TextConfirmations, isYes, confirmationQuestion } = require('./lib/text-confirmation');
+const { createScriptHistory, scriptName } = require('./lib/scripts');
 
 /**
  * Text blocks of the model messages of one transcript entry.
@@ -195,6 +196,10 @@ class PiAgent extends utils.Adapter {
         this.adminChat = createAdminChat(this);
         /** Long-term memory shared by all conversations (lib/memory.js). */
         this.memory = createMemory(this, () => this.config.longTermMemory !== false);
+        /** Previous versions of the scripts the agent changed (lib/scripts.js), set up in onReady. */
+        this.scriptHistory = null;
+        /** How long the log is watched for errors after the agent started a script. */
+        this.scriptCheckMs = 15_000;
         /** Watches of notify_when (lib/watches.js); they tell the chat of their conversation like a reminder. */
         this.watches = createWatches(this, (conversationId, text) => this.deliverReminder(conversationId, text));
         /** Instances with "Restart allowed" in the write permissions. */
@@ -240,6 +245,8 @@ class PiAgent extends utils.Adapter {
             }
             // Created here, not in instanceObjects: js-controller would reset their ACL at every start.
             await ensureObjects(this);
+            this.scriptHistory = createScriptHistory(utils.getAbsoluteInstanceDataDir(this));
+            this.scriptHistory.load();
             // a backup chosen for restore replaces the store before anything opens it
             await this.applyRestore();
             await this.memory.load();
@@ -558,6 +565,14 @@ class PiAgent extends utils.Adapter {
                 restartList: this.restartList,
                 restartInstance: instance => this.restartInstance(instance),
                 memory: this.memory,
+                scripts: {
+                    allowed: () => this.config.allowScripts === true,
+                    foreign: () => this.config.allowScripts === true && this.config.allowForeignScripts === true,
+                    instance: () =>
+                        String(this.config.scriptInstance || 'javascript.0').replace(/^system\.adapter\./, ''),
+                    checkMs: () => this.scriptCheckMs,
+                    history: this.scriptHistory,
+                },
                 watches: this.watches,
                 scheduled: {
                     tasks: conversationId => this.plannedTasks(conversationId),
@@ -740,7 +755,9 @@ class PiAgent extends utils.Adapter {
     async requestTextConfirmation(key, { id, val, action }) {
         const language = await this.systemLanguage();
         let what = id;
-        if (!action) {
+        if (String(action).startsWith('script')) {
+            what = scriptName(id);
+        } else if (!action) {
             // a state is spoken by its name, if it has one
             const name = (await this.getForeignObjectAsync(id).catch(() => null))?.common?.name;
             what = String((name && typeof name === 'object' ? name[language] || name.en : name) || id);
@@ -792,7 +809,11 @@ class PiAgent extends utils.Adapter {
             return this.adminChat.confirm(user, id, val, action);
         }
         const key = this.keyOfConversation(conversationId);
-        if (key?.startsWith('sendTo:') && this.config.textConfirmation === true) {
+        // scripts are confirmed by voice only with their own setting: the code cannot be read out
+        const byText =
+            this.config.textConfirmation === true &&
+            (!String(action).startsWith('script') || this.config.scriptVoice === true);
+        if (key?.startsWith('sendTo:') && byText) {
             const answer = await this.requestTextConfirmation(key, { id, val, action });
             if (answer !== 'unavailable') {
                 return answer;
@@ -933,7 +954,11 @@ class PiAgent extends utils.Adapter {
         } catch {
             // an unreadable map is not part of the backup
         }
-        const { data, rawSize } = createSnapshot(this.storeFile(), { chats, memory: this.memory.list() });
+        const { data, rawSize } = createSnapshot(this.storeFile(), {
+            chats,
+            memory: this.memory.list(),
+            scripts: this.scriptHistory.all(),
+        });
         // meta.user: ioBroker and BackItUp backups take the files of the mount point along
         await this.setForeignObjectNotExistsAsync(this.storageId(), {
             type: 'meta',
@@ -1175,6 +1200,9 @@ class PiAgent extends utils.Adapter {
         await this.setStateAsync('chat.pending', { val: '', ack: true });
         if (restored.memory) {
             await this.memory.replace(restored.memory);
+        }
+        if (restored.scripts) {
+            this.scriptHistory.replace(restored.scripts);
         }
         this.log.info(
             `Conversations restored from a backup (${Object.keys(restored.chats).length} chat(s)); waiting requests were dropped`,

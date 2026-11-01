@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.7.3",
+		"version": "0.8.0",
 		"news": {
+			"0.8.0": {
+				"en": "Scripts of the javascript adapter, off by default: the agent creates and changes scripts in the folder script.js.pi-agent (other scripts with an extra setting), starts, stops and reverts them; every step is confirmed on its own with the change line by line, by voice only with its own setting",
+				"de": "Skripte des javascript-Adapters, ab Werk aus: Der Agent legt Skripte im Ordner script.js.pi-agent an und ändert sie (andere Skripte mit einer eigenen Einstellung), startet, stoppt und setzt sie zurück; jeder Schritt wird einzeln mit der Änderung Zeile für Zeile bestätigt, per Sprache nur mit eigener Einstellung",
+				"ru": "Скрипты javascript-адаптера, по умолчанию выключено: агент создаёт и меняет скрипты в папке script.js.pi-agent (другие скрипты — с отдельной настройкой), запускает, останавливает и откатывает их; каждый шаг подтверждается отдельно с изменениями построчно, голосом — только с отдельной настройкой",
+				"pt": "Scripts do adaptador javascript, desligado por defeito: o agente cria e altera scripts na pasta script.js.pi-agent (outros scripts com uma definição própria), inicia, para e repõe-nos; cada passo é confirmado à parte com a alteração linha a linha, por voz só com uma definição própria",
+				"nl": "Scripts van de javascript-adapter, standaard uit: de agent maakt en wijzigt scripts in de map script.js.pi-agent (andere scripts met een eigen instelling), start, stopt en zet ze terug; elke stap wordt apart bevestigd met de wijziging regel voor regel, met spraak alleen met een eigen instelling",
+				"fr": "Scripts de l'adaptateur javascript, désactivés par défaut : l'agent crée et modifie des scripts dans le dossier script.js.pi-agent (les autres scripts avec un réglage à part), les démarre, les arrête et les rétablit ; chaque étape est confirmée à part avec la modification ligne par ligne, à la voix seulement avec son propre réglage",
+				"it": "Script dell'adattatore javascript, disattivati di default: l'agente crea e modifica script nella cartella script.js.pi-agent (altri script con un'impostazione apposita), li avvia, li ferma e li ripristina; ogni passo è confermato a parte con la modifica riga per riga, a voce solo con un'impostazione apposita",
+				"es": "Scripts del adaptador javascript, desactivado por defecto: el agente crea y cambia scripts en la carpeta script.js.pi-agent (otros scripts con un ajuste propio), los inicia, detiene y recupera; cada paso se confirma por separado con el cambio línea a línea, por voz solo con un ajuste propio",
+				"pl": "Skrypty adaptera javascript, domyślnie wyłączone: agent tworzy i zmienia skrypty w folderze script.js.pi-agent (inne skrypty z osobnym ustawieniem), uruchamia, zatrzymuje i przywraca je; każdy krok jest potwierdzany osobno ze zmianą linia po linii, głosem tylko z osobnym ustawieniem",
+				"uk": "Скрипти javascript-адаптера, типово вимкнено: агент створює та змінює скрипти в папці script.js.pi-agent (інші скрипти — з окремим налаштуванням), запускає, зупиняє та відкочує їх; кожен крок підтверджується окремо зі змінами порядково, голосом — лише з окремим налаштуванням",
+				"zh-cn": "javascript 适配器的脚本，默认关闭：代理在文件夹 script.js.pi-agent 中创建和修改脚本（其他脚本需单独设置），启动、停止和回滚它们；每一步都要单独确认并逐行显示修改，语音确认需单独设置"
+			},
 			"0.7.3": {
 				"en": "Write permissions: buttons above the table switch the column \"Write allowed\", \"Confirmation required\" or \"Restart allowed\" for all rows at once",
 				"de": "Schreibrechte: Schaltflächen über der Tabelle schalten die Spalte „Schreiben erlaubt“, „Bestätigung nötig“ oder „Neustart erlaubt“ für alle Zeilen auf einmal",
@@ -80,19 +93,6 @@
 				"pl": "Narzędzia notify_when (wiadomość, gdy stan spełnia warunek, także przez kilka minut), schedule_set_state (zapis później, sprawdzany ponownie w chwili wykonania), list_scheduled i cancel_scheduled, get_logs i list_notifications",
 				"uk": "Інструменти notify_when (повідомлення, коли стан виконує умову, зокрема протягом кількох хвилин), schedule_set_state (запис пізніше, перевіряється знову в момент виконання), list_scheduled і cancel_scheduled, get_logs і list_notifications",
 				"zh-cn": "工具 notify_when（状态满足条件时发送消息，也可要求持续几分钟）、schedule_set_state（稍后写入，到时再次检查）、list_scheduled 和 cancel_scheduled、get_logs 和 list_notifications"
-			},
-			"0.6.2": {
-				"en": "Tools list_rooms, list_functions and find_states: the states of a room and/or a function as set up in ioBroker (\"the lights in the kitchen\"); search_objects and get_state also show min, max and the allowed values of a state",
-				"de": "Werkzeuge list_rooms, list_functions und find_states: die Datenpunkte eines Raums und/oder einer Funktion, wie in ioBroker eingerichtet („das Licht in der Küche“); search_objects und get_state zeigen auch Minimum, Maximum und die erlaubten Werte eines Datenpunkts",
-				"ru": "Инструменты list_rooms, list_functions и find_states: состояния комнаты и/или функции, как они настроены в ioBroker («свет на кухне»); search_objects и get_state также показывают минимум, максимум и допустимые значения состояния",
-				"pt": "Ferramentas list_rooms, list_functions e find_states: os estados de uma divisão e/ou de uma função tal como configurados no ioBroker (\"as luzes da cozinha\"); search_objects e get_state mostram também o mínimo, o máximo e os valores permitidos de um estado",
-				"nl": "Tools list_rooms, list_functions en find_states: de states van een ruimte en/of een functie zoals ingesteld in ioBroker (\"de lampen in de keuken\"); search_objects en get_state tonen ook minimum, maximum en de toegestane waarden van een state",
-				"fr": "Outils list_rooms, list_functions et find_states : les états d'une pièce et/ou d'une fonction tels que configurés dans ioBroker (« les lumières de la cuisine ») ; search_objects et get_state montrent aussi le minimum, le maximum et les valeurs autorisées d'un état",
-				"it": "Strumenti list_rooms, list_functions e find_states: gli stati di una stanza e/o di una funzione come configurati in ioBroker («le luci della cucina»); search_objects e get_state mostrano anche minimo, massimo e i valori consentiti di uno stato",
-				"es": "Herramientas list_rooms, list_functions y find_states: los estados de una habitación y/o una función tal como están configurados en ioBroker («las luces de la cocina»); search_objects y get_state muestran también el mínimo, el máximo y los valores permitidos de un estado",
-				"pl": "Narzędzia list_rooms, list_functions i find_states: stany pomieszczenia i/lub funkcji skonfigurowane w ioBroker („światła w kuchni”); search_objects i get_state pokazują też minimum, maksimum i dozwolone wartości stanu",
-				"uk": "Інструменти list_rooms, list_functions і find_states: стани кімнати та/або функції, як їх налаштовано в ioBroker («світло на кухні»); search_objects і get_state також показують мінімум, максимум і допустимі значення стану",
-				"zh-cn": "工具 list_rooms、list_functions 和 find_states：按 ioBroker 中的设置获取某个房间和/或功能的状态（“厨房的灯”）；search_objects 和 get_state 还会显示状态的最小值、最大值和允许的值"
 			}
 		},
 		"titleLang": {
@@ -195,6 +195,10 @@
 		"writeRules": [],
 		"allowUpdates": false,
 		"textConfirmation": false,
+		"allowScripts": false,
+		"scriptInstance": "javascript.0",
+		"allowForeignScripts": false,
+		"scriptVoice": false,
 		"writeAllow": "",
 		"instructions": "",
 		"dryRun": true,

@@ -31,6 +31,11 @@ declare global {
             allowUpdates: boolean;
             /** Confirmations by text in the conversations of sendTo callers since 0.7.2 (tab "Write permissions"). */
             textConfirmation: boolean;
+            /** Scripts of the javascript adapter by the agent since 0.8.0 (tab "Write permissions"). */
+            allowScripts: boolean;
+            scriptInstance: string;
+            allowForeignScripts: boolean;
+            scriptVoice: boolean;
             /** Tab "Backup" since 0.4.0: automatic backup every so many hours (0 off, 24, 168) and how many to keep. */
             autoBackupInterval: number;
             backupKeep: number;

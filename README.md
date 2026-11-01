@@ -57,6 +57,7 @@ The settings have four tabs: **General**, **Write permissions**, **Messengers** 
 | Simulation mode (nothing is switched) | On by default. The agent says what it would switch, but no state is written and no instance is restarted. |
 | Long-term memory | On by default: the agent keeps facts across all conversations, see below. |
 | Write permissions | Table, one row per scope: an instance or object ID (`hm-rpc.0` covers everything below it) or a pattern with `*` (`hm-rpc.0.*.STATE`), with the checkboxes "Write allowed", "Confirmation required" and "Restart allowed" (only for a row with a whole instance, see below). **Add installed instances** adds a row for every installed instance that has none, with nothing allowed yet. The buttons **… all on/off** above the table switch one checkbox column for all rows: when every row has it set, it is cleared, otherwise it is set; "Confirmation required" only in rows where writing is allowed, "Restart allowed" only in rows with a whole instance. Like the import, they change the table only; save it as usual. States that match no row can only be read. |
+| Scripts | **The agent may create and change scripts** (off by default), the javascript instance of new scripts, **Also change other scripts** and **Confirm scripts by voice**, see below. |
 | Write allowlist, Confirmation required | Under "Advanced": regular expressions, one per line, in addition to the table (the settings of 0.0.5 and earlier keep working). |
 | Time zone       | IANA name such as `Europe/Berlin` for reminders, `get_time` and history times, chosen from a list with the current UTC offsets (the instance must be running for the list) or typed in. Empty: the time zone of the ioBroker server. |
 | History instance | `history`, `sql` or `influxdb` instance for `get_history`. Empty: the default history of the system settings. |
@@ -210,6 +211,8 @@ Select **OpenAI-compatible (own URL)** for any server with the OpenAI chat compl
 ## Security
 
 - The model decides which tools to call. The write permissions and the simulation mode are your protection, not the prompt.
+- Scripts the agent writes run with the rights of the javascript adapter: once one runs, the write permissions and
+  the simulation mode of pi-agent do not limit it. Read the change before you confirm it (see Scripts).
 - The text of your requests and the values the agent reads are sent to the provider. Do not give it access to states
   that contain secrets.
 - The conversations are stored unencrypted in the instance data directory (`session.sqlite`, SQLite built into
@@ -293,6 +296,32 @@ there updates?" or "update telegram":
   agent waits up to 10 minutes and reports the result. When pi-agent updates itself it restarts and tells the chat
   afterwards whether the new version runs (state `update.pending` in the meantime).
 
+## Scripts
+
+With **The agent may create and change scripts** (tab "Write permissions", off by default) the agent writes scripts
+of the javascript adapter, e.g. "write a script that switches the hall light on at sunset". A script runs with the
+rights of the javascript adapter, not of pi-agent: the write permissions and the simulation mode do not reach it once
+it runs. So this is meant for users who read the code before they confirm it.
+
+- `list_scripts` and `get_script` read every script. `save_script` creates or changes one, `set_script_enabled`
+  starts or stops it, `revert_script` brings back the previous version (each call one version further back; the
+  script is stopped afterwards).
+- The agent writes only in the folder `script.js.pi-agent`. **Also change other scripts** lets it change the other
+  scripts too, global scripts included. Blockly and Rules scripts stay read-only.
+- Every save, start, stop and revert is confirmed on its own. The admin chat shows the change line by line; Telegram
+  and MAX show it as far as a message allows. The question also lists what pi-agent found in the code: `exec`,
+  `require`, file access, object changes, `sendTo`, network calls, and `setState` on states outside the write
+  permissions of pi-agent or by a computed id. This search is a hint, not a protection.
+- A new script stays stopped until its start is confirmed. A running script restarts with the new code at once; the
+  question says so. JavaScript is checked for syntax errors before the user is asked; the agent fixes them first.
+- After a start the agent watches the log of the javascript instance for a few seconds and reports errors of the
+  script.
+- By voice (a `sendTo` conversation such as ioBroker.assistant) scripts are confirmed only with **Confirm scripts by
+  voice**, which needs "Confirmation by text in sendTo conversations". The code is not read out: the question names
+  the script, says in one sentence what it does (written by the model) and lists what pi-agent found in the code.
+- The previous versions (five per script) are kept in the instance data directory and are part of the backups of the
+  conversations.
+
 ## Long-term memory
 
 A conversation remembers everything said in it, but the conversations do not know each other. Facts that should
@@ -337,6 +366,12 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.8.0 (2026-11-02)
+
+- Scripts of the javascript adapter, off by default: the agent creates and changes scripts in the folder
+  `script.js.pi-agent` (other scripts with an extra setting), starts, stops and reverts them; every step is confirmed
+  on its own with the change line by line, by voice only with its own setting
+
 ### 0.7.3 (2026-11-01)
 
 - Write permissions: buttons above the table switch the column "Write allowed", "Confirmation required" or
@@ -370,12 +405,6 @@ the last copy.
 - Tool `schedule_set_state`: a write later; the permission is checked again when it is due
 - Tools `list_scheduled` and `cancel_scheduled` for reminders, scheduled writes and watches
 - Tools `get_logs` and `list_notifications` (read only)
-
-### 0.6.2 (2026-10-29)
-
-- Tools `list_rooms`, `list_functions` and `find_states`: the states of a room and/or a function as set up in
-  ioBroker ("the lights in the kitchen")
-- `search_objects` and `get_state` also show min, max and the allowed values of a state
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

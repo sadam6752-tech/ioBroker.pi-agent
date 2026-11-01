@@ -1,5 +1,11 @@
 # Older Changelog
 
+### 0.6.2 (2026-10-29)
+
+- Tools `list_rooms`, `list_functions` and `find_states`: the states of a room and/or a function as set up in
+  ioBroker ("the lights in the kitchen")
+- `search_objects` and `get_state` also show min, max and the allowed values of a state
+
 ### 0.6.1 (2026-10-29)
 
 - Tool `send_to`: commands to other adapters (e.g. a Telegram message), only to instances with "Write allowed",
