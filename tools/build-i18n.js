@@ -1340,6 +1340,19 @@ const DESC = [
 ];
 /** common.news per version, newest first; the repository builder keeps at most seven. */
 const NEWS = {};
+NEWS['0.8.2'] = [
+    'Confirmation by text: the question is in the language the caller sends (ioBroker.assistant: the language of its satellites); the same yes twice is yes; the log shows what was heard; the question about a script is in one language',
+    'Bestätigung per Text: Die Frage kommt in der Sprache, die der Aufrufer mitschickt (ioBroker.assistant: die Sprache seiner Satelliten); dasselbe Ja zweimal ist ein Ja; das Log zeigt, was gehört wurde; die Frage zu einem Skript ist in einer Sprache',
+    'Подтверждение текстом: вопрос задаётся на языке, который передаёт вызывающий (ioBroker.assistant — язык его сателлитов); «да» дважды тоже «да»; в логе видно, что было услышано; вопрос о скрипте целиком на одном языке',
+    'Confirmação por texto: a pergunta vem no idioma que o chamador envia (ioBroker.assistant: o idioma dos seus satélites); o mesmo sim duas vezes é sim; o log mostra o que foi ouvido; a pergunta sobre um script está num só idioma',
+    'Bevestiging per tekst: de vraag komt in de taal die de aanroeper meestuurt (ioBroker.assistant: de taal van zijn satellieten); twee keer hetzelfde ja is ja; het log toont wat er gehoord is; de vraag over een script is in één taal',
+    "Confirmation par texte : la question est dans la langue que l'appelant transmet (ioBroker.assistant : la langue de ses satellites) ; le même oui deux fois vaut oui ; le journal montre ce qui a été entendu ; la question sur un script est dans une seule langue",
+    'Conferma via testo: la domanda è nella lingua che il chiamante invia (ioBroker.assistant: la lingua dei suoi satelliti); lo stesso sì due volte vale sì; il log mostra cosa è stato sentito; la domanda su uno script è in una sola lingua',
+    'Confirmación por texto: la pregunta va en el idioma que envía quien llama (ioBroker.assistant: el idioma de sus satélites); el mismo sí dos veces es sí; el registro muestra lo que se oyó; la pregunta sobre un script está en un solo idioma',
+    'Potwierdzenie tekstem: pytanie jest w języku, który przesyła wywołujący (ioBroker.assistant: język jego satelitów); to samo „tak” dwa razy to „tak”; log pokazuje, co usłyszano; pytanie o skrypt jest w jednym języku',
+    'Підтвердження текстом: питання ставиться мовою, яку передає той, хто викликає (ioBroker.assistant — мова його сателітів); «так» двічі теж «так»; у лозі видно, що було почуто; питання про скрипт однією мовою',
+    '文字确认：问题使用调用方发送的语言（ioBroker.assistant：其卫星设备的语言）；同一个“是”说两遍也算是；日志显示听到的内容；关于脚本的问题只用一种语言',
+];
 NEWS['0.8.1'] = [
     'Scripts: new scripts in TypeScript when the user asks for it; TypeScript is checked for syntax errors too',
     'Skripte: neue Skripte in TypeScript, wenn der Benutzer es wünscht; auch TypeScript wird auf Syntaxfehler geprüft',

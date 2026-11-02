@@ -1,5 +1,11 @@
 # Older Changelog
 
+### 0.6.4 (2026-10-29)
+
+- Scheduler fullcalendar: repeating, longer and timed actions go to fullcalendar through `send_to`, but only for
+  states pi-agent may write; asked where "Confirmation required" is set
+- When fullcalendar is not installed or not allowed, the agent tells the user what is missing
+
 ### 0.6.3 (2026-10-29)
 
 - Tool `notify_when`: a message in the chat when a state meets a condition, also for some minutes

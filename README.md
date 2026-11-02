@@ -376,7 +376,7 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 0.8.2 (2026-11-02)
 
 - Confirmation by text: the question is in the `language` the caller sends with `ask` (ioBroker.assistant: the
   language of its satellites) instead of the system language; a satellite listening in Russian could not hear the
@@ -416,12 +416,6 @@ the last copy.
 - Adapter updates: tools `list_updates`, `check_npm` and `update_adapter` (repository or npm), only with "Allow
   adapter updates", for adapters with "Write allowed" and pi-agent itself, always confirmed in the chat
 - `list_notifications` reads the notifications from the host, as admin shows them
-
-### 0.6.4 (2026-10-29)
-
-- Scheduler fullcalendar: repeating, longer and timed actions go to fullcalendar through `send_to`, but only for
-  states pi-agent may write; asked where "Confirmation required" is set
-- When fullcalendar is not installed or not allowed, the agent tells the user what is missing
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 
