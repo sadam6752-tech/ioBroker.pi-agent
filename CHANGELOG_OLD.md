@@ -1,5 +1,12 @@
 # Older Changelog
 
+### 0.6.3 (2026-10-29)
+
+- Tool `notify_when`: a message in the chat when a state meets a condition, also for some minutes
+- Tool `schedule_set_state`: a write later; the permission is checked again when it is due
+- Tools `list_scheduled` and `cancel_scheduled` for reminders, scheduled writes and watches
+- Tools `get_logs` and `list_notifications` (read only)
+
 ### 0.6.2 (2026-10-29)
 
 - Tools `list_rooms`, `list_functions` and `find_states`: the states of a room and/or a function as set up in

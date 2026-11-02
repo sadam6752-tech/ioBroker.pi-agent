@@ -306,6 +306,8 @@ it runs. So this is meant for users who read the code before they confirm it.
 - `list_scripts` and `get_script` read every script. `save_script` creates or changes one, `set_script_enabled`
   starts or stops it, `revert_script` brings back the previous version (each call one version further back; the
   script is stopped afterwards).
+- New scripts are JavaScript; TypeScript when you ask for it ("write it in TypeScript"). An existing script keeps its
+  language.
 - The agent writes only in the folder `script.js.pi-agent`. **Also change other scripts** lets it change the other
   scripts too, global scripts included. Blockly and Rules scripts stay read-only.
 - Every save, start, stop and revert is confirmed on its own. The admin chat shows the change line by line; Telegram
@@ -313,7 +315,9 @@ it runs. So this is meant for users who read the code before they confirm it.
   `require`, file access, object changes, `sendTo`, network calls, and `setState` on states outside the write
   permissions of pi-agent or by a computed id. This search is a hint, not a protection.
 - A new script stays stopped until its start is confirmed. A running script restarts with the new code at once; the
-  question says so. JavaScript is checked for syntax errors before the user is asked; the agent fixes them first.
+  question says so. The syntax is checked before the user is asked; the agent fixes errors first. TypeScript loses its
+  types for this check (Node.js `stripTypeScriptTypes`): types are not checked, and `enum` or `namespace` only by the
+  compiler of the javascript adapter when the script starts.
 - After a start the agent watches the log of the javascript instance for a few seconds and reports errors of the
   script.
 - By voice (a `sendTo` conversation such as ioBroker.assistant) scripts are confirmed only with **Confirm scripts by
@@ -366,6 +370,10 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.8.1 (2026-11-02)
+
+- Scripts: new scripts in TypeScript when the user asks for it; TypeScript is checked for syntax errors too
+
 ### 0.8.0 (2026-11-02)
 
 - Scripts of the javascript adapter, off by default: the agent creates and changes scripts in the folder
@@ -398,13 +406,6 @@ the last copy.
 - Scheduler fullcalendar: repeating, longer and timed actions go to fullcalendar through `send_to`, but only for
   states pi-agent may write; asked where "Confirmation required" is set
 - When fullcalendar is not installed or not allowed, the agent tells the user what is missing
-
-### 0.6.3 (2026-10-29)
-
-- Tool `notify_when`: a message in the chat when a state meets a condition, also for some minutes
-- Tool `schedule_set_state`: a write later; the permission is checked again when it is due
-- Tools `list_scheduled` and `cancel_scheduled` for reminders, scheduled writes and watches
-- Tools `get_logs` and `list_notifications` (read only)
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

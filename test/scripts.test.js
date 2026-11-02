@@ -94,10 +94,25 @@ test('scriptWarnings: risky calls and writes outside the write permissions', () 
     ]);
 });
 
-test('syntaxError: the line of the error; await at the top is fine; TypeScript is not checked', () => {
+test('syntaxError: the line of the error; await and return at the top are fine', () => {
     assert.equal(syntaxError('const x = await getStateAsync("a");\nlog(x);', 'Javascript/js'), '');
     assert.match(syntaxError('log(1);\nconst = 2;', 'Javascript/js'), /\(line 2\)$/);
-    assert.equal(syntaxError('const x: number = ;', 'TypeScript/ts'), '');
+    assert.equal(syntaxError('<xml/>', 'Blockly'), '');
+});
+
+test('syntaxError of TypeScript: types are stripped, syntax errors found, enum is left to the compiler', () => {
+    const emitted = [];
+    const listener = w => emitted.push(w.name);
+    process.on('warning', listener);
+    try {
+        assert.equal(syntaxError('const x: number = await getStateAsync("a");\nif (!x) return;', 'TypeScript/ts'), '');
+        assert.match(syntaxError('log(1);\nconst x: = ;', 'TypeScript/ts'), /\(line 2\)$/);
+        assert.match(syntaxError('let a: string = "x";\nlog(a;', 'TypeScript/ts'), /\(line 2\)$/);
+        assert.equal(syntaxError('enum A { B }\nlog(A.B);', 'TypeScript/ts'), '');
+    } finally {
+        process.off('warning', listener);
+    }
+    assert.deepEqual(emitted, [], 'no ExperimentalWarning of Node.js in the log');
 });
 
 test('questions: messenger text with the diff, spoken text with the summary and the warnings', () => {
@@ -230,6 +245,43 @@ test('other scripts need their own setting; Blockly stays read-only', async () =
     assert.match(outcome.result, /Blockly script, which the agent only reads/);
     outcome = await tryIt({ allowForeignScripts: true, dryRun: true }, FOREIGN);
     assert.match(outcome.result, /^DRY RUN - NOTHING WAS SAVED/);
+});
+
+test('a new TypeScript script: asked as TypeScript, created with its engine type', async () => {
+    const f = await faux();
+    const TS = 'const hour: number = new Date().getHours();\nlog(`hour ${hour}`);';
+    const { agent, db } = await startAgent({
+        dataDir: tmp(),
+        config: { dryRun: false, allowScripts: true },
+        responses: [
+            f.fauxAssistantMessage(
+                f.fauxToolCall('save_script', {
+                    id: 'Hour',
+                    source: TS,
+                    summary: 'logs the hour',
+                    language: 'typescript',
+                }),
+                { stopReason: 'toolUse' },
+            ),
+            f.fauxAssistantMessage('Saved.'),
+        ],
+    });
+    await call(agent, 'chatSend', { text: 'write it in TypeScript' });
+    const question = await questionOf(agent);
+    assert.deepEqual([question.val.isNew, question.val.engineType], [true, 'TypeScript/ts']);
+    await call(agent, 'chatConfirm', { nonce: question.nonce, answer: 'yes' });
+    await waitFor(async () => !(await call(agent, 'chatHistory')).busy, 'the answer');
+    assert.equal(db.objects['script.js.pi-agent.Hour'].common.engineType, 'TypeScript/ts');
+    assert.equal(db.objects['script.js.pi-agent.Hour'].common.source, TS);
+    assert.equal(
+        confirmationQuestion('ru', {
+            what: 'Hour',
+            action: 'scriptSave',
+            val: { isNew: true, engineType: 'TypeScript/ts' },
+        }),
+        'Сохранить новый скрипт Hour, TypeScript? Скажи да или нет. [[LISTEN]]',
+    );
+    await stopAgent(agent);
 });
 
 test('a syntax error goes back to the model before the user is asked', async () => {

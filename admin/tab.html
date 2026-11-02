@@ -537,7 +537,7 @@
                         const v = q.val || {};
                         const key = q.action === 'scriptEnable' ? (v.enabled ? 'questionScriptStart' : 'questionScriptStop') : q.action === 'scriptRevert' ? 'questionScriptRevert' : v.isNew ? 'questionScriptNew' : 'questionScriptChange';
                         text = [
-                            t(key).replace('%id', `<code>${escapeHtml(q.id)}</code>`),
+                            t(key).replace('%id', `<code>${escapeHtml(q.id)}</code>${v.isNew && v.engineType === 'TypeScript/ts' ? ' (TypeScript)' : ''}`),
                             ...(q.action === 'scriptSave' && v.running ? [escapeHtml(t('questionScriptRunning'))] : []),
                             ...(v.warnings || []).map(w => `⚠ ${escapeHtml(w)}`),
                         ].join('<br>');

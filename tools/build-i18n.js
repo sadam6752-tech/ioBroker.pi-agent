@@ -1340,6 +1340,19 @@ const DESC = [
 ];
 /** common.news per version, newest first; the repository builder keeps at most seven. */
 const NEWS = {};
+NEWS['0.8.1'] = [
+    'Scripts: new scripts in TypeScript when the user asks for it; TypeScript is checked for syntax errors too',
+    'Skripte: neue Skripte in TypeScript, wenn der Benutzer es wünscht; auch TypeScript wird auf Syntaxfehler geprüft',
+    'Скрипты: новые скрипты на TypeScript, если пользователь об этом просит; TypeScript тоже проверяется на синтаксические ошибки',
+    'Scripts: novos scripts em TypeScript quando o utilizador o pede; o TypeScript também é verificado quanto a erros de sintaxe',
+    'Scripts: nieuwe scripts in TypeScript als de gebruiker erom vraagt; ook TypeScript wordt op syntaxfouten gecontroleerd',
+    "Scripts : nouveaux scripts en TypeScript si l'utilisateur le demande ; le TypeScript est aussi vérifié pour les erreurs de syntaxe",
+    "Script: nuovi script in TypeScript quando l'utente lo chiede; anche il TypeScript viene controllato per gli errori di sintassi",
+    'Scripts: nuevos scripts en TypeScript cuando el usuario lo pide; el TypeScript también se comprueba en busca de errores de sintaxis',
+    'Skrypty: nowe skrypty w TypeScript, gdy użytkownik o to poprosi; TypeScript też jest sprawdzany pod kątem błędów składni',
+    'Скрипти: нові скрипти на TypeScript, якщо користувач про це просить; TypeScript теж перевіряється на синтаксичні помилки',
+    '脚本：用户要求时可用 TypeScript 新建脚本；TypeScript 也会检查语法错误',
+];
 NEWS['0.8.0'] = [
     'Scripts of the javascript adapter, off by default: the agent creates and changes scripts in the folder script.js.pi-agent (other scripts with an extra setting), starts, stops and reverts them; every step is confirmed on its own with the change line by line, by voice only with its own setting',
     'Skripte des javascript-Adapters, ab Werk aus: Der Agent legt Skripte im Ordner script.js.pi-agent an und ändert sie (andere Skripte mit einer eigenen Einstellung), startet, stoppt und setzt sie zurück; jeder Schritt wird einzeln mit der Änderung Zeile für Zeile bestätigt, per Sprache nur mit eigener Einstellung',

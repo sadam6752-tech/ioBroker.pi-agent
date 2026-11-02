@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.8.0",
+		"version": "0.8.1",
 		"news": {
+			"0.8.1": {
+				"en": "Scripts: new scripts in TypeScript when the user asks for it; TypeScript is checked for syntax errors too",
+				"de": "Skripte: neue Skripte in TypeScript, wenn der Benutzer es wünscht; auch TypeScript wird auf Syntaxfehler geprüft",
+				"ru": "Скрипты: новые скрипты на TypeScript, если пользователь об этом просит; TypeScript тоже проверяется на синтаксические ошибки",
+				"pt": "Scripts: novos scripts em TypeScript quando o utilizador o pede; o TypeScript também é verificado quanto a erros de sintaxe",
+				"nl": "Scripts: nieuwe scripts in TypeScript als de gebruiker erom vraagt; ook TypeScript wordt op syntaxfouten gecontroleerd",
+				"fr": "Scripts : nouveaux scripts en TypeScript si l'utilisateur le demande ; le TypeScript est aussi vérifié pour les erreurs de syntaxe",
+				"it": "Script: nuovi script in TypeScript quando l'utente lo chiede; anche il TypeScript viene controllato per gli errori di sintassi",
+				"es": "Scripts: nuevos scripts en TypeScript cuando el usuario lo pide; el TypeScript también se comprueba en busca de errores de sintaxis",
+				"pl": "Skrypty: nowe skrypty w TypeScript, gdy użytkownik o to poprosi; TypeScript też jest sprawdzany pod kątem błędów składni",
+				"uk": "Скрипти: нові скрипти на TypeScript, якщо користувач про це просить; TypeScript теж перевіряється на синтаксичні помилки",
+				"zh-cn": "脚本：用户要求时可用 TypeScript 新建脚本；TypeScript 也会检查语法错误"
+			},
 			"0.8.0": {
 				"en": "Scripts of the javascript adapter, off by default: the agent creates and changes scripts in the folder script.js.pi-agent (other scripts with an extra setting), starts, stops and reverts them; every step is confirmed on its own with the change line by line, by voice only with its own setting",
 				"de": "Skripte des javascript-Adapters, ab Werk aus: Der Agent legt Skripte im Ordner script.js.pi-agent an und ändert sie (andere Skripte mit einer eigenen Einstellung), startet, stoppt und setzt sie zurück; jeder Schritt wird einzeln mit der Änderung Zeile für Zeile bestätigt, per Sprache nur mit eigener Einstellung",
@@ -80,19 +93,6 @@
 				"pl": "Planer fullcalendar: powtarzające się, dłuższe i czasowe działania trafiają przez send_to do fullcalendar, ale tylko dla stanów, które pi-agent może zapisywać (z potwierdzeniem tam, gdzie ustawiono „Wymagane potwierdzenie”); jeśli fullcalendar nie jest zainstalowany lub dozwolony, agent mówi o tym użytkownikowi",
 				"uk": "Планувальник fullcalendar: повторювані, довші та обмежені в часі дії йдуть у fullcalendar через send_to, але лише для станів, у які pi-agent може писати (з підтвердженням там, де встановлено «Потрібне підтвердження»); якщо fullcalendar не встановлено або не дозволено, агент повідомляє про це користувачеві",
 				"zh-cn": "调度器 fullcalendar：重复、较长和定时的操作通过 send_to 交给 fullcalendar，但仅限 pi-agent 可写入的状态（设置了“需要确认”的需确认）；若未安装或未允许 fullcalendar，代理会告诉用户"
-			},
-			"0.6.3": {
-				"en": "Tools notify_when (a message when a state meets a condition, also for some minutes), schedule_set_state (a write later, checked again when due), list_scheduled and cancel_scheduled, get_logs and list_notifications",
-				"de": "Werkzeuge notify_when (eine Nachricht, wenn ein Datenpunkt eine Bedingung erfüllt, auch für einige Minuten), schedule_set_state (ein späterer Schreibvorgang, bei Fälligkeit erneut geprüft), list_scheduled und cancel_scheduled, get_logs und list_notifications",
-				"ru": "Инструменты notify_when (сообщение, когда состояние выполняет условие, в том числе в течение нескольких минут), schedule_set_state (запись позже, при наступлении времени проверяется снова), list_scheduled и cancel_scheduled, get_logs и list_notifications",
-				"pt": "Ferramentas notify_when (uma mensagem quando um estado cumpre uma condição, também durante alguns minutos), schedule_set_state (uma escrita mais tarde, verificada de novo na hora), list_scheduled e cancel_scheduled, get_logs e list_notifications",
-				"nl": "Tools notify_when (een bericht wanneer een state aan een voorwaarde voldoet, ook gedurende enkele minuten), schedule_set_state (een latere schrijfactie, opnieuw gecontroleerd als ze aan de beurt is), list_scheduled en cancel_scheduled, get_logs en list_notifications",
-				"fr": "Outils notify_when (un message quand un état remplit une condition, aussi pendant quelques minutes), schedule_set_state (une écriture plus tard, vérifiée à nouveau à l'échéance), list_scheduled et cancel_scheduled, get_logs et list_notifications",
-				"it": "Strumenti notify_when (un messaggio quando uno stato soddisfa una condizione, anche per alcuni minuti), schedule_set_state (una scrittura più tardi, verificata di nuovo alla scadenza), list_scheduled e cancel_scheduled, get_logs e list_notifications",
-				"es": "Herramientas notify_when (un mensaje cuando un estado cumple una condición, también durante unos minutos), schedule_set_state (una escritura más tarde, comprobada de nuevo al vencer), list_scheduled y cancel_scheduled, get_logs y list_notifications",
-				"pl": "Narzędzia notify_when (wiadomość, gdy stan spełnia warunek, także przez kilka minut), schedule_set_state (zapis później, sprawdzany ponownie w chwili wykonania), list_scheduled i cancel_scheduled, get_logs i list_notifications",
-				"uk": "Інструменти notify_when (повідомлення, коли стан виконує умову, зокрема протягом кількох хвилин), schedule_set_state (запис пізніше, перевіряється знову в момент виконання), list_scheduled і cancel_scheduled, get_logs і list_notifications",
-				"zh-cn": "工具 notify_when（状态满足条件时发送消息，也可要求持续几分钟）、schedule_set_state（稍后写入，到时再次检查）、list_scheduled 和 cancel_scheduled、get_logs 和 list_notifications"
 			}
 		},
 		"titleLang": {
