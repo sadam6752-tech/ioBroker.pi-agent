@@ -28,11 +28,17 @@ const CONFIG = (textConfirmation = true) => ({
     writeRules: [{ scope: LAMP, write: true, confirm: true }],
 });
 
-/** "ask" of ioBroker.assistant in the conversation "kitchen"; returns what its callback got. */
-async function ask(agent, text) {
+/**
+ * "ask" of ioBroker.assistant in the conversation "kitchen"; returns what its callback got.
+ *
+ * @param {object} agent the started adapter
+ * @param {string} text what the user said
+ * @param {object} [extra] more fields of the message, e.g. language
+ */
+async function ask(agent, text, extra = {}) {
     await agent.onMessage({
         command: 'ask',
-        message: { text, conversation: 'kitchen' },
+        message: { text, conversation: 'kitchen', ...extra },
         from: 'system.adapter.assistant.0',
         callback: 'cb',
     });
@@ -43,9 +49,17 @@ test('isYes: what the user said is a yes word of any language, apart from case a
     for (const yes of ['да', 'Да.', ' ДА! ', 'yes', 'Yes!', 'Ja', 'ja', 'Sí.', 'так']) {
         assert.equal(isYes(yes), true, yes);
     }
-    for (const no of ['нет', 'nein', 'да, но сначала скажи', 'ja bitte', 'ok', '', 'конечно', 'jaja']) {
+    for (const no of ['нет', 'nein', 'да, но сначала скажи', 'ja bitte', 'ok', '', 'конечно', 'jaja', 'да нет']) {
         assert.equal(isYes(no), false, no);
     }
+});
+
+test('isYes: the same yes twice is yes (speech recognition turned a spoken "Да." into "Да да.")', () => {
+    for (const yes of ['Да да.', 'Ja, ja.', 'yes yes', 'да-да']) {
+        assert.equal(isYes(yes), true, yes);
+    }
+    // what a Russian speech recognition made of a German "Ja": not a yes word
+    assert.equal(isYes('Я'), false);
 });
 
 test('isYes: context in front of the words of the user (ioBroker.assistant) does not count', () => {
@@ -70,6 +84,28 @@ test('confirmationQuestion: plain text in the system language, with [[LISTEN]]',
         confirmationQuestion('xx', { what: 'telegram', val: '1.0.0 → 1.1.0 (repository)', action: 'update' }),
         /^Update the adapter telegram, 1\.0\.0 → 1\.1\.0 \(repository\)\?/,
     );
+    assert.match(confirmationQuestion('ru-RU', { what: 'telegram.0', action: 'restart' }), /^Перезапустить/);
+    assert.match(confirmationQuestion('zh-cn', { what: 'telegram.0', action: 'restart' }), /^重启/);
+});
+
+test('the language of the caller wins over the system language: a satellite that listens in German is asked in German', async () => {
+    const f = await faux();
+    const { agent, db } = await startAgent({
+        dataDir: tmp(),
+        seed: SEED(), // system language ru
+        config: CONFIG(),
+        responses: [
+            f.fauxAssistantMessage(f.fauxToolCall('set_state', { id: LAMP, val: true }), { stopReason: 'toolUse' }),
+            f.fauxAssistantMessage('Die Lampe ist an.'),
+        ],
+    });
+    const question = await ask(agent, 'Schalte die Küchenlampe ein', { language: 'de' });
+    // no German name: the English one, not the Russian one of the system language
+    assert.deepEqual(question, { answer: 'Kitchen lamp auf true setzen? Sag ja oder nein. [[LISTEN]]' });
+    assert.deepEqual(await ask(agent, 'Ja, ja.', { language: 'de' }), { answer: 'Die Lampe ist an.' });
+    assert.deepEqual(db.writes, [[LAMP, true]]);
+    assert.ok(agent.logs.some(([, msg]) => /Answer by text in .*: "Ja, ja\." → yes/.test(msg)), 'what was heard is logged');
+    await stopAgent(agent);
 });
 
 test('"да" as the next ask confirms the write, and its answer is the result', async () => {

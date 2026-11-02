@@ -126,6 +126,7 @@ sendTo('pi-agent.0', 'ask', {
     conversation: 'kitchen', // own conversation of this caller; up to 100 characters
     instructions: 'Answer in one or two short sentences without Markdown; the answer is spoken.', // optional
     requestId: 'kitchen-1730123456789', // optional: a repeated request with the same id is answered once
+    language: 'ru', // optional: language of the user, for the questions to confirm (see below)
 }, result => log(result.answer));
 ```
 
@@ -136,12 +137,17 @@ Such a conversation has no buttons, so by default a write with "Confirmation req
 blocked there. With **Confirmation by text in sendTo conversations** (tab "Write permissions", off by default) the
 agent asks by text instead:
 
-- The question comes back as the answer of the request, in the language of the ioBroker system and followed by
-  `[[LISTEN]]` (ioBroker.assistant opens the microphone again), e.g. "Restart the instance telegram.0? Say yes or no.".
+- The question comes back as the answer of the request, followed by `[[LISTEN]]` (ioBroker.assistant opens the
+  microphone again), e.g. "Restart the instance telegram.0? Say yes or no.". It is in the `language` the caller sent
+  with its last request of the conversation (ioBroker.assistant sends the language its satellites listen in), else in
+  the language of the ioBroker system. A satellite that listens in Russian does not understand a German "Ja": its
+  speech recognition returns nothing or "Я".
 - The next request of the same conversation is the answer. pi-agent checks it itself, not the model: only "yes" (or
   the word for it in one of the languages of the adapter, e.g. "ja", "да", "oui") as the whole answer confirms, apart
-  from case and punctuation. Context a caller puts in front, separated by an empty line (ioBroker.assistant sends time,
-  weather and presence first), does not count. Anything else is no, and so are 2 minutes without an answer.
+  from case and punctuation; the same word twice ("да да", "Ja, ja."), as speech recognition sometimes writes a
+  single "да", counts too. Context a caller puts in front, separated by an empty line (ioBroker.assistant sends time,
+  weather and presence first), does not count. Anything else is no, and so are 2 minutes without an answer. The log
+  shows what was heard and how it was decided.
 - The answer of that next request is the result: what the agent says after the action, or the next question.
 - By voice anyone in the room can say yes. Only switch it on where that is acceptable.
 
@@ -365,6 +371,13 @@ the last copy.
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+
+- Confirmation by text: the question is in the `language` the caller sends with `ask` (ioBroker.assistant: the
+  language of its satellites) instead of the system language; a satellite listening in Russian could not hear the
+  German "Ja" it was asked for. The same yes twice ("Да да.", what speech recognition made of one "Да") is yes; the log
+  shows what was heard
 
 ### 0.8.0 (2026-11-02)
 
