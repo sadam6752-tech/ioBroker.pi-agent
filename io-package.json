@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.8.4",
+		"version": "0.8.5",
 		"news": {
+			"0.8.5": {
+				"en": "Backups: the lists of backups show the time in the time zone of the house instead of UTC, so the right backup is restored",
+				"de": "Backups: die Listen der Backups zeigen die Zeit in der Zeitzone des Hauses statt in UTC, damit das richtige Backup wiederhergestellt wird",
+				"ru": "Бэкапы: в списках бэкапов время показано в часовом поясе дома, а не в UTC, чтобы восстанавливался нужный бэкап",
+				"pt": "Backups: as listas de backups mostram a hora no fuso horário da casa em vez de UTC, para que seja reposto o backup certo",
+				"nl": "Back-ups: de lijsten met back-ups tonen de tijd in de tijdzone van het huis in plaats van UTC, zodat de juiste back-up wordt hersteld",
+				"fr": "Sauvegardes : les listes de sauvegardes affichent l'heure dans le fuseau horaire de la maison au lieu de l'UTC, pour restaurer la bonne sauvegarde",
+				"it": "Backup: gli elenchi dei backup mostrano l'ora nel fuso orario della casa invece che in UTC, così si ripristina il backup giusto",
+				"es": "Copias de seguridad: las listas muestran la hora en la zona horaria de la casa en lugar de UTC, para restaurar la copia correcta",
+				"pl": "Kopie zapasowe: listy kopii pokazują czas w strefie czasowej domu zamiast UTC, aby przywrócić właściwą kopię",
+				"uk": "Бекапи: у списках бекапів час показано в часовому поясі дому, а не в UTC, щоб відновлювався потрібний бекап",
+				"zh-cn": "备份：备份列表按家中的时区显示时间，而不是 UTC，以便恢复正确的备份"
+			},
 			"0.8.4": {
 				"en": "Code mode (setting, off by default): for a question with several steps the agent writes a short script that calls its tools in a sandbox, and only the result goes to the model; write permissions, simulation mode and confirmations hold for every call; it saves tokens only on questions with several steps",
 				"de": "Code-Modus (Einstellung, ab Werk aus): bei einer Frage mit mehreren Schritten schreibt der Agent ein kurzes Skript, das seine Werkzeuge in einer Sandbox aufruft, und nur das Ergebnis geht an das Modell; Schreibrechte, Simulationsmodus und Bestätigungen gelten für jeden Aufruf; Tokens spart er nur bei Fragen mit mehreren Schritten",
@@ -80,19 +93,6 @@
 				"pl": "Uprawnienia do zapisu: przyciski nad tabelą przełączają kolumnę „Zapis dozwolony”, „Wymagane potwierdzenie” lub „Restart dozwolony” dla wszystkich wierszy naraz",
 				"uk": "Права на запис: кнопки над таблицею перемикають колонку «Запис», «Підтвердження» або «Перезапуск» одразу для всіх рядків",
 				"zh-cn": "写入权限：表格上方的按钮可一次性切换所有行的“允许写入”、“需要确认”或“允许重启”列"
-			},
-			"0.7.2": {
-				"en": "Confirmation by text in sendTo conversations (e.g. ioBroker.assistant), off by default: the question is the answer of the request, the next request decides; only \"yes\" confirms, anything else or 2 minutes of silence is no",
-				"de": "Bestätigung per Text in sendTo-Unterhaltungen (z. B. ioBroker.assistant), ab Werk aus: Die Frage ist die Antwort der Anfrage, die nächste Anfrage entscheidet; nur „Ja“ bestätigt, alles andere oder 2 Minuten Stille ist ein Nein",
-				"ru": "Подтверждение текстом в sendTo-разговорах (например, ioBroker.assistant), по умолчанию выключено: вопрос приходит как ответ на запрос, следующий запрос решает; подтверждает только «да», всё остальное или 2 минуты тишины означают нет",
-				"pt": "Confirmação por texto em conversas sendTo (p. ex. ioBroker.assistant), desligada por defeito: a pergunta é a resposta do pedido, o pedido seguinte decide; só \"sim\" confirma, qualquer outra coisa ou 2 minutos de silêncio é não",
-				"nl": "Bevestiging per tekst in sendTo-gesprekken (bijv. ioBroker.assistant), standaard uit: de vraag is het antwoord op het verzoek, het volgende verzoek beslist; alleen \"ja\" bevestigt, al het andere of 2 minuten stilte is nee",
-				"fr": "Confirmation par texte dans les conversations sendTo (p. ex. ioBroker.assistant), désactivée par défaut : la question est la réponse de la requête, la requête suivante décide ; seul « oui » confirme, tout le reste ou 2 minutes de silence vaut non",
-				"it": "Conferma via testo nelle conversazioni sendTo (ad es. ioBroker.assistant), disattivata di default: la domanda è la risposta della richiesta, la richiesta successiva decide; solo «sì» conferma, qualsiasi altra cosa o 2 minuti di silenzio è no",
-				"es": "Confirmación por texto en conversaciones sendTo (p. ej. ioBroker.assistant), desactivada por defecto: la pregunta es la respuesta de la solicitud, la siguiente solicitud decide; solo «sí» confirma, cualquier otra cosa o 2 minutos de silencio es no",
-				"pl": "Potwierdzenie tekstem w rozmowach sendTo (np. ioBroker.assistant), domyślnie wyłączone: pytanie jest odpowiedzią na żądanie, następne żądanie decyduje; potwierdza tylko „tak”, wszystko inne lub 2 minuty ciszy oznacza nie",
-				"uk": "Підтвердження текстом у sendTo-розмовах (наприклад, ioBroker.assistant), типово вимкнено: питання надходить як відповідь на запит, наступний запит вирішує; підтверджує лише «так», усе інше або 2 хвилини тиші означають ні",
-				"zh-cn": "sendTo 对话中的文字确认（例如 ioBroker.assistant），默认关闭：问题作为请求的回答返回，下一个请求决定；只有“是”才算确认，其他任何内容或 2 分钟无响应均视为否"
 			}
 		},
 		"titleLang": {

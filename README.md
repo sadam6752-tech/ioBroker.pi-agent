@@ -443,6 +443,12 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.8.5 (2026-11-02)
+
+- Backups: the lists of backups show the time in the time zone of the house (e.g. `2026-11-02 18:31:40
+  (Europe/Berlin) · by hand`) instead of UTC; a backup made at 18:31 read "17:31 UTC", and the wrong one was easily
+  restored
+
 ### 0.8.4 (2026-11-02)
 
 - Code mode (setting, off by default): for a question with several steps the agent writes a short script that calls
@@ -486,11 +492,6 @@ the last copy.
 
 - Write permissions: buttons above the table switch the column "Write allowed", "Confirmation required" or
   "Restart allowed" for all rows at once
-
-### 0.7.2 (2026-10-30)
-
-- Confirmation by text in sendTo conversations (e.g. ioBroker.assistant), off by default: the question is the answer
-  of the request, the next request decides; only "yes" confirms, anything else or 2 minutes of silence is no
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

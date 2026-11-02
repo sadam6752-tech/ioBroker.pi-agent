@@ -1367,6 +1367,19 @@ const DESC = [
 ];
 /** common.news per version, newest first; the repository builder keeps at most seven. */
 const NEWS = {};
+NEWS['0.8.5'] = [
+    'Backups: the lists of backups show the time in the time zone of the house instead of UTC, so the right backup is restored',
+    'Backups: die Listen der Backups zeigen die Zeit in der Zeitzone des Hauses statt in UTC, damit das richtige Backup wiederhergestellt wird',
+    'Бэкапы: в списках бэкапов время показано в часовом поясе дома, а не в UTC, чтобы восстанавливался нужный бэкап',
+    'Backups: as listas de backups mostram a hora no fuso horário da casa em vez de UTC, para que seja reposto o backup certo',
+    'Back-ups: de lijsten met back-ups tonen de tijd in de tijdzone van het huis in plaats van UTC, zodat de juiste back-up wordt hersteld',
+    "Sauvegardes : les listes de sauvegardes affichent l'heure dans le fuseau horaire de la maison au lieu de l'UTC, pour restaurer la bonne sauvegarde",
+    "Backup: gli elenchi dei backup mostrano l'ora nel fuso orario della casa invece che in UTC, così si ripristina il backup giusto",
+    'Copias de seguridad: las listas muestran la hora en la zona horaria de la casa en lugar de UTC, para restaurar la copia correcta',
+    'Kopie zapasowe: listy kopii pokazują czas w strefie czasowej domu zamiast UTC, aby przywrócić właściwą kopię',
+    'Бекапи: у списках бекапів час показано в часовому поясі дому, а не в UTC, щоб відновлювався потрібний бекап',
+    '备份：备份列表按家中的时区显示时间，而不是 UTC，以便恢复正确的备份',
+];
 NEWS['0.8.4'] = [
     'Code mode (setting, off by default): for a question with several steps the agent writes a short script that calls its tools in a sandbox, and only the result goes to the model; write permissions, simulation mode and confirmations hold for every call; it saves tokens only on questions with several steps',
     'Code-Modus (Einstellung, ab Werk aus): bei einer Frage mit mehreren Schritten schreibt der Agent ein kurzes Skript, das seine Werkzeuge in einer Sandbox aufruft, und nur das Ergebnis geht an das Modell; Schreibrechte, Simulationsmodus und Bestätigungen gelten für jeden Aufruf; Tokens spart er nur bei Fragen mit mehreren Schritten',

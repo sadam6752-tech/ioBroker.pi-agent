@@ -1234,7 +1234,7 @@ class PiAgent extends utils.Adapter {
             case 'listBackups': {
                 const backups = await this.listStoredBackups();
                 return backups.length > 0
-                    ? backups.map(b => ({ value: b.name, label: backupLabel(b.name, b.size) }))
+                    ? backups.map(b => ({ value: b.name, label: backupLabel(b.name, b.size, this.timeZone) }))
                     : [{ value: '', label: 'No backup in the storage folder' }];
             }
             case 'restoreBackup':
@@ -1259,7 +1259,7 @@ class PiAgent extends utils.Adapter {
                     return [{ value: '', label: `Error: ${result.message}` }];
                 }
                 return result.names.length > 0
-                    ? result.names.map(name => ({ value: name, label: backupLabel(name) }))
+                    ? result.names.map(name => ({ value: name, label: backupLabel(name, undefined, this.timeZone) }))
                     : [{ value: '', label: 'No backup on the server' }];
             }
             case 'restoreFromRemote':

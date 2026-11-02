@@ -76,7 +76,12 @@ test('backup names: time in the name, only own files, newest first, only automat
     ]);
     assert.deepEqual(selectLocalBackupsToPrune(names, 2), [backupName('auto', at(1))]);
     assert.deepEqual(selectLocalBackupsToPrune(names, 0), []);
-    assert.equal(backupLabel(backupName('auto', at(2)), 3000), '2026-10-28 02:00:00 UTC · automatic · 3 kB');
+    assert.equal(backupLabel(backupName('auto', at(2)), 3000), '2026-10-28 02:00:00 (UTC) · automatic · 3 kB');
+    // the list shows the time of the house: 02:00 UTC is 03:00 in Berlin (winter time)
+    assert.equal(
+        backupLabel(backupName('manual', at(2)), undefined, 'Europe/Berlin'),
+        '2026-10-28 03:00:00 (Europe/Berlin) · by hand',
+    );
 });
 
 test('autoBackupDelay: off, overdue after five minutes, otherwise from the last backup', () => {

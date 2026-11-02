@@ -1,5 +1,10 @@
 # Older Changelog
 
+### 0.7.2 (2026-10-30)
+
+- Confirmation by text in sendTo conversations (e.g. ioBroker.assistant), off by default: the question is the answer
+  of the request, the next request decides; only "yes" confirms, anything else or 2 minutes of silence is no
+
 ### 0.7.1 (2026-10-30)
 
 - Review: the migrations of old settings change the own instance object with a partial update (extendForeignObject)
