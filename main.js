@@ -33,6 +33,7 @@ const { autoBackupDelay } = require('./lib/backup-schedule');
 const { queuedPurges, queuePurge, purgeQueued } = require('./lib/purge');
 const { createMemory } = require('./lib/memory');
 const { createWatches } = require('./lib/watches');
+const { createJobs, localDay, MAX_WAKES_PER_DAY } = require('./lib/jobs');
 const { findLogFile } = require('./lib/diagnostics');
 const {
     OUTPUT_LINES,
@@ -63,7 +64,7 @@ const BACKUP_COMMANDS = [
     'listRemoteBackups',
     'restoreFromRemote',
 ];
-const { resolveTimeZone, timeZoneOptions } = require('./lib/time');
+const { resolveTimeZone, timeZoneOptions, formatLocal } = require('./lib/time');
 const { channelsFromConfig, legacyRows, chatKey, parseChatKey, migrateChats } = require('./lib/channels');
 const { createDrivers, messengerType, MESSENGER_ADAPTERS } = require('./lib/messengers');
 const { ADMIN, ADMIN_INSTRUCTIONS, historyOf, withNotices, createAdminChat } = require('./lib/admin-chat');
@@ -126,6 +127,9 @@ function chatTarget(target) {
     }
     return target.kind === 'telegram' ? { ...target, kind: 'chat' } : target;
 }
+
+/** The answer of a background job when nothing needs to be told. */
+const SILENT = '[[SILENT]]';
 
 /** Longest instructions a sendTo caller may give its conversation, in characters. */
 const MAX_CALLER_INSTRUCTIONS = 20000;
@@ -206,7 +210,20 @@ class PiAgent extends utils.Adapter {
         /** How long the log is watched for errors after the agent started a script. */
         this.scriptCheckMs = 15_000;
         /** Watches of notify_when (lib/watches.js); they tell the chat of their conversation like a reminder. */
-        this.watches = createWatches(this, (conversationId, text) => this.deliverReminder(conversationId, text));
+        this.watches = createWatches(
+            this,
+            (conversationId, text) => this.deliverReminder(conversationId, text),
+            stateId => this.jobs.handles(stateId),
+        );
+        /** Jobs that stopped themselves while answering: their last answer still goes to their targets. */
+        this.endedJobs = new Map();
+        /** Background jobs (lib/jobs.js): their triggers wake their own conversation. */
+        this.jobs = createJobs(this, {
+            wake: (job, reason) => this.wakeJob(job, reason),
+            tell: (job, text) => this.sendToJob(job, text),
+            timeZone: () => this.timeZone,
+            inUse: stateId => this.watches.handles(stateId),
+        });
         /** Instances with "Restart allowed" in the write permissions. */
         this.restartList = [];
         /** How long a restarted instance may take to run again. */
@@ -294,6 +311,7 @@ class PiAgent extends utils.Adapter {
             await this.startMessengers();
             // after the chats: a watch that fires at once tells its chat
             await this.watches.load();
+            await this.startJobs();
             // an update of pi-agent itself restarted the instance: tell the chat that asked for it
             await this.reportSelfUpdate();
             await this.scheduleAutoBackup();
@@ -579,6 +597,13 @@ class PiAgent extends utils.Adapter {
                     history: this.scriptHistory,
                 },
                 watches: this.watches,
+                jobs: {
+                    create: (owner, request) => this.createJob(owner, request),
+                    list: () => this.jobs.list().map(job => this.jobs.row(job)),
+                    stop: (caller, id) => this.stopJob(caller, id),
+                    resume: (caller, id) => this.resumeJob(caller, id),
+                    isJob: conversationId => Boolean(this.jobs.byConversation(conversationId)),
+                },
                 scheduled: {
                     tasks: conversationId => this.plannedTasks(conversationId),
                     cancel: (conversationId, id) => this.cancelPlanned(conversationId, id),
@@ -678,6 +703,14 @@ class PiAgent extends utils.Adapter {
      * @returns {Promise<object>} conversation handle
      */
     async conversationFor(target) {
+        if (target.kind === 'job') {
+            const job = this.jobs.get(target.chatId);
+            const conversation = job ? await this.harness.conversation(job.conversationId, this.context) : undefined;
+            if (!conversation) {
+                throw new Error(`Job ${target.chatId} no longer exists`);
+            }
+            return conversation;
+        }
         const key = this.chatKeyOf(target);
         if (!key) {
             return this.root;
@@ -731,6 +764,9 @@ class PiAgent extends utils.Adapter {
         if (target.kind === 'sendTo') {
             // a sendTo request without a conversation of its own goes to the root conversation, as up to 0.3.0
             return target.instance && target.chatId ? chatKey(target.instance, target.chatId) : '';
+        }
+        if (target.kind === 'job') {
+            return chatKey('job', target.chatId);
         }
         return target.kind === 'chat' ? chatKey(target.instance, target.chatId) : '';
     }
@@ -813,6 +849,10 @@ class PiAgent extends utils.Adapter {
      * @returns {Promise<string>} "yes", "no", "timeout" or "unavailable" (no messenger chat for this conversation)
      */
     async requestConfirmation({ conversationId, id, val, action }) {
+        const job = this.jobs.byConversation(conversationId);
+        if (job) {
+            return this.confirmForJob(job, { id, val, action });
+        }
         const user = this.adminUserOf(conversationId);
         if (user) {
             return this.adminChat.confirm(user, id, val, action);
@@ -848,6 +888,12 @@ class PiAgent extends utils.Adapter {
      * @param {string} text reminder text
      */
     async deliverReminder(conversationId, text) {
+        const job = this.jobs.byConversation(conversationId);
+        if (job) {
+            this.log.info(`Reminder due for job ${job.id}`);
+            await this.sendToJob(job, `⏰ ${text}`);
+            return;
+        }
         const user = this.adminUserOf(conversationId);
         if (user) {
             this.log.info(`Reminder due for the admin chat of ${user}`);
@@ -858,6 +904,293 @@ class PiAgent extends utils.Adapter {
         const target = chat ? { kind: 'chat', ...chat } : { kind: 'state' };
         this.log.info(`Reminder due${chat ? ` for chat ${chat.chatId} on ${chat.instance}` : ''}`);
         await this.deliver(target, `⏰ ${text}`);
+    }
+
+    /**
+     * The instructions of a job's conversation: its task and how it answers.
+     *
+     * @param {{ id: string, name: string, task: string }} job the job
+     * @returns {string} instructions
+     */
+    jobInstructions(job) {
+        return [
+            `You are the background job "${job.name}" (id ${job.id}) of the ioBroker agent. The user gave you this task:`,
+            job.task,
+            'You are woken up when one of your triggers fires; the message tells which one and when. Read the states you need with the tools, then decide.',
+            `Your answer is sent to the user as a message (messenger, admin chat or spoken by a voice assistant): short and plain, in the language of the task. When nothing needs to be told (e.g. a false alarm, or the task says to stay quiet in this case), answer exactly ${SILENT} and nothing else.`,
+            'Every action (set_state, schedule_set_state, send_to, restart_instance, update_adapter, scripts) is asked to the user with yes/no first, so do only what the task asks for. A refused or unanswered question is not repeated at the next wake-up unless the situation changed.',
+            `When the task is complete (e.g. something that should be told once has happened), call stop_job with id ${job.id}. You cannot create jobs.`,
+        ].join('\n');
+    }
+
+    /** Load the jobs, bring their conversations to the current model, start their triggers. */
+    async startJobs() {
+        await this.jobs.load();
+        for (const job of this.jobs.list()) {
+            const conversation = await this.harness.conversation(job.conversationId, this.context);
+            await conversation?.configure({ model: this.model, instructions: this.jobInstructions(job) }, this.context);
+        }
+        if (this.jobs.list().length) {
+            this.log.info(`${this.jobs.list().length} background job(s) running`);
+        }
+    }
+
+    /**
+     * The state a voice assistant speaks a text from: the satellite of a sendTo conversation of ioBroker.assistant,
+     * else all satellites of the first assistant instance.
+     *
+     * @param {string | undefined} ownerKey key of the conversation that creates the job
+     * @returns {Promise<string>} state id, e.g. "assistant.0.satellites.kitchen.tts"
+     */
+    async voiceState(ownerKey) {
+        const exists = async id => Boolean(await this.getForeignObjectAsync(id).catch(() => null));
+        if (ownerKey?.startsWith('sendTo:')) {
+            const { instance, chatId } = parseChatKey(ownerKey.slice('sendTo:'.length), '');
+            for (const id of [`${instance}.satellites.${chatId}.tts`, `${instance}.tts.text`]) {
+                if (await exists(id)) {
+                    return id;
+                }
+            }
+        }
+        const view = await this.getObjectViewAsync('system', 'instance', {
+            startkey: 'system.adapter.assistant.',
+            endkey: 'system.adapter.assistant.香',
+        });
+        for (const { id } of view?.rows || []) {
+            const tts = `${id.replace('system.adapter.', '')}.tts.text`;
+            if (await exists(tts)) {
+                return tts;
+            }
+        }
+        throw new Error(
+            'No voice assistant (adapter assistant with tts.text) was found: offer a messenger or the admin chat',
+        );
+    }
+
+    /**
+     * Where the messages of a new job go, from what the user chose.
+     *
+     * @param {string | undefined} ownerKey key of the conversation that creates the job, undefined for the root one
+     * @param {string[]} wanted "here", "voice", "admin", "messenger"
+     * @returns {Promise<string[]>} keys: chats of telegram.chats, "voice:<state>", or "state" for chat.answer
+     */
+    async jobTargets(ownerKey, wanted) {
+        const isMessenger = key => !key.startsWith('sendTo:') && this.channels.has(parseChatKey(key, '').instance);
+        const targets = [];
+        for (const kind of wanted.length ? wanted : ['here']) {
+            if (kind === 'voice' || (kind === 'here' && ownerKey?.startsWith('sendTo:'))) {
+                const id = await this.voiceState(ownerKey);
+                if (!isWriteAllowed(id, this.allowlist)) {
+                    throw new Error(
+                        `Speaking needs "Write allowed" for ${id} in the write permissions of pi-agent: tell the user, or offer a messenger or the admin chat`,
+                    );
+                }
+                targets.push(`voice:${id}`);
+            } else if (kind === 'here') {
+                targets.push(ownerKey || 'state');
+            } else if (kind === 'admin') {
+                const admin = ownerKey?.startsWith(`${ADMIN}/`)
+                    ? ownerKey
+                    : Object.keys(this.chats).find(k => k.startsWith(`${ADMIN}/`)) ||
+                      chatKey(ADMIN, 'system.user.admin');
+                targets.push(admin);
+            } else if (kind === 'messenger') {
+                if (ownerKey && isMessenger(ownerKey)) {
+                    targets.push(ownerKey);
+                    continue;
+                }
+                const chats = Object.keys(this.chats).filter(isMessenger);
+                if (chats.length !== 1) {
+                    throw new Error(
+                        chats.length
+                            ? `There are several messenger chats (${chats.join(', ')}): the user should set up the job in the messenger chat that gets its messages, or choose the admin chat`
+                            : 'No messenger chat is known yet: the user writes to the bot once, or chooses the admin chat',
+                    );
+                }
+                targets.push(chats[0]);
+            } else {
+                throw new Error(`Unknown target "${kind}": use here, voice, admin or messenger`);
+            }
+        }
+        return [...new Set(targets)];
+    }
+
+    /**
+     * Create a background job with a conversation of its own (tool create_job).
+     *
+     * @param {unknown} owner conversation that creates the job
+     * @param {{ name: string, task: string, triggers: unknown[], days?: number, notify?: string[] }} request job
+     * @returns {Promise<string>} what happened, for the model
+     */
+    async createJob(owner, request) {
+        if (this.jobs.byConversation(owner)) {
+            throw new Error('A background job cannot create jobs');
+        }
+        const checked = this.jobs.validate(request);
+        for (const trigger of checked.triggers.filter(t => t.kind === 'state')) {
+            const obj = await this.getForeignObjectAsync(trigger.stateId).catch(() => null);
+            if (!obj || obj.type !== 'state') {
+                throw new Error(`State ${trigger.stateId} does not exist`);
+            }
+        }
+        const ownerKey = this.keyOfConversation(owner);
+        const notify = await this.jobTargets(
+            ownerKey,
+            (Array.isArray(request.notify) ? request.notify : []).map(n => String(n).trim().toLowerCase()),
+        );
+        const task = String(request.task ?? '').trim();
+        if (!task) {
+            throw new Error('The job needs the task in the words of the user');
+        }
+        const created = await this.harness.createConversation(
+            { ownership: { kind: 'ownerless' }, agent: { model: this.model } },
+            this.context,
+        );
+        const job = await this.jobs.add({ ...checked, task, owner: String(owner), conversationId: created.id, notify });
+        await created.configure({ model: this.model, instructions: this.jobInstructions(job) }, this.context);
+        const confirmable = notify.some(k => k !== 'state' && !k.startsWith('voice:'));
+        return JSON.stringify({
+            created: this.jobs.row(job),
+            note: [
+                `Tell the user: the job "${job.name}" runs until ${formatLocal(job.until, this.timeZone)}, where its messages go, and that it can be stopped any time.`,
+                confirmable
+                    ? 'Actions of the job are asked with yes/no in the messenger or admin chat it reports to.'
+                    : 'The job reports only by voice (or chat.answer): it cannot ask to confirm actions, so it only tells. Mention that a messenger or the admin chat would allow actions with yes/no.',
+            ].join(' '),
+        });
+    }
+
+    /**
+     * @param {unknown} caller conversation of the tool call
+     * @param {unknown} id job id
+     * @returns {object | undefined} the job, if the caller may act on it: any job, but a job only on itself
+     */
+    jobFor(caller, id) {
+        const own = this.jobs.byConversation(caller);
+        const job = this.jobs.get(id);
+        return own && own !== job ? undefined : job;
+    }
+
+    /**
+     * Stop a job (tool stop_job); its conversation is deleted at the next start.
+     *
+     * @param {unknown} caller conversation of the tool call
+     * @param {unknown} id job id
+     * @returns {Promise<string>} what happened, for the model
+     */
+    async stopJob(caller, id) {
+        const job = this.jobFor(caller, id);
+        if (!job) {
+            return `There is no job ${id}${this.jobs.byConversation(caller) ? ' (a job can only stop itself)' : ''}.`;
+        }
+        await this.jobs.remove(job.id);
+        queuePurge(utils.getAbsoluteInstanceDataDir(this), job.conversationId);
+        if (String(caller) === job.conversationId) {
+            this.endedJobs.set(job.id, job); // the job stopped itself: its last answer still goes out
+        }
+        return `Job ${job.id} "${job.name}" stopped.`;
+    }
+
+    /**
+     * Resume a paused job (tool resume_job).
+     *
+     * @param {unknown} caller conversation of the tool call
+     * @param {unknown} id job id
+     * @returns {Promise<string>} what happened, for the model
+     */
+    async resumeJob(caller, id) {
+        const job = this.jobFor(caller, id);
+        if (!job) {
+            return `There is no job ${id}.`;
+        }
+        if (!job.paused) {
+            return `Job ${job.id} "${job.name}" is running, not paused.`;
+        }
+        await this.jobs.resume(job.id);
+        return `Job ${job.id} "${job.name}" runs again; today it may wake up ${MAX_WAKES_PER_DAY} times.`;
+    }
+
+    /**
+     * A trigger of a job fired: ask its conversation, the answer goes to the job's targets (see deliver).
+     *
+     * @param {{ id: string, seq: number, wakes: number, until: number }} job the job
+     * @param {string} reason what fired
+     */
+    async wakeJob(job, reason) {
+        const content = [
+            `[Wake-up] Trigger: ${reason}.`,
+            `Local time: ${formatLocal(Date.now(), this.timeZone)}.`,
+            `Wake-up ${job.wakes} of at most ${MAX_WAKES_PER_DAY} today; the job runs until ${formatLocal(job.until, this.timeZone)}.`,
+        ].join(' ');
+        // not awaited: the trigger must not wait for the model, and a question to confirm may take minutes
+        void this.process({ requestId: `job:${job.id}:${job.seq}`, content, target: { kind: 'job', chatId: job.id } });
+    }
+
+    /**
+     * Send a message of a job to all its targets.
+     *
+     * @param {{ id: string, name: string, notify: string[] }} job the job
+     * @param {string} text message
+     */
+    async sendToJob(job, text) {
+        const message = `🕵️ ${job.name}: ${text}`;
+        for (const key of job.notify) {
+            try {
+                if (key === 'state') {
+                    await this.setStateAsync('chat.answer', { val: message, ack: true });
+                } else if (key.startsWith('voice:')) {
+                    const id = key.slice('voice:'.length);
+                    if (!isWriteAllowed(id, this.allowlist)) {
+                        this.log.warn(`Job ${job.id}: not spoken, writing ${id} is no longer allowed`);
+                    } else if (this.config.dryRun) {
+                        this.log.info(`Job ${job.id}: simulation mode, not spoken on ${id}: ${text}`);
+                    } else {
+                        await this.setForeignStateAsync(id, { val: `${job.name}: ${text}`, ack: false });
+                    }
+                } else {
+                    const chat = parseChatKey(key, '');
+                    if (chat.instance === ADMIN) {
+                        this.adminChat.addNotice(chat.chatId, message);
+                    } else if (this.channels.has(chat.instance)) {
+                        this.channels.get(chat.instance).driver.send(chat.instance, chat.chatId, message);
+                    } else {
+                        this.log.warn(`Job ${job.id}: ${chat.instance} is not configured any more, message not sent`);
+                    }
+                }
+            } catch (e) {
+                this.log.warn(`Job ${job.id}: message to ${key} failed: ${e.message}`);
+            }
+        }
+    }
+
+    /**
+     * Ask the user of a job to confirm an action: in the first messenger or admin chat the job reports to.
+     *
+     * @param {{ id: string, notify: string[] }} job the job
+     * @param {{ id: string, val: unknown, action?: string }} request what to confirm
+     * @returns {Promise<string>} "yes", "no", "timeout" or "unavailable"
+     */
+    async confirmForJob(job, { id, val, action }) {
+        for (const key of job.notify.filter(k => k !== 'state' && !k.startsWith('voice:'))) {
+            const chat = parseChatKey(key, '');
+            if (chat.instance === ADMIN) {
+                return this.adminChat.confirm(chat.chatId, id, val, action);
+            }
+            if (this.channels.has(chat.instance)) {
+                try {
+                    return await this.channels
+                        .get(chat.instance)
+                        .driver.confirm(chat.instance, chat.chatId, id, val, action);
+                } catch (e) {
+                    this.log.warn(`No answer to the confirmation for ${id}: ${e.message}`);
+                    return 'timeout';
+                }
+            }
+        }
+        this.log.warn(
+            `Job ${job.id}: confirmation for ${id} needed, but the job reports to no messenger or admin chat`,
+        );
+        return 'unavailable';
     }
 
     /** @returns {Promise<string>} configured history instance, else the system default, else "" */
@@ -1686,6 +2019,28 @@ class PiAgent extends utils.Adapter {
      * @param {string} text answer or error text
      */
     async deliver(target, text) {
+        if (target.kind === 'job') {
+            const running = this.jobs.get(target.chatId);
+            const job = running || this.endedJobs.get(target.chatId);
+            this.endedJobs.delete(target.chatId);
+            const silent = !text.trim() || text.includes(SILENT);
+            if (!job) {
+                this.log.info(`Answer of job ${target.chatId} dropped: the job was stopped meanwhile`);
+            } else if (running && silent) {
+                this.log.info(`Job ${job.id} "${job.name}": nothing to tell`);
+            } else if (running) {
+                await this.sendToJob(job, text);
+            } else {
+                await this.sendToJob(
+                    job,
+                    silent
+                        ? 'The job has ended.'
+                        : `${text}
+(The job has ended.)`,
+                );
+            }
+            return;
+        }
         if (target.kind === 'admin') {
             return; // the admin tab reads the answer from the conversation
         }
@@ -1732,6 +2087,9 @@ class PiAgent extends utils.Adapter {
         }
         if (this.watches.handles(id)) {
             await this.watches.onState(id, state);
+        }
+        if (this.jobs.handles(id)) {
+            await this.jobs.onState(id, state);
         }
         if (id === `${this.namespace}.memory.list` && state && !state.ack) {
             // the user edited the facts: take them over (invalid entries are dropped) and confirm with ack
@@ -1790,9 +2148,9 @@ class PiAgent extends utils.Adapter {
     /**
      * Commands of the chat in the admin tab (admin/tab.html). The page polls chatHistory while a request runs.
      *
-     * @param {string} command chatHistory, chatSend, chatConfirm, chatNew or chatConversations
+     * @param {string} command chatHistory, chatSend, chatConfirm, chatNew, chatConversations, chatJobStop or chatJobResume
      * @param {string} user ioBroker user of the admin session
-     * @param {{ text?: unknown, nonce?: unknown, answer?: unknown, conversation?: unknown }} message message of the page
+     * @param {{ text?: unknown, nonce?: unknown, answer?: unknown, conversation?: unknown, id?: unknown }} message message of the page
      * @returns {Promise<object>} answer for the page
      */
     async onAdminChat(command, user, message) {
@@ -1819,6 +2177,15 @@ class PiAgent extends utils.Adapter {
         if (command === 'chatConfirm') {
             return { ok: this.adminChat.answer(user, message.nonce, message.answer) };
         }
+        if (command === 'chatJobStop' || command === 'chatJobResume') {
+            const id = String(message.id || '');
+            const result =
+                command === 'chatJobStop'
+                    ? await this.stopJob(this.chats[key], id)
+                    : await this.resumeJob(this.chats[key], id);
+            this.log.info(`Admin chat of ${user}: ${result}`);
+            return { ok: true, jobs: this.jobRows() };
+        }
         if (command === 'chatNew') {
             if (busy()) {
                 return { error: 'busy' };
@@ -1842,6 +2209,7 @@ class PiAgent extends utils.Adapter {
             simulation: Boolean(this.config.dryRun),
             user,
             administrator: isAdmin,
+            jobs: this.jobRows(),
         };
         const other = String(message.conversation || '');
         if (other && other !== key) {
@@ -1867,6 +2235,36 @@ class PiAgent extends utils.Adapter {
             error: this.adminChat.error(user),
             entries: withNotices(await this.historyOfKey(key), this.adminChat.notices(user)),
         };
+    }
+
+    /**
+     * The background jobs as the admin page shows them: the page writes the triggers and targets in its language.
+     *
+     * @returns {Array<object>} jobs
+     */
+    jobRows() {
+        const today = localDay(Date.now(), this.timeZone || 'UTC');
+        return this.jobs.list().map(job => ({
+            id: job.id,
+            name: job.name,
+            task: job.task,
+            paused: Boolean(job.paused),
+            until: job.until,
+            wakesToday: job.day === today ? job.wakes : 0,
+            maxWakes: MAX_WAKES_PER_DAY,
+            last: job.last || 0,
+            lastReason: job.lastReason || '',
+            triggers: job.triggers.map(({ kind, stateId, condition, value, forMs, time, minutes }) => ({
+                kind,
+                stateId,
+                condition,
+                value,
+                forMs,
+                time,
+                minutes,
+            })),
+            notify: job.notify,
+        }));
     }
 
     /**
@@ -2060,7 +2458,17 @@ class PiAgent extends utils.Adapter {
             }
             return;
         }
-        if (['chatHistory', 'chatSend', 'chatConfirm', 'chatNew', 'chatConversations'].includes(String(obj?.command))) {
+        if (
+            [
+                'chatHistory',
+                'chatSend',
+                'chatConfirm',
+                'chatNew',
+                'chatConversations',
+                'chatJobStop',
+                'chatJobResume',
+            ].includes(String(obj?.command))
+        ) {
             let answer;
             try {
                 answer = await this.onAdminChat(obj.command, adminUser(obj), Object(obj.message));
@@ -2153,6 +2561,7 @@ class PiAgent extends utils.Adapter {
         this.stopping = true;
         this.clearTimeout(this.backupTimer);
         this.watches.stop();
+        this.jobs.stop();
         this.textConfirmations.stop();
         const done = async () => {
             try {

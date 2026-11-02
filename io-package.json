@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.8.2",
+		"version": "0.8.3",
 		"news": {
+			"0.8.3": {
+				"en": "Background jobs: a task that runs up to 30 days (watch the house while away, a report every morning); the adapter watches the triggers and wakes the job only when one fires; it reports in the chat, the admin chat, a messenger or by voice, and asks before every action; a panel in the admin chat; a link to the chat in the instance row",
+				"de": "Hintergrundaufträge: eine Aufgabe, die bis zu 30 Tage läuft (das Haus im Urlaub beobachten, jeden Morgen ein Bericht); der Adapter beobachtet die Auslöser und weckt den Auftrag nur, wenn einer auslöst; er meldet sich im Chat, im Admin-Chat, im Messenger oder per Sprache und fragt vor jeder Aktion; eine Übersicht im Admin-Chat; ein Link zum Chat in der Instanzzeile",
+				"ru": "Фоновые задания: задача на срок до 30 дней (следить за домом в отпуске, отчёт каждое утро); адаптер сам следит за триггерами и будит задание, только когда триггер срабатывает; оно пишет в чат, админ-чат, мессенджер или голосом и спрашивает перед каждым действием; панель в админ-чате; ссылка на чат в строке инстанса",
+				"pt": "Tarefas em segundo plano: uma tarefa que dura até 30 dias (vigiar a casa nas férias, um relatório todas as manhãs); o adaptador vigia os gatilhos e acorda a tarefa só quando um dispara; ela informa no chat, no chat do admin, num mensageiro ou por voz e pergunta antes de cada ação; um painel no chat do admin; um link para o chat na linha da instância",
+				"nl": "Achtergrondtaken: een taak die tot 30 dagen loopt (het huis bewaken tijdens de vakantie, elke ochtend een rapport); de adapter bewaakt de triggers en wekt de taak alleen als er een afgaat; die meldt zich in de chat, de admin-chat, een messenger of via spraak en vraagt vóór elke actie; een paneel in de admin-chat; een link naar de chat in de instantieregel",
+				"fr": "Tâches d'arrière-plan : une tâche qui dure jusqu'à 30 jours (surveiller la maison en vacances, un rapport chaque matin) ; l'adaptateur surveille les déclencheurs et ne réveille la tâche que lorsqu'un se déclenche ; elle informe dans le chat, le chat admin, une messagerie ou par la voix et demande avant chaque action ; un panneau dans le chat admin ; un lien vers le chat dans la ligne de l'instance",
+				"it": "Attività in background: un compito che dura fino a 30 giorni (sorvegliare la casa in vacanza, un rapporto ogni mattina); l'adattatore sorveglia i trigger e risveglia l'attività solo quando uno scatta; essa avvisa nella chat, nella chat admin, in un messenger o a voce e chiede prima di ogni azione; un pannello nella chat admin; un link alla chat nella riga dell'istanza",
+				"es": "Tareas en segundo plano: una tarea que dura hasta 30 días (vigilar la casa en vacaciones, un informe cada mañana); el adaptador vigila los disparadores y despierta la tarea solo cuando uno salta; avisa en el chat, el chat del admin, un mensajero o por voz y pregunta antes de cada acción; un panel en el chat del admin; un enlace al chat en la fila de la instancia",
+				"pl": "Zadania w tle: zadanie działające do 30 dni (pilnowanie domu podczas urlopu, raport każdego ranka); adapter sam pilnuje wyzwalaczy i budzi zadanie tylko wtedy, gdy któryś zadziała; zadanie pisze na czacie, czacie admina, w komunikatorze lub głosem i pyta przed każdą akcją; panel w czacie admina; link do czatu w wierszu instancji",
+				"uk": "Фонові завдання: задача на строк до 30 днів (стежити за домом у відпустці, звіт щоранку); адаптер сам стежить за тригерами і будить завдання, лише коли тригер спрацьовує; воно пише в чат, адмін-чат, месенджер або голосом і питає перед кожною дією; панель в адмін-чаті; посилання на чат у рядку інстансу",
+				"zh-cn": "后台任务：最长运行 30 天的任务（度假时看家、每天早上的报告）；适配器自行监视触发器，只在触发时唤醒任务；任务在聊天、管理聊天、消息应用中或通过语音通知，并在每个操作前询问；管理聊天中的任务面板；实例行中打开聊天的链接"
+			},
 			"0.8.2": {
 				"en": "Confirmation by text: the question is in the language the caller sends (ioBroker.assistant: the language of its satellites); the same yes twice is yes; the log shows what was heard; the question about a script is in one language",
 				"de": "Bestätigung per Text: Die Frage kommt in der Sprache, die der Aufrufer mitschickt (ioBroker.assistant: die Sprache seiner Satelliten); dasselbe Ja zweimal ist ein Ja; das Log zeigt, was gehört wurde; die Frage zu einem Skript ist in einer Sprache",
@@ -80,19 +93,6 @@
 				"pl": "Przegląd: migracje starych ustawień zmieniają tylko własny atrybut obiektu instancji; jeden handler dla wszystkich obserwowanych obiektów",
 				"uk": "Рев’ю: міграції старих налаштувань змінюють лише своє поле об’єкта інстансу; один обробник для всіх відстежуваних об’єктів",
 				"zh-cn": "审查：旧设置的迁移只修改实例对象中自己的属性；所有被监视的对象只用一个处理程序"
-			},
-			"0.7.0": {
-				"en": "Adapter updates: tools list_updates, check_npm and update_adapter (repository or npm), only with \"Allow adapter updates\", for adapters with \"Write allowed\" and pi-agent itself, always confirmed in the chat; list_notifications reads the notifications from the host",
-				"de": "Adapter-Updates: Werkzeuge list_updates, check_npm und update_adapter (Repository oder npm), nur mit „Adapter-Updates erlauben“, für Adapter mit „Schreiben erlaubt“ und pi-agent selbst, immer im Chat bestätigt; list_notifications liest die Benachrichtigungen vom Host",
-				"ru": "Обновление адаптеров: инструменты list_updates, check_npm и update_adapter (репозиторий или npm), только при «Разрешить обновление адаптеров», для адаптеров с «Запись разрешена» и самого pi-agent, всегда с подтверждением в чате; list_notifications читает уведомления с хоста",
-				"pt": "Atualizações de adaptadores: ferramentas list_updates, check_npm e update_adapter (repositório ou npm), só com \"Permitir atualizações de adaptadores\", para adaptadores com \"Escrita permitida\" e o próprio pi-agent, sempre confirmadas no chat; list_notifications lê as notificações do host",
-				"nl": "Adapter-updates: tools list_updates, check_npm en update_adapter (repository of npm), alleen met \"Adapter-updates toestaan\", voor adapters met \"Schrijven toegestaan\" en pi-agent zelf, altijd bevestigd in de chat; list_notifications leest de meldingen van de host",
-				"fr": "Mises à jour des adaptateurs : outils list_updates, check_npm et update_adapter (dépôt ou npm), uniquement avec « Autoriser les mises à jour des adaptateurs », pour les adaptateurs avec « Écriture autorisée » et pi-agent lui-même, toujours confirmées dans le chat ; list_notifications lit les notifications de l'hôte",
-				"it": "Aggiornamenti degli adattatori: strumenti list_updates, check_npm e update_adapter (repository o npm), solo con «Consenti aggiornamenti degli adattatori», per adattatori con «Scrittura consentita» e pi-agent stesso, sempre confermati nella chat; list_notifications legge le notifiche dall'host",
-				"es": "Actualizaciones de adaptadores: herramientas list_updates, check_npm y update_adapter (repositorio o npm), solo con «Permitir actualizaciones de adaptadores», para adaptadores con «Escritura permitida» y el propio pi-agent, siempre confirmadas en el chat; list_notifications lee las notificaciones del host",
-				"pl": "Aktualizacje adapterów: narzędzia list_updates, check_npm i update_adapter (repozytorium lub npm), tylko z „Zezwalaj na aktualizacje adapterów”, dla adapterów z „Zapis dozwolony” i samego pi-agent, zawsze potwierdzane w czacie; list_notifications odczytuje powiadomienia z hosta",
-				"uk": "Оновлення адаптерів: інструменти list_updates, check_npm і update_adapter (репозиторій або npm), лише з «Дозволити оновлення адаптерів», для адаптерів із «Запис дозволено» і самого pi-agent, завжди з підтвердженням у чаті; list_notifications читає сповіщення з хоста",
-				"zh-cn": "适配器更新：工具 list_updates、check_npm 和 update_adapter（仓库或 npm），仅在启用“允许更新适配器”时，适用于具有“允许写入”的适配器和 pi-agent 本身，始终需在聊天中确认；list_notifications 从主机读取通知"
 			}
 		},
 		"titleLang": {
@@ -164,6 +164,25 @@
 				"pl": "Pi Agent",
 				"uk": "Pi Agent",
 				"zh-cn": "Pi Agent"
+			}
+		},
+		"localLinks": {
+			"_default": {
+				"link": "%admin_protocol%://%admin_bind%:%admin_port%/adapter/pi-agent/tab.html?%instance%",
+				"name": {
+					"en": "Open the chat",
+					"de": "Chat öffnen",
+					"ru": "Открыть чат",
+					"pt": "Abrir o chat",
+					"nl": "Chat openen",
+					"fr": "Ouvrir le chat",
+					"it": "Apri la chat",
+					"es": "Abrir el chat",
+					"pl": "Otwórz czat",
+					"uk": "Відкрити чат",
+					"zh-cn": "打开聊天"
+				},
+				"order": 5
 			}
 		},
 		"dependencies": [

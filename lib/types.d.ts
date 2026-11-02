@@ -73,6 +73,14 @@ export interface Policy {
         }>;
         cancel: (conversationId: unknown, id: string) => Promise<boolean>;
     };
+    /** Background jobs (lib/jobs.js). */
+    jobs?: {
+        create: (owner: unknown, request: any) => Promise<string>;
+        list: () => object[];
+        stop: (caller: unknown, id: unknown) => Promise<string>;
+        resume: (caller: unknown, id: unknown) => Promise<string>;
+        isJob: (conversationId: unknown) => boolean;
+    };
     /** Reminders and scheduled writes of a conversation (live tasks of the harness). */
     scheduled?: {
         tasks: (

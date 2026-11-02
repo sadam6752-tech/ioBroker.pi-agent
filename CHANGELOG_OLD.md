@@ -1,5 +1,11 @@
 # Older Changelog
 
+### 0.7.0 (2026-10-30)
+
+- Adapter updates: tools `list_updates`, `check_npm` and `update_adapter` (repository or npm), only with "Allow
+  adapter updates", for adapters with "Write allowed" and pi-agent itself, always confirmed in the chat
+- `list_notifications` reads the notifications from the host, as admin shows them
+
 ### 0.6.4 (2026-10-29)
 
 - Scheduler fullcalendar: repeating, longer and timed actions go to fullcalendar through `send_to`, but only for

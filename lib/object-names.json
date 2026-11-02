@@ -207,6 +207,19 @@
 		"uk": "Спостереження notify_when (JSON)",
 		"zh-cn": "notify_when 的监视（JSON）"
 	},
+	"scheduled.jobs": {
+		"en": "Background jobs (JSON)",
+		"de": "Hintergrundaufträge (JSON)",
+		"ru": "Фоновые задания (JSON)",
+		"pt": "Tarefas em segundo plano (JSON)",
+		"nl": "Achtergrondtaken (JSON)",
+		"fr": "Tâches d'arrière-plan (JSON)",
+		"it": "Attività in background (JSON)",
+		"es": "Tareas en segundo plano (JSON)",
+		"pl": "Zadania w tle (JSON)",
+		"uk": "Фонові завдання (JSON)",
+		"zh-cn": "后台任务（JSON）"
+	},
 	"update": {
 		"en": "Update of pi-agent",
 		"de": "Update von pi-agent",

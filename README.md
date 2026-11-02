@@ -244,6 +244,36 @@ Select **OpenAI-compatible (own URL)** for any server with the OpenAI chat compl
   `list_notifications` shows the notifications of ioBroker (the bell in admin). Both only read.
 - A message from a conversation of a `sendTo` caller (e.g. ioBroker.assistant) goes to `chat.answer`.
 
+## Background jobs
+
+A background job is a task that runs for days and needs thinking each time, e.g. "while I am away until the 20th,
+tell me when a window stays open for 15 minutes while the heating runs, or a Zigbee sensor drops out" or "every morning
+at 7, tell me the weather and the low batteries".
+
+- The agent sets it up with `create_job`: a short name, the task in the words of the user, the triggers, how many days
+  it runs (at most 30) and where its messages go.
+- **Triggers:** a state that meets a condition (`==`, `!=`, `>`, `<`, `>=`, `<=` or `changes`, optionally for some
+  minutes; only values of the device count), a time of day (`daily`, local time), or an interval (15 to 1440
+  minutes). A state trigger fires when its condition becomes met and again only after the condition broke off.
+- **The model is called only when a trigger fires.** The adapter watches the triggers itself; then the job's own
+  conversation is woken up with the task, reads what it needs and tells the user, or stays quiet (a false alarm).
+  A job that never fires costs nothing.
+- **Where it reports:** the chat the job was set up in (default), the admin chat, a messenger chat, or **by voice**:
+  the satellite of ioBroker.assistant the job was set up from (`assistant.0.satellites.<id>.tts`), else all of them
+  (`assistant.0.tts.text`). Speaking needs **Write allowed** for that state in "Write permissions"; in simulation mode
+  nothing is spoken. Set up by voice, the agent asks where to report.
+- **Actions only with ✅/❌:** every write, restart, command, update or script change of a job is asked in the
+  messenger or admin chat it reports to, also without "Confirmation required". A job that reports only by voice can
+  only tell.
+- **Limits:** at most 5 jobs and 5 triggers per job. A job woken more than 20 times in one day is paused and says so,
+  so a flapping sensor cannot use up the budget; `resume_job` starts it again.
+- `list_jobs` shows the jobs (triggers, running or paused, until when, how often they woke up), `stop_job` stops one;
+  a job may stop itself when its task is complete ("tell me once when the washing machine is done"). The jobs are kept
+  in `scheduled.jobs` and go on after a restart.
+- The chat in the admin shows the jobs above the conversation (collapsible): status, triggers, until when, wake-ups
+  of today, the last one, where they report, with **Stop** and **Resume**.
+- For a single message when something happens, `notify_when` is enough.
+
 ## Scheduler fullcalendar
 
 For actions that repeat (every weekday at 7:00), lie more than 7 days ahead, switch something on for a while, or
@@ -378,6 +408,16 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.8.3 (2026-11-02)
+
+- Background jobs: `create_job` sets up a task that runs up to 30 days ("while I am away, tell me when a window stays
+  open while the heating runs", "every morning at 7 a report"). The adapter watches its triggers (a state condition,
+  a time of day, an interval) and wakes the job's own conversation only when one fires; the job tells the user in the
+  chat it was set up in, the admin chat, a messenger chat or by voice through ioBroker.assistant, or stays quiet.
+  Actions of a job are always confirmed with ✅/❌. At most 5 jobs, paused after 20 wake-ups in one day; `list_jobs`,
+  `stop_job`, `resume_job`, and a panel of the jobs in the chat of the admin
+- The instance row in admin has a link that opens the chat (`common.localLinks`), at the address of the admin
+
 ### 0.8.2 (2026-11-02)
 
 - Confirmation by text: the question is in the `language` the caller sends with `ask` (ioBroker.assistant: the
@@ -412,12 +452,6 @@ the last copy.
 
 - Review: the migrations of old settings change the own instance object with a partial update (extendForeignObject)
 - One objectChange handler for all watched objects, registered once
-
-### 0.7.0 (2026-10-30)
-
-- Adapter updates: tools `list_updates`, `check_npm` and `update_adapter` (repository or npm), only with "Allow
-  adapter updates", for adapters with "Write allowed" and pi-agent itself, always confirmed in the chat
-- `list_notifications` reads the notifications from the host, as admin shows them
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

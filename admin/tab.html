@@ -233,6 +233,65 @@
                 padding: 10px 16px;
                 border-top: 1px solid var(--border);
             }
+            #jobs {
+                margin: 10px 16px 0;
+                border: 1px solid var(--border);
+                border-radius: 8px;
+            }
+            #jobs .head {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 6px 12px;
+                cursor: pointer;
+                user-select: none;
+            }
+            #jobs .head .count {
+                color: var(--muted);
+            }
+            #jobs.collapsed .job {
+                display: none;
+            }
+            .job {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 8px 12px;
+                border-top: 1px solid var(--border);
+                font-size: 13px;
+            }
+            .job .text {
+                flex: 1;
+                min-width: 0;
+            }
+            .job .name {
+                font-weight: 500;
+                font-size: 14px;
+            }
+            .job .triggers {
+                color: var(--muted);
+                overflow-wrap: anywhere;
+            }
+            .job .meta {
+                color: var(--muted);
+                font-size: 12px;
+            }
+            .job .status {
+                border-radius: 10px;
+                padding: 0 8px;
+                margin-left: 6px;
+                font-size: 12px;
+                background: var(--accent-bg);
+                color: var(--accent-text);
+            }
+            .job .status.paused {
+                background: var(--warn-bg);
+                color: var(--warn);
+            }
+            .job .buttons {
+                display: flex;
+                gap: 6px;
+            }
             textarea {
                 flex: 1;
                 resize: none;
@@ -256,6 +315,7 @@
             <label><input type="checkbox" id="details" /> <span id="detailsLabel"></span></label>
             <button id="new"></button>
         </header>
+        <section id="jobs" hidden></section>
         <div id="messages"></div>
         <footer>
             <textarea id="input" rows="1"></textarea>
@@ -378,6 +438,20 @@
                     'Лише читання: розмова %name. Її відповіді йдуть до %source.',
                     '只读：%name 的对话。其回答发送到 %source。',
                 ],
+                jobs: ['Background jobs', 'Hintergrundaufträge', 'Фоновые задания', 'Tarefas em segundo plano', 'Achtergrondtaken', "Tâches d'arrière-plan", 'Attività in background', 'Tareas en segundo plano', 'Zadania w tle', 'Фонові завдання', '后台任务'],
+                jobCount: ['%n of %m', '%n von %m', '%n из %m', '%n de %m', '%n van %m', '%n sur %m', '%n di %m', '%n de %m', '%n z %m', '%n з %m', '%n / %m'],
+                jobRunning: ['running', 'läuft', 'работает', 'em execução', 'actief', 'en cours', 'in esecuzione', 'en marcha', 'działa', 'працює', '运行中'],
+                jobPaused: ['paused', 'pausiert', 'на паузе', 'em pausa', 'gepauzeerd', 'en pause', 'in pausa', 'en pausa', 'wstrzymane', 'на паузі', '已暂停'],
+                jobStop: ['Stop', 'Stoppen', 'Стоп', 'Parar', 'Stoppen', 'Arrêter', 'Ferma', 'Detener', 'Zatrzymaj', 'Стоп', '停止'],
+                jobResume: ['Resume', 'Fortsetzen', 'Продолжить', 'Retomar', 'Hervatten', 'Reprendre', 'Riprendi', 'Reanudar', 'Wznów', 'Продовжити', '继续'],
+                confirmJobStop: ['Stop the job "%name"?', 'Den Auftrag „%name“ stoppen?', 'Остановить задание «%name»?', 'Parar a tarefa "%name"?', 'De taak "%name" stoppen?', 'Arrêter la tâche « %name » ?', 'Fermare l\'attività "%name"?', '¿Detener la tarea "%name"?', 'Zatrzymać zadanie „%name”?', 'Зупинити завдання «%name»?', '停止任务“%name”？'],
+                jobUntil: ['until %t', 'bis %t', 'до %t', 'até %t', 'tot %t', "jusqu'au %t", 'fino al %t', 'hasta el %t', 'do %t', 'до %t', '至 %t'],
+                jobToday: ['today %n of %m', 'heute %n von %m', 'сегодня %n из %m', 'hoje %n de %m', 'vandaag %n van %m', "aujourd'hui %n sur %m", 'oggi %n di %m', 'hoy %n de %m', 'dziś %n z %m', 'сьогодні %n з %m', '今天 %n / %m'],
+                jobLast: ['last %t', 'zuletzt %t', 'последнее %t', 'último %t', 'laatst %t', 'dernier %t', 'ultimo %t', 'último %t', 'ostatnio %t', 'останнє %t', '上次 %t'],
+                triggerDaily: ['every day at %t', 'täglich um %t', 'каждый день в %t', 'todos os dias às %t', 'elke dag om %t', 'chaque jour à %t', 'ogni giorno alle %t', 'cada día a las %t', 'codziennie o %t', 'щодня о %t', '每天 %t'],
+                triggerInterval: ['every %n min', 'alle %n min', 'каждые %n мин', 'a cada %n min', 'elke %n min', 'toutes les %n min', 'ogni %n min', 'cada %n min', 'co %n min', 'кожні %n хв', '每 %n 分钟'],
+                triggerFor: ['for %n min', 'für %n min', '%n мин', 'durante %n min', '%n min lang', 'pendant %n min', 'per %n min', 'durante %n min', 'przez %n min', '%n хв', '持续 %n 分钟'],
+                voice: ['voice', 'Sprache', 'голос', 'voz', 'spraak', 'voix', 'voce', 'voz', 'głos', 'голос', '语音'],
                 calls: ['%n model call(s)', '%n Modellaufruf(e)', 'вызовов модели: %n', '%n chamada(s) do modelo', '%n modelaanroep(en)', '%n appel(s) du modèle', '%n chiamata/e al modello', '%n llamada(s) al modelo', 'wywołania modelu: %n', 'викликів моделі: %n', '%n 次模型调用'],
             };
             let lang = 'en';
@@ -572,6 +646,90 @@
                 }
             }
 
+            const localTime = ts =>
+                new Date(ts).toLocaleString(lang, { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+
+            /** A trigger of a job in the language of the page. */
+            function triggerLabel(tr) {
+                if (tr.kind === 'daily') {
+                    return t('triggerDaily').replace('%t', tr.time);
+                }
+                if (tr.kind === 'interval') {
+                    return t('triggerInterval').replace('%n', number(tr.minutes));
+                }
+                const condition = tr.condition === 'changes' ? '≠' : `${tr.condition} ${JSON.stringify(tr.value)}`;
+                const duration = tr.forMs ? ` ${t('triggerFor').replace('%n', number(Math.round(tr.forMs / 60000)))}` : '';
+                return `${tr.stateId} ${condition}${duration}`;
+            }
+
+            /** Where the messages of a job go: "admin chat", "telegram.0", "voice: kitchen". */
+            function targetLabel(key) {
+                if (key === 'state') {
+                    return 'chat.answer';
+                }
+                if (key.startsWith('voice:')) {
+                    const m = /\.satellites\.([^.]+)\.tts$/.exec(key);
+                    return `${t('voice')}${m ? `: ${m[1]}` : ''}`;
+                }
+                return key.startsWith('admin/') ? t('adminChat') : key.slice(0, key.lastIndexOf('/'));
+            }
+
+            const jobsBox = $('jobs');
+            let jobsShown = '';
+            let jobsCollapsed = recall('jobsCollapsed') === '1';
+
+            /** The panel of the background jobs above the chat; hidden while there is none. */
+            function renderJobs(jobs) {
+                const list = Array.isArray(jobs) ? jobs : [];
+                jobsBox.hidden = offline || list.length === 0;
+                jobsBox.classList.toggle('collapsed', jobsCollapsed);
+                const key = JSON.stringify([list, lang, jobsCollapsed]);
+                if (key === jobsShown) {
+                    return;
+                }
+                jobsShown = key;
+                jobsBox.textContent = '';
+                const head = item('head', `${jobsCollapsed ? '▸' : '▾'} <b>${escapeHtml(t('jobs'))}</b> <span class="count">${escapeHtml(t('jobCount').replace('%n', number(list.length)).replace('%m', '5'))}</span>`);
+                head.onclick = () => {
+                    jobsCollapsed = !jobsCollapsed;
+                    remember('jobsCollapsed', jobsCollapsed ? '1' : '');
+                    renderJobs(list);
+                };
+                jobsBox.append(head);
+                for (const job of list) {
+                    const meta = [
+                        t('jobUntil').replace('%t', localTime(job.until)),
+                        t('jobToday').replace('%n', number(job.wakesToday)).replace('%m', number(job.maxWakes)),
+                        ...(job.last ? [t('jobLast').replace('%t', localTime(job.last))] : []),
+                        job.notify.map(targetLabel).join(', '),
+                    ];
+                    const row = item(
+                        'job',
+                        `<div class="text"><div><span class="name">${escapeHtml(job.name)}</span><span class="status${job.paused ? ' paused' : ''}">${escapeHtml(t(job.paused ? 'jobPaused' : 'jobRunning'))}</span></div><div class="triggers">${escapeHtml(job.triggers.map(triggerLabel).join(' · '))}</div><div class="meta">${escapeHtml(meta.join(' · '))}</div></div><div class="buttons"></div>`,
+                    );
+                    row.querySelector('.text').title = job.lastReason ? `${job.task}\n\n${job.lastReason}` : job.task;
+                    const buttons = row.querySelector('.buttons');
+                    if (job.paused) {
+                        const resume = document.createElement('button');
+                        resume.textContent = t('jobResume');
+                        resume.onclick = () => jobCommand('chatJobResume', job.id);
+                        buttons.append(resume);
+                    }
+                    const stop = document.createElement('button');
+                    stop.textContent = t('jobStop');
+                    stop.onclick = () => confirm(t('confirmJobStop').replace('%name', job.name)) && jobCommand('chatJobStop', job.id);
+                    buttons.append(stop);
+                    jobsBox.append(row);
+                }
+            }
+
+            async function jobCommand(command, id) {
+                const answer = await sendTo(command, { id });
+                if (Array.isArray(answer.jobs)) {
+                    renderJobs(answer.jobs);
+                }
+            }
+
             async function refresh() {
                 clearTimeout(timer);
                 const answer = await sendTo('chatHistory', selected ? { conversation: selected } : {});
@@ -586,6 +744,7 @@
                     pending = false;
                 }
                 render();
+                renderJobs(state.jobs);
                 // fast while the agent works, slowly otherwise (reminders, other sessions, requests of other sources)
                 timer = setTimeout(refresh, state.busy || state.question ? 1500 : selected ? 3000 : 10000);
             }
@@ -685,7 +844,9 @@
                     }
                 }
                 shown = '';
+                jobsShown = '';
                 render();
+                renderJobs(state.jobs);
             }
 
             socket.on('connect', async () => {
@@ -702,6 +863,7 @@
             socket.on('disconnect', () => {
                 offline = true;
                 render();
+                renderJobs([]);
             });
             applyLanguage();
         </script>

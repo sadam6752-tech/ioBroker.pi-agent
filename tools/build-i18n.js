@@ -1340,6 +1340,19 @@ const DESC = [
 ];
 /** common.news per version, newest first; the repository builder keeps at most seven. */
 const NEWS = {};
+NEWS['0.8.3'] = [
+    'Background jobs: a task that runs up to 30 days (watch the house while away, a report every morning); the adapter watches the triggers and wakes the job only when one fires; it reports in the chat, the admin chat, a messenger or by voice, and asks before every action; a panel in the admin chat; a link to the chat in the instance row',
+    'Hintergrundaufträge: eine Aufgabe, die bis zu 30 Tage läuft (das Haus im Urlaub beobachten, jeden Morgen ein Bericht); der Adapter beobachtet die Auslöser und weckt den Auftrag nur, wenn einer auslöst; er meldet sich im Chat, im Admin-Chat, im Messenger oder per Sprache und fragt vor jeder Aktion; eine Übersicht im Admin-Chat; ein Link zum Chat in der Instanzzeile',
+    'Фоновые задания: задача на срок до 30 дней (следить за домом в отпуске, отчёт каждое утро); адаптер сам следит за триггерами и будит задание, только когда триггер срабатывает; оно пишет в чат, админ-чат, мессенджер или голосом и спрашивает перед каждым действием; панель в админ-чате; ссылка на чат в строке инстанса',
+    'Tarefas em segundo plano: uma tarefa que dura até 30 dias (vigiar a casa nas férias, um relatório todas as manhãs); o adaptador vigia os gatilhos e acorda a tarefa só quando um dispara; ela informa no chat, no chat do admin, num mensageiro ou por voz e pergunta antes de cada ação; um painel no chat do admin; um link para o chat na linha da instância',
+    'Achtergrondtaken: een taak die tot 30 dagen loopt (het huis bewaken tijdens de vakantie, elke ochtend een rapport); de adapter bewaakt de triggers en wekt de taak alleen als er een afgaat; die meldt zich in de chat, de admin-chat, een messenger of via spraak en vraagt vóór elke actie; een paneel in de admin-chat; een link naar de chat in de instantieregel',
+    "Tâches d'arrière-plan : une tâche qui dure jusqu'à 30 jours (surveiller la maison en vacances, un rapport chaque matin) ; l'adaptateur surveille les déclencheurs et ne réveille la tâche que lorsqu'un se déclenche ; elle informe dans le chat, le chat admin, une messagerie ou par la voix et demande avant chaque action ; un panneau dans le chat admin ; un lien vers le chat dans la ligne de l'instance",
+    "Attività in background: un compito che dura fino a 30 giorni (sorvegliare la casa in vacanza, un rapporto ogni mattina); l'adattatore sorveglia i trigger e risveglia l'attività solo quando uno scatta; essa avvisa nella chat, nella chat admin, in un messenger o a voce e chiede prima di ogni azione; un pannello nella chat admin; un link alla chat nella riga dell'istanza",
+    'Tareas en segundo plano: una tarea que dura hasta 30 días (vigilar la casa en vacaciones, un informe cada mañana); el adaptador vigila los disparadores y despierta la tarea solo cuando uno salta; avisa en el chat, el chat del admin, un mensajero o por voz y pregunta antes de cada acción; un panel en el chat del admin; un enlace al chat en la fila de la instancia',
+    'Zadania w tle: zadanie działające do 30 dni (pilnowanie domu podczas urlopu, raport każdego ranka); adapter sam pilnuje wyzwalaczy i budzi zadanie tylko wtedy, gdy któryś zadziała; zadanie pisze na czacie, czacie admina, w komunikatorze lub głosem i pyta przed każdą akcją; panel w czacie admina; link do czatu w wierszu instancji',
+    'Фонові завдання: задача на строк до 30 днів (стежити за домом у відпустці, звіт щоранку); адаптер сам стежить за тригерами і будить завдання, лише коли тригер спрацьовує; воно пише в чат, адмін-чат, месенджер або голосом і питає перед кожною дією; панель в адмін-чаті; посилання на чат у рядку інстансу',
+    '后台任务：最长运行 30 天的任务（度假时看家、每天早上的报告）；适配器自行监视触发器，只在触发时唤醒任务；任务在聊天、管理聊天、消息应用中或通过语音通知，并在每个操作前询问；管理聊天中的任务面板；实例行中打开聊天的链接',
+];
 NEWS['0.8.2'] = [
     'Confirmation by text: the question is in the language the caller sends (ioBroker.assistant: the language of its satellites); the same yes twice is yes; the log shows what was heard; the question about a script is in one language',
     'Bestätigung per Text: Die Frage kommt in der Sprache, die der Aufrufer mitschickt (ioBroker.assistant: die Sprache seiner Satelliten); dasselbe Ja zweimal ist ein Ja; das Log zeigt, was gehört wurde; die Frage zu einem Skript ist in einer Sprache',
@@ -1862,6 +1875,19 @@ const OBJECT_NAMES = {
         'Obserwacje notify_when (JSON)',
         'Спостереження notify_when (JSON)',
         'notify_when 的监视（JSON）',
+    ],
+    'scheduled.jobs': [
+        'Background jobs (JSON)',
+        'Hintergrundaufträge (JSON)',
+        'Фоновые задания (JSON)',
+        'Tarefas em segundo plano (JSON)',
+        'Achtergrondtaken (JSON)',
+        "Tâches d'arrière-plan (JSON)",
+        'Attività in background (JSON)',
+        'Tareas en segundo plano (JSON)',
+        'Zadania w tle (JSON)',
+        'Фонові завдання (JSON)',
+        '后台任务（JSON）',
     ],
     update: [
         'Update of pi-agent',
