@@ -91,6 +91,8 @@
 	"No API key entered: the system-wide AI settings of admin (System settings, tab \"AI\") are used.": "未输入 API 密钥：将使用 admin 的系统级 AI 设置（系统设置，“AI”选项卡）。",
 	"One row per scope: an instance (hm-rpc.0) or an object ID with everything below it, or a pattern with * (hm-rpc.0.*.STATE). States that match no row can only be read. \"Confirmation required\" counts only where writing is allowed. \"Restart allowed\" counts only for a whole instance (not pi-agent or admin); every restart is confirmed in the chat.": "每个范围一行：一个实例（hm-rpc.0）或一个对象 ID 及其下的所有内容，或带 * 的模式（hm-rpc.0.*.STATE）。不匹配任何行的状态只能读取。“需要确认”仅在允许写入的地方生效。“允许重启”仅适用于整个实例（不包括 pi-agent 和 admin）；每次重启都需在聊天中确认。",
 	"Restart allowed": "允许重启",
+	"Code mode: scripts for questions about many states": "代码模式：针对多个状态的问题使用脚本",
+	"For a question about many states (all batteries, every room) the agent writes a short script that calls its tools in a sandbox, and only the result goes to the model: faster and fewer tokens. Write permissions, simulation mode and confirmations count for every call of the script. It saves tokens only on questions with several steps (combine data, count, go through many devices); a simple question costs a little more than without it. Works best with strong models.": "当问题涉及许多状态（所有电池、每个房间）时，代理会编写一个在沙箱中调用其工具的短脚本，只有结果会发给模型：更快、更省 token。写入权限、模拟模式和确认对脚本的每次调用都有效。只有在多步骤的问题上（合并数据、计数、遍历许多设备）才能节省 token；简单问题会比不用时稍贵一些。与强大的模型配合效果最佳。",
 	"Long-term memory": "长期记忆",
 	"The agent keeps facts you tell it to remember (tools remember and forget) across all conversations, in the state memory.list": "代理会在所有对话中保留你让它记住的事实（工具 remember 和 forget），保存在状态 memory.list 中",
 	"Allow adapter updates": "允许更新适配器",

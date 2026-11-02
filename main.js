@@ -178,6 +178,8 @@ class PiAgent extends utils.Adapter {
         this.on('objectChange', this.onObjectChange.bind(this));
 
         this.harness = null;
+        /** QuickJS sandbox of code mode (setting "codeMode"), else null. */
+        this.codemodeSandbox = null;
         this.root = null;
         this.context = null;
         this.model = null;
@@ -575,12 +577,25 @@ class PiAgent extends utils.Adapter {
         this.context = BACKGROUND_CONTEXT;
 
         const registry = durable.createRegistry();
+        if (this.config.codeMode === true) {
+            // Code mode: the model may write a script that calls the tools in a QuickJS sandbox. Every call of the
+            // script is a tool call of its own, so the write guard and the confirmations hold for it as well.
+            const [{ CodemodeSandbox }, { createCodemodeExtension }] = await Promise.all([
+                import('@earendil-works/pi-codemode'),
+                import('@earendil-works/pi-durable/codemode'),
+            ]);
+            this.codemodeSandbox = new CodemodeSandbox({ memoryLimitBytes: 64 * 1024 * 1024 });
+            // models: false - no classifiers or image generation from scripts, only the ioBroker tools
+            registry.install(createCodemodeExtension({ sandbox: this.codemodeSandbox, models: false }));
+            this.log.info('Code mode is on: the agent may answer with scripts that call its tools');
+        }
         registry.install(
             createIoBrokerExtension(this, { ...durable, Type: ai.Type }, () => ({
                 allowlist: this.allowlist,
                 confirmList: this.confirmList,
                 timeZone: this.timeZone,
                 dryRun: Boolean(this.config.dryRun),
+                codeMode: this.config.codeMode === true,
                 instructions: String(this.config.instructions || ''),
                 requestConfirmation: request => this.requestConfirmation(request),
                 deliverReminder: (conversationId, text) => this.deliverReminder(conversationId, text),
@@ -2569,6 +2584,8 @@ class PiAgent extends utils.Adapter {
             } catch (e) {
                 this.log.error(`Closing the harness failed: ${e.message}`);
             }
+            // a script still running resumes with the sandbox of the next start
+            await this.codemodeSandbox?.close().catch(() => undefined);
             try {
                 await this.pendingWrite;
                 await this.setStateAsync('info.connection', { val: false, ack: true });

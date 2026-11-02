@@ -172,6 +172,17 @@
                     "lg": 12,
                     "xl": 12
                 },
+                "codeMode": {
+                    "type": "checkbox",
+                    "label": "Code mode: scripts for questions about many states",
+                    "help": "For a question about many states (all batteries, every room) the agent writes a short script that calls its tools in a sandbox, and only the result goes to the model: faster and fewer tokens. Write permissions, simulation mode and confirmations count for every call of the script. It saves tokens only on questions with several steps (combine data, count, go through many devices); a simple question costs a little more than without it. Works best with strong models.",
+                    "default": false,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
                 "instructions": {
                     "type": "text",
                     "label": "Instructions",

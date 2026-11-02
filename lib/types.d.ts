@@ -73,6 +73,8 @@ export interface Policy {
         }>;
         cancel: (conversationId: unknown, id: string) => Promise<boolean>;
     };
+    /** Code mode is on: the instructions tell how to write a script. */
+    codeMode?: boolean;
     /** Background jobs (lib/jobs.js). */
     jobs?: {
         create: (owner: unknown, request: any) => Promise<string>;

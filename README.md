@@ -274,6 +274,41 @@ at 7, tell me the weather and the low batteries".
   of today, the last one, where they report, with **Stop** and **Resume**.
 - For a single message when something happens, `notify_when` is enough.
 
+## Code mode
+
+With **Code mode** (tab "General", off by default) the agent may answer a question about many states with a short
+script instead of one tool call after the other, e.g. "which batteries are below 20 %, by room?":
+
+```js
+const rooms = await tools.list_rooms({});
+for (const room of rooms.rows) {
+    const found = await tools.find_states({ room: room.name, function: 'battery' });
+    const low = found.rows.filter(s => s.role === 'value.battery');
+    // …
+}
+```
+
+- The script runs in a QuickJS sandbox (`@earendil-works/pi-codemode`): no files, no network, no timers, only the
+  tools of the agent as `tools.<name>(args)`. The read tools give their values as objects. Only what the script
+  prints goes to the model, so a question about the whole house takes one model call instead of dozens, with far fewer
+  tokens.
+- **Every call of a script is a tool call of its own:** the write permissions, the simulation mode and the
+  confirmations hold for each one, also in background jobs. A script that switches ten lamps on the "Confirmation
+  required" list asks ten times. A blocked call is an error in the script, which the script may handle.
+- A script survives a restart of the adapter: it continues where it was, and the calls it made before are not run
+  again (a write that was interrupted is reported as interrupted, like outside a script).
+- Scripts cannot call models (no classifiers, no image generation). The model decides when a script is worth it; a
+  single switch stays a single tool call.
+- The tools are described to the model as TypeScript declarations (about 3000 tokens more per request). Works best with
+  strong models; with a small one, compare the answers with Code mode off.
+
+> **Code mode saves tokens only on questions with several steps.** A question that one read with a pattern answers
+> ("which batteries are below 20 %?") costs a little more with Code mode than without it: on a test system with
+> DeepSeek flash 3 model calls instead of 2. A question that combines data, counts or goes through many devices ("where
+> is a window open while the light is on, and which batteries are below 20 %?") took 1,646 new input tokens instead
+> of 7,972, about 80 % less, and the script did the matching exactly instead of the model. Switch it on when such
+> questions are common or the house is large.
+
 ## Scheduler fullcalendar
 
 For actions that repeat (every weekday at 7:00), lie more than 7 days ahead, switch something on for a while, or
@@ -408,6 +443,15 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.8.4 (2026-11-02)
+
+- Code mode (setting, off by default): for a question with several steps the agent writes a short script that calls
+  its tools in a QuickJS sandbox; only the result goes to the model. Write permissions, simulation mode and
+  confirmations hold for every call of the script, also in background jobs; a script survives a restart without
+  running its finished calls again. The read tools give their values to scripts as objects. The instructions tell the
+  model to write a script only when one call is not enough and to print only the result; it saves tokens only on
+  questions with several steps, a simple question costs a little more
+
 ### 0.8.3 (2026-11-02)
 
 - Background jobs: `create_job` sets up a task that runs up to 30 days ("while I am away, tell me when a window stays
@@ -447,11 +491,6 @@ the last copy.
 
 - Confirmation by text in sendTo conversations (e.g. ioBroker.assistant), off by default: the question is the answer
   of the request, the next request decides; only "yes" confirms, anything else or 2 minutes of silence is no
-
-### 0.7.1 (2026-10-30)
-
-- Review: the migrations of old settings change the own instance object with a partial update (extendForeignObject)
-- One objectChange handler for all watched objects, registered once
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

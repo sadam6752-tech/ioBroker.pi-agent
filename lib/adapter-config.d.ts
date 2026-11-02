@@ -18,6 +18,7 @@ declare global {
             dryRun: boolean;
             /** Facts kept across all conversations (tools remember and forget) since 0.6.0. */
             longTermMemory: boolean;
+            codeMode: boolean;
             /** Messenger instances (telegram, max) since 0.1.0: one row per instance. */
             messengers: Array<{ enabled?: boolean; instance: string; users: string; prefix: string }>;
             /** Single fields of 0.0.5 and earlier, moved into messengers at the first start. */
