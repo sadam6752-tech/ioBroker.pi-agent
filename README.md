@@ -378,6 +378,9 @@ the last copy.
   language of its satellites) instead of the system language; a satellite listening in Russian could not hear the
   German "Ja" it was asked for. The same yes twice ("Да да.", what speech recognition made of one "Да") is yes; the log
   shows what was heard
+- One language in the question about a script: the summary the model writes follows the language of the user (it was
+  German in a Russian conversation), and the warnings ("file access", "setState with a computed id" …) are spoken in
+  the language of the question; the messenger chat and the log keep them in English
 
 ### 0.8.0 (2026-11-02)
 
