@@ -135,6 +135,29 @@ test('questions: messenger text with the diff, spoken text with the summary and 
     );
 });
 
+test('questions: the spoken warnings are in the language of the question, the messenger text stays English', () => {
+    // was "Внимание, в коде: setState with a computed id." in a Russian question
+    const source =
+        'setState(id, true);\nsetState("hm-rpc.0.ABC.1.STATE", true);\nwriteFile("x", "y", "z");\nexec("ls");';
+    const warnings = scriptWarnings(source, () => false);
+    const val = { id: OWN, isNew: true, running: false, warnings, diff: '', summary: 'Переключает свет.' };
+    assert.equal(
+        confirmationQuestion('ru', { what: 'Свет', action: 'scriptSave', val }),
+        'Сохранить новый скрипт Свет? Переключает свет. Внимание, в коде: exec, доступ к файлам, ' +
+            'setState вне прав на запись: hm-rpc.0.ABC.1.STATE, setState с вычисляемым ID. Скажи да или нет. [[LISTEN]]',
+    );
+    assert.match(
+        confirmationQuestion('de', { what: 'Licht', action: 'scriptSave', val }),
+        /Dateizugriffe, setState außerhalb/,
+    );
+    assert.match(
+        confirmationQuestion('en', { what: 'Light', action: 'scriptSave', val }),
+        /file access, setState outside/,
+    );
+    const messenger = scriptQuestion('scriptSave', val, { mark: s => s, pre: s => s, maxDiff: 100 });
+    assert.match(messenger, /⚠ setState with a computed id/);
+});
+
 test('history: keeps five versions per script and survives a new start', () => {
     const dir = tmp();
     const history = createScriptHistory(dir);

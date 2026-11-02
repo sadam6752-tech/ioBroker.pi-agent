@@ -122,5 +122,7 @@ test('prompt: answer in the language of the question unless the instructions nam
     const own = prompt.indexOf('Antworte immer auf Deutsch.');
     assert.ok(rule > 0, 'the language rule is in the prompt');
     assert.ok(own > rule, 'the instructions of the user come after the rule that defers to them');
+    // a Russian voice conversation got the summary of a script in German, inside a Russian question
+    assert.ok(prompt.includes('Texts in tool arguments that the user reads or hears'), 'texts in tool arguments too');
     await stopAgent(agent);
 });

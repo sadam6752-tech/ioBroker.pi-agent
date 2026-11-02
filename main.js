@@ -68,7 +68,7 @@ const { channelsFromConfig, legacyRows, chatKey, parseChatKey, migrateChats } = 
 const { createDrivers, messengerType, MESSENGER_ADAPTERS } = require('./lib/messengers');
 const { ADMIN, ADMIN_INSTRUCTIONS, historyOf, withNotices, createAdminChat } = require('./lib/admin-chat');
 const { isAllowedUser, stripPrefix, telegramRequestId } = require('./lib/telegram');
-const { TextConfirmations, isYes, confirmationQuestion } = require('./lib/text-confirmation');
+const { TextConfirmations, isYes, spokenAnswer, languageOf, confirmationQuestion } = require('./lib/text-confirmation');
 const { createScriptHistory, scriptName } = require('./lib/scripts');
 
 /**
@@ -192,6 +192,11 @@ class PiAgent extends utils.Adapter {
         this.drivers = createDrivers(this);
         /** Confirmations by text in the conversations of sendTo callers (setting "textConfirmation"). */
         this.textConfirmations = new TextConfirmations(this);
+        /**
+         * Per sendTo conversation: the language the caller named in its last "ask" (e.g. "ru"), for the questions to
+         * confirm. A voice satellite listens in it; a question in another language gets an answer it cannot hear.
+         */
+        this.callerLanguages = new Map();
         /** Questions, errors and reminders of the chat in the admin tab, per ioBroker user. */
         this.adminChat = createAdminChat(this);
         /** Long-term memory shared by all conversations (lib/memory.js). */
@@ -753,14 +758,18 @@ class PiAgent extends utils.Adapter {
      * @returns {Promise<string>} "yes", "no", "timeout", or "unavailable" when the caller does not wait for an answer
      */
     async requestTextConfirmation(key, { id, val, action }) {
-        const language = await this.systemLanguage();
+        // the language of the caller first: ioBroker.assistant names the one its satellites listen in
+        const language = this.callerLanguages.get(key) || (await this.systemLanguage());
         let what = id;
         if (String(action).startsWith('script')) {
             what = scriptName(id);
         } else if (!action) {
             // a state is spoken by its name, if it has one
             const name = (await this.getForeignObjectAsync(id).catch(() => null))?.common?.name;
-            what = String((name && typeof name === 'object' ? name[language] || name.en : name) || id);
+            what = String(
+                (name && typeof name === 'object' ? name[language] || name[languageOf(language)] || name.en : name) ||
+                    id,
+            );
         }
         const answer = await this.textConfirmations.request(key, confirmationQuestion(language, { what, val, action }));
         if (answer !== 'unavailable') {
@@ -2106,10 +2115,22 @@ class PiAgent extends utils.Adapter {
             const requestId = message.requestId || requestIdFor(crypto, Date.now(), message.text);
             const target = sendToTarget(obj.from, message);
             const key = this.chatKeyOf(target);
+            const language = String(message.language ?? '')
+                .trim()
+                .toLowerCase()
+                .slice(0, 10);
+            if (key && language) {
+                this.callerLanguages.set(key, language);
+            }
             let run;
             if (key && this.textConfirmations.has(key)) {
                 // the answer to a question of the agent: decided here, not by the model
-                run = this.textConfirmations.decide(key, isYes(message.text));
+                const yes = isYes(message.text);
+                // what was heard, so a "no" the user did not say can be traced (speech recognition: "Ja" → "Я")
+                this.log.info(
+                    `Answer by text in ${key}: "${spokenAnswer(message.text).slice(0, 100)}" → ${yes ? 'yes' : 'no'}`,
+                );
+                run = this.textConfirmations.decide(key, yes);
             } else {
                 run = this.ask(String(message.text), String(requestId), target);
             }
