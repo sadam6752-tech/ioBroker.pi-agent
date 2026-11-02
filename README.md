@@ -2,13 +2,15 @@
 
 # ioBroker.pi-agent
 
+![Stable](https://iobroker.live/badges/pi-agent-stable.svg)
 [![NPM version](https://img.shields.io/npm/v/iobroker.pi-agent.svg)](https://www.npmjs.com/package/iobroker.pi-agent)
 [![Downloads](https://img.shields.io/npm/dm/iobroker.pi-agent.svg)](https://www.npmjs.com/package/iobroker.pi-agent)
 [![License](https://img.shields.io/github/license/sadam6752-tech/ioBroker.pi-agent.svg)](LICENSE)
 
 [![NPM](https://nodei.co/npm/iobroker.pi-agent.png?downloads=true)](https://nodei.co/npm/iobroker.pi-agent/)
 
-![Test and Release](https://github.com/sadam6752-tech/ioBroker.pi-agent/workflows/Test%20and%20Release/badge.svg)
+[![Test and Release](https://github.com/sadam6752-tech/ioBroker.pi-agent/actions/workflows/test-and-release.yml/badge.svg)](https://github.com/sadam6752-tech/ioBroker.pi-agent/actions/workflows/test-and-release.yml)
+![Number of Installations](https://iobroker.live/badges/pi-agent-installed.svg)
 
 A language model agent for ioBroker that survives restarts and crashes. It is built on
 [Pi Durable](https://earendil.com/posts/pi-durable/): every model call and tool call is stored as a checkpoint
