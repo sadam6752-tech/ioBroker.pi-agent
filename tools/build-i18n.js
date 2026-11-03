@@ -1367,6 +1367,19 @@ const DESC = [
 ];
 /** common.news per version, newest first; the repository builder keeps at most seven. */
 const NEWS = {};
+NEWS['0.8.7'] = [
+    'Update of the agent runtime to pi-durable 1.5.0: the tool schemas are built with pi-schema (the same JSON Schema), the chat history is read from the active context of the conversation',
+    'Aktualisierung der Agenten-Laufzeit auf pi-durable 1.5.0: die Schemas der Werkzeuge entstehen mit pi-schema (dasselbe JSON Schema), der Chatverlauf wird aus dem aktiven Kontext des Gesprächs gelesen',
+    'Обновление среды агента до pi-durable 1.5.0: схемы инструментов строятся через pi-schema (те же JSON Schema), история чата читается из активного контекста разговора',
+    'Atualização do runtime do agente para pi-durable 1.5.0: os esquemas das ferramentas são criados com pi-schema (o mesmo JSON Schema), o histórico do chat é lido do contexto ativo da conversa',
+    'Update van de agent-runtime naar pi-durable 1.5.0: de schema’s van de tools worden met pi-schema gebouwd (hetzelfde JSON Schema), de chatgeschiedenis wordt uit de actieve context van het gesprek gelezen',
+    "Mise à jour du moteur de l'agent vers pi-durable 1.5.0 : les schémas des outils sont construits avec pi-schema (le même JSON Schema), l'historique du chat est lu dans le contexte actif de la conversation",
+    "Aggiornamento del runtime dell'agente a pi-durable 1.5.0: gli schemi degli strumenti sono creati con pi-schema (lo stesso JSON Schema), la cronologia della chat viene letta dal contesto attivo della conversazione",
+    'Actualización del entorno del agente a pi-durable 1.5.0: los esquemas de las herramientas se crean con pi-schema (el mismo JSON Schema), el historial del chat se lee del contexto activo de la conversación',
+    'Aktualizacja środowiska agenta do pi-durable 1.5.0: schematy narzędzi są budowane przez pi-schema (ten sam JSON Schema), historia czatu jest czytana z aktywnego kontekstu rozmowy',
+    'Оновлення середовища агента до pi-durable 1.5.0: схеми інструментів будуються через pi-schema (ті самі JSON Schema), історія чату читається з активного контексту розмови',
+    '代理运行时更新到 pi-durable 1.5.0：工具模式改用 pi-schema 构建（JSON Schema 相同），聊天记录从对话的活动上下文中读取',
+];
 NEWS['0.8.6'] = [
     'OpenRouter: a model that the catalog does not list yet (e.g. minimax/minimax-m3.1-flash) works with conservative limits; after a model change, requests of assistant cut off by a restart use the new model',
     'OpenRouter: ein Modell, das der Katalog noch nicht kennt (z. B. minimax/minimax-m3.1-flash), funktioniert mit vorsichtigen Grenzen; nach einem Modellwechsel nutzen durch einen Neustart unterbrochene Anfragen von assistant das neue Modell',

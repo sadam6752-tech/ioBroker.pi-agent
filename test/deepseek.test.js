@@ -53,7 +53,7 @@ test('DeepSeek: tool call reaches the ioBroker tool and the answer comes back', 
     try {
         const { BACKGROUND_CONTEXT: context } = await import('@earendil-works/chord/context');
         const durable = await import('@earendil-works/pi-durable');
-        const { Type } = await import('@earendil-works/pi-ai');
+        const schema = await import('@earendil-works/pi-schema');
 
         const adapter = {
             log: { info() {}, warn() {}, error() {} },
@@ -63,7 +63,7 @@ test('DeepSeek: tool call reaches the ioBroker tool and the answer comes back', 
         assert.equal(process.env.DEEPSEEK_API_KEY, undefined, 'the key must not be put into the environment');
         const registry = durable.createRegistry();
         registry.install(
-            createIoBrokerExtension(adapter, { ...durable, Type }, () => ({
+            createIoBrokerExtension(adapter, { ...durable, schema }, () => ({
                 allowlist: parseAllowlist(''),
                 dryRun: true,
                 instructions: '',
@@ -76,10 +76,9 @@ test('DeepSeek: tool call reaches the ioBroker tool and the answer comes back', 
         const settled = await (
             await root.submit({ type: 'input', content: 'Ist das Licht an?' }, context)
         ).wait(context);
-        const view = await root.viewState(context);
-        const kinds = view.value.entries.map(e => e.kind);
-        const last = view.value.entries.filter(e => e.kind === 'pi.assistant').at(-1);
-        view.dispose?.();
+        const { entries } = await root.context(context);
+        const kinds = entries.map(e => e.kind);
+        const last = entries.filter(e => e.kind === 'pi.assistant').at(-1);
         await harness.close(context);
 
         assert.equal(settled.status, 'done', JSON.stringify(settled));

@@ -73,8 +73,8 @@ function fakeAdapter() {
 async function setup({ allow, dryRun }) {
 	const adapter = fakeAdapter();
 	const durable = await import('@earendil-works/pi-durable');
-	const { Type } = await import('@earendil-works/pi-ai');
-	const ext = createIoBrokerExtension(adapter, { ...durable, Type }, () => ({
+	const schema = await import('@earendil-works/pi-schema');
+	const ext = createIoBrokerExtension(adapter, { ...durable, schema }, () => ({
 		allowlist: parseAllowlist(allow),
 		dryRun,
 		instructions: '',
@@ -101,10 +101,9 @@ async function callTool(ctx, name, args) {
 	const root = await harness.root(context, { agent: { model: { provider: provider.provider.id, modelId: provider.getModel().id } } });
 	const sub = await root.submit({ type: 'input', content: 'go' }, context);
 	await sub.wait(context);
-	const view = await root.viewState(context);
-	const entry = view.value.entries.find(e => e.kind === 'pi.tool-result');
+	const { entries } = await root.context(context);
+	const entry = entries.find(e => e.kind === 'pi.tool-result');
 	const out = JSON.stringify(entry?.model ?? entry?.data);
-	view.dispose?.();
 	await harness.close(context);
 	return out;
 }

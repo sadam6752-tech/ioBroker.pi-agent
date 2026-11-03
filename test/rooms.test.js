@@ -53,13 +53,12 @@ async function toolResult(name, args) {
     await waitFor(async () => !(await call('chatHistory')).busy, 'the answer');
     // the page shows the start of a result; the log line of the tool names the outcome
     const conversation = await agent.harness.conversation(agent.chats['admin/system.user.admin'], agent.context);
-    const view = await conversation.viewState(agent.context);
-    const result = view.value.entries
+    const { entries } = await conversation.context(agent.context);
+    const result = entries
         .filter(e => e.kind === 'pi.tool-result')
         .flatMap(e => e.model)
         .map(m => m.content.map(p => p.text).join(''))
         .at(-1);
-    view.dispose?.();
     await stopAgent(agent);
     return JSON.parse(result);
 }

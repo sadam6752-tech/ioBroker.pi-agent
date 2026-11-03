@@ -197,7 +197,11 @@ test('usage states show the tokens of the answered requests', async () => {
     await waitFor(() => db.states[`${NAMESPACE}.usage.tokensTotal`]?.val > 0, 'usage to be published');
     const usage = JSON.parse(db.states[`${NAMESPACE}.usage.json`].val);
     assert.ok(Object.keys(usage.models).length === 1, JSON.stringify(usage));
-    assert.ok(db.states[`${NAMESPACE}.usage.tokensInput`].val > 0);
+    // the faux provider of pi-ai 1.5.0 simulates a prompt cache: the prompt is counted as cacheWrite, input stays 0
+    const [model] = Object.values(usage.models);
+    assert.equal(db.states[`${NAMESPACE}.usage.tokensInput`].val, model.input);
+    assert.ok(db.states[`${NAMESPACE}.usage.tokensOutput`].val > 0);
+    assert.equal(db.states[`${NAMESPACE}.usage.tokensTotal`].val, model.totalTokens);
     await stopAgent(agent);
 });
 

@@ -108,12 +108,11 @@ async function lastResult(agent, tool) {
 /** The full text of the tool results in the admin chat (the history of the page shortens them). */
 async function toolResults(agent) {
     const conversation = await agent.harness.conversation(agent.chats['admin/system.user.admin'], agent.context);
-    const view = await conversation.viewState(agent.context);
-    const results = view.value.entries
+    const { entries } = await conversation.context(agent.context);
+    const results = entries
         .filter(e => e.kind === 'pi.tool-result')
         .flatMap(e => e.model)
         .map(m => m.content.map(p => p.text).join(''));
-    view.dispose?.();
     return results;
 }
 

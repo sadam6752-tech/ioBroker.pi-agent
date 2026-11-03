@@ -450,6 +450,12 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.8.7 (2026-11-03)
+
+- Update of the agent runtime to pi-durable 1.5.0 (`@earendil-works/*` 1.5.0): the tool schemas are built with
+  `@earendil-works/pi-schema` instead of TypeBox (the same JSON Schema), the admin chat history and the answers are
+  read from the active context of the conversation
+
 ### 0.8.6 (2026-11-03)
 
 - OpenRouter: a model that the catalog of the installed version does not list yet (e.g. `minimax/minimax-m3.1-flash`)
@@ -495,12 +501,6 @@ the last copy.
 ### 0.8.1 (2026-11-02)
 
 - Scripts: new scripts in TypeScript when the user asks for it; TypeScript is checked for syntax errors too
-
-### 0.8.0 (2026-11-02)
-
-- Scripts of the javascript adapter, off by default: the agent creates and changes scripts in the folder
-  `script.js.pi-agent` (other scripts with an extra setting), starts, stops and reverts them; every step is confirmed
-  on its own with the change line by line, by voice only with its own setting
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

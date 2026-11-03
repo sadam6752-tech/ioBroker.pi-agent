@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.8.6",
+		"version": "0.8.7",
 		"news": {
+			"0.8.7": {
+				"en": "Update of the agent runtime to pi-durable 1.5.0: the tool schemas are built with pi-schema (the same JSON Schema), the chat history is read from the active context of the conversation",
+				"de": "Aktualisierung der Agenten-Laufzeit auf pi-durable 1.5.0: die Schemas der Werkzeuge entstehen mit pi-schema (dasselbe JSON Schema), der Chatverlauf wird aus dem aktiven Kontext des Gesprächs gelesen",
+				"ru": "Обновление среды агента до pi-durable 1.5.0: схемы инструментов строятся через pi-schema (те же JSON Schema), история чата читается из активного контекста разговора",
+				"pt": "Atualização do runtime do agente para pi-durable 1.5.0: os esquemas das ferramentas são criados com pi-schema (o mesmo JSON Schema), o histórico do chat é lido do contexto ativo da conversa",
+				"nl": "Update van de agent-runtime naar pi-durable 1.5.0: de schema’s van de tools worden met pi-schema gebouwd (hetzelfde JSON Schema), de chatgeschiedenis wordt uit de actieve context van het gesprek gelezen",
+				"fr": "Mise à jour du moteur de l'agent vers pi-durable 1.5.0 : les schémas des outils sont construits avec pi-schema (le même JSON Schema), l'historique du chat est lu dans le contexte actif de la conversation",
+				"it": "Aggiornamento del runtime dell'agente a pi-durable 1.5.0: gli schemi degli strumenti sono creati con pi-schema (lo stesso JSON Schema), la cronologia della chat viene letta dal contesto attivo della conversazione",
+				"es": "Actualización del entorno del agente a pi-durable 1.5.0: los esquemas de las herramientas se crean con pi-schema (el mismo JSON Schema), el historial del chat se lee del contexto activo de la conversación",
+				"pl": "Aktualizacja środowiska agenta do pi-durable 1.5.0: schematy narzędzi są budowane przez pi-schema (ten sam JSON Schema), historia czatu jest czytana z aktywnego kontekstu rozmowy",
+				"uk": "Оновлення середовища агента до pi-durable 1.5.0: схеми інструментів будуються через pi-schema (ті самі JSON Schema), історія чату читається з активного контексту розмови",
+				"zh-cn": "代理运行时更新到 pi-durable 1.5.0：工具模式改用 pi-schema 构建（JSON Schema 相同），聊天记录从对话的活动上下文中读取"
+			},
 			"0.8.6": {
 				"en": "OpenRouter: a model that the catalog does not list yet (e.g. minimax/minimax-m3.1-flash) works with conservative limits; after a model change, requests of assistant cut off by a restart use the new model",
 				"de": "OpenRouter: ein Modell, das der Katalog noch nicht kennt (z. B. minimax/minimax-m3.1-flash), funktioniert mit vorsichtigen Grenzen; nach einem Modellwechsel nutzen durch einen Neustart unterbrochene Anfragen von assistant das neue Modell",
@@ -80,19 +93,6 @@
 				"pl": "Skrypty: nowe skrypty w TypeScript, gdy użytkownik o to poprosi; TypeScript też jest sprawdzany pod kątem błędów składni",
 				"uk": "Скрипти: нові скрипти на TypeScript, якщо користувач про це просить; TypeScript теж перевіряється на синтаксичні помилки",
 				"zh-cn": "脚本：用户要求时可用 TypeScript 新建脚本；TypeScript 也会检查语法错误"
-			},
-			"0.8.0": {
-				"en": "Scripts of the javascript adapter, off by default: the agent creates and changes scripts in the folder script.js.pi-agent (other scripts with an extra setting), starts, stops and reverts them; every step is confirmed on its own with the change line by line, by voice only with its own setting",
-				"de": "Skripte des javascript-Adapters, ab Werk aus: Der Agent legt Skripte im Ordner script.js.pi-agent an und ändert sie (andere Skripte mit einer eigenen Einstellung), startet, stoppt und setzt sie zurück; jeder Schritt wird einzeln mit der Änderung Zeile für Zeile bestätigt, per Sprache nur mit eigener Einstellung",
-				"ru": "Скрипты javascript-адаптера, по умолчанию выключено: агент создаёт и меняет скрипты в папке script.js.pi-agent (другие скрипты — с отдельной настройкой), запускает, останавливает и откатывает их; каждый шаг подтверждается отдельно с изменениями построчно, голосом — только с отдельной настройкой",
-				"pt": "Scripts do adaptador javascript, desligado por defeito: o agente cria e altera scripts na pasta script.js.pi-agent (outros scripts com uma definição própria), inicia, para e repõe-nos; cada passo é confirmado à parte com a alteração linha a linha, por voz só com uma definição própria",
-				"nl": "Scripts van de javascript-adapter, standaard uit: de agent maakt en wijzigt scripts in de map script.js.pi-agent (andere scripts met een eigen instelling), start, stopt en zet ze terug; elke stap wordt apart bevestigd met de wijziging regel voor regel, met spraak alleen met een eigen instelling",
-				"fr": "Scripts de l'adaptateur javascript, désactivés par défaut : l'agent crée et modifie des scripts dans le dossier script.js.pi-agent (les autres scripts avec un réglage à part), les démarre, les arrête et les rétablit ; chaque étape est confirmée à part avec la modification ligne par ligne, à la voix seulement avec son propre réglage",
-				"it": "Script dell'adattatore javascript, disattivati di default: l'agente crea e modifica script nella cartella script.js.pi-agent (altri script con un'impostazione apposita), li avvia, li ferma e li ripristina; ogni passo è confermato a parte con la modifica riga per riga, a voce solo con un'impostazione apposita",
-				"es": "Scripts del adaptador javascript, desactivado por defecto: el agente crea y cambia scripts en la carpeta script.js.pi-agent (otros scripts con un ajuste propio), los inicia, detiene y recupera; cada paso se confirma por separado con el cambio línea a línea, por voz solo con un ajuste propio",
-				"pl": "Skrypty adaptera javascript, domyślnie wyłączone: agent tworzy i zmienia skrypty w folderze script.js.pi-agent (inne skrypty z osobnym ustawieniem), uruchamia, zatrzymuje i przywraca je; każdy krok jest potwierdzany osobno ze zmianą linia po linii, głosem tylko z osobnym ustawieniem",
-				"uk": "Скрипти javascript-адаптера, типово вимкнено: агент створює та змінює скрипти в папці script.js.pi-agent (інші скрипти — з окремим налаштуванням), запускає, зупиняє та відкочує їх; кожен крок підтверджується окремо зі змінами порядково, голосом — лише з окремим налаштуванням",
-				"zh-cn": "javascript 适配器的脚本，默认关闭：代理在文件夹 script.js.pi-agent 中创建和修改脚本（其他脚本需单独设置），启动、停止和回滚它们；每一步都要单独确认并逐行显示修改，语音确认需单独设置"
 			}
 		},
 		"titleLang": {

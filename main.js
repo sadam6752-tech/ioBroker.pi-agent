@@ -569,10 +569,10 @@ class PiAgent extends utils.Adapter {
         const { spec, models } = await createModelsWithKey(provider, apiKey, { baseUrl, modelId: configuredModel });
         const modelId = configuredModel || spec.defaultModel;
 
-        const [{ BACKGROUND_CONTEXT }, durable, ai] = await Promise.all([
+        const [{ BACKGROUND_CONTEXT }, durable, schema] = await Promise.all([
             import('@earendil-works/chord/context'),
             import('@earendil-works/pi-durable'),
-            import('@earendil-works/pi-ai'),
+            import('@earendil-works/pi-schema'),
         ]);
         this.context = BACKGROUND_CONTEXT;
 
@@ -590,7 +590,7 @@ class PiAgent extends utils.Adapter {
             this.log.info('Code mode is on: the agent may answer with scripts that call its tools');
         }
         registry.install(
-            createIoBrokerExtension(this, { ...durable, Type: ai.Type }, () => ({
+            createIoBrokerExtension(this, { ...durable, schema }, () => ({
                 allowlist: this.allowlist,
                 confirmList: this.confirmList,
                 timeZone: this.timeZone,
@@ -1991,22 +1991,17 @@ class PiAgent extends utils.Adapter {
      * @returns {Promise<string>} answer text
      */
     async lastAnswer(conversation) {
-        const view = await conversation.viewState(this.context);
-        try {
-            const entries = view.value.entries;
-            for (let i = entries.length - 1; i >= 0; i--) {
-                if (entries[i].kind !== 'pi.assistant') {
-                    continue;
-                }
-                const answer = answerText(entries[i].model || []);
-                if (answer) {
-                    return answer;
-                }
+        const { entries } = await conversation.context(this.context);
+        for (let i = entries.length - 1; i >= 0; i--) {
+            if (entries[i].kind !== 'pi.assistant') {
+                continue;
             }
-            return '';
-        } finally {
-            view.dispose?.();
+            const answer = answerText(entries[i].model || []);
+            if (answer) {
+                return answer;
+            }
         }
+        return '';
     }
 
     /**
@@ -2297,12 +2292,9 @@ class PiAgent extends utils.Adapter {
         if (!conversation) {
             return [];
         }
-        const view = await conversation.viewState(this.context);
-        try {
-            return historyOf(view.value.entries);
-        } finally {
-            view.dispose?.();
-        }
+        // the active transcript, as the conversation view showed it before pi-durable 1.5.0
+        const { entries } = await conversation.context(this.context);
+        return historyOf(entries);
     }
 
     /**
