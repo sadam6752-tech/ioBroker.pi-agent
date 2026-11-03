@@ -36,6 +36,24 @@ test('unknown provider is refused', async () => {
     await assert.rejects(loadProvider('nope'), /Unknown provider/);
 });
 
+test('openrouter: a model outside the catalog is added, a catalog model stays as it is', async () => {
+    const { createModels } = await import('@earendil-works/pi-ai/models');
+    const lookup = async modelId => {
+        const { provider } = await loadProvider('openrouter', { modelId });
+        const models = createModels();
+        models.setProvider(provider);
+        return models.getModel('openrouter', modelId);
+    };
+    const extra = await lookup('vendor/brand-new-model');
+    assert.equal(extra.provider, 'openrouter');
+    assert.equal(extra.api, 'openai-completions');
+    assert.equal(extra.baseUrl, 'https://openrouter.ai/api/v1');
+    const known = await lookup(PROVIDERS.openrouter.defaultModel);
+    assert.notEqual(known.name, known.id, 'the catalog entry with its own name is used');
+    const { provider } = await loadProvider('openrouter', { modelId: PROVIDERS.openrouter.defaultModel });
+    assert.equal(provider.getModels().filter(m => m.id === PROVIDERS.openrouter.defaultModel).length, 1);
+});
+
 test('listModels: default first, then unique catalog ids with readable labels', async () => {
     for (const name of CATALOG) {
         const options = await listModels(name);

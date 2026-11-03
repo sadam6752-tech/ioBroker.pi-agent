@@ -199,6 +199,13 @@ Messenger adapters that can only send (e.g. WhatsApp, Signal, Pushover) cannot b
 Select **DeepSeek** as provider and enter a key from the DeepSeek platform. Available models: `deepseek-flash`
 (default, fast) and `deepseek-v4-pro`. Requests go to `https://api.deepseek.com`.
 
+### OpenRouter
+
+Select **OpenRouter** and enter an OpenRouter key. The model field lists the OpenRouter models that the installed
+version knows, with their limits and prices. OpenRouter adds models faster than that list grows: a model ID that is not
+listed (e.g. `minimax/minimax-m3.1-flash`) still works through the OpenAI API of OpenRouter, with the same assumptions
+as for an OpenAI-compatible server (context of 128k tokens, at most 8192 tokens per answer, no cost, no reasoning).
+
 ### OpenAI-compatible servers
 
 Select **OpenAI-compatible (own URL)** for any server with the OpenAI chat completions API, local or in the cloud:
@@ -443,6 +450,13 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.8.6 (2026-11-03)
+
+- OpenRouter: a model that the catalog of the installed version does not list yet (e.g. `minimax/minimax-m3.1-flash`)
+  works with conservative limits instead of failing with "Unknown model" / `no_model`
+- After a change of the model, requests from sendTo callers (e.g. assistant) that a restart cut off use the new model
+  instead of failing with `no_model`
+
 ### 0.8.5 (2026-11-02)
 
 - Backups: the lists of backups show the time in the time zone of the house (e.g. `2026-11-02 18:31:40
@@ -487,11 +501,6 @@ the last copy.
 - Scripts of the javascript adapter, off by default: the agent creates and changes scripts in the folder
   `script.js.pi-agent` (other scripts with an extra setting), starts, stops and reverts them; every step is confirmed
   on its own with the change line by line, by voice only with its own setting
-
-### 0.7.3 (2026-11-01)
-
-- Write permissions: buttons above the table switch the column "Write allowed", "Confirmation required" or
-  "Restart allowed" for all rows at once
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

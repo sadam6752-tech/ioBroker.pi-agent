@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.8.5",
+		"version": "0.8.6",
 		"news": {
+			"0.8.6": {
+				"en": "OpenRouter: a model that the catalog does not list yet (e.g. minimax/minimax-m3.1-flash) works with conservative limits; after a model change, requests of assistant cut off by a restart use the new model",
+				"de": "OpenRouter: ein Modell, das der Katalog noch nicht kennt (z. B. minimax/minimax-m3.1-flash), funktioniert mit vorsichtigen Grenzen; nach einem Modellwechsel nutzen durch einen Neustart unterbrochene Anfragen von assistant das neue Modell",
+				"ru": "OpenRouter: модель, которой ещё нет в каталоге (например, minimax/minimax-m3.1-flash), работает с осторожными лимитами; после смены модели прерванные перезапуском запросы assistant идут на новую модель",
+				"pt": "OpenRouter: um modelo que o catálogo ainda não lista (p. ex. minimax/minimax-m3.1-flash) funciona com limites prudentes; após mudar o modelo, os pedidos do assistant interrompidos por um reinício usam o novo modelo",
+				"nl": "OpenRouter: een model dat de catalogus nog niet kent (bijv. minimax/minimax-m3.1-flash) werkt met voorzichtige limieten; na een modelwissel gebruiken door een herstart onderbroken verzoeken van assistant het nieuwe model",
+				"fr": "OpenRouter : un modèle que le catalogue ne liste pas encore (p. ex. minimax/minimax-m3.1-flash) fonctionne avec des limites prudentes ; après un changement de modèle, les requêtes d'assistant interrompues par un redémarrage utilisent le nouveau modèle",
+				"it": "OpenRouter: un modello che il catalogo non elenca ancora (ad es. minimax/minimax-m3.1-flash) funziona con limiti prudenti; dopo un cambio di modello, le richieste di assistant interrotte da un riavvio usano il nuovo modello",
+				"es": "OpenRouter: un modelo que el catálogo aún no incluye (p. ej. minimax/minimax-m3.1-flash) funciona con límites prudentes; tras cambiar de modelo, las peticiones de assistant cortadas por un reinicio usan el nuevo modelo",
+				"pl": "OpenRouter: model, którego katalog jeszcze nie zna (np. minimax/minimax-m3.1-flash), działa z ostrożnymi limitami; po zmianie modelu żądania assistant przerwane restartem używają nowego modelu",
+				"uk": "OpenRouter: модель, якої ще немає в каталозі (наприклад, minimax/minimax-m3.1-flash), працює з обережними лімітами; після зміни моделі перервані перезапуском запити assistant ідуть на нову модель",
+				"zh-cn": "OpenRouter：目录中尚未列出的模型（例如 minimax/minimax-m3.1-flash）以保守的限制运行；更换模型后，因重启而中断的 assistant 请求会使用新模型"
+			},
 			"0.8.5": {
 				"en": "Backups: the lists of backups show the time in the time zone of the house instead of UTC, so the right backup is restored",
 				"de": "Backups: die Listen der Backups zeigen die Zeit in der Zeitzone des Hauses statt in UTC, damit das richtige Backup wiederhergestellt wird",
@@ -80,19 +93,6 @@
 				"pl": "Skrypty adaptera javascript, domyślnie wyłączone: agent tworzy i zmienia skrypty w folderze script.js.pi-agent (inne skrypty z osobnym ustawieniem), uruchamia, zatrzymuje i przywraca je; każdy krok jest potwierdzany osobno ze zmianą linia po linii, głosem tylko z osobnym ustawieniem",
 				"uk": "Скрипти javascript-адаптера, типово вимкнено: агент створює та змінює скрипти в папці script.js.pi-agent (інші скрипти — з окремим налаштуванням), запускає, зупиняє та відкочує їх; кожен крок підтверджується окремо зі змінами порядково, голосом — лише з окремим налаштуванням",
 				"zh-cn": "javascript 适配器的脚本，默认关闭：代理在文件夹 script.js.pi-agent 中创建和修改脚本（其他脚本需单独设置），启动、停止和回滚它们；每一步都要单独确认并逐行显示修改，语音确认需单独设置"
-			},
-			"0.7.3": {
-				"en": "Write permissions: buttons above the table switch the column \"Write allowed\", \"Confirmation required\" or \"Restart allowed\" for all rows at once",
-				"de": "Schreibrechte: Schaltflächen über der Tabelle schalten die Spalte „Schreiben erlaubt“, „Bestätigung nötig“ oder „Neustart erlaubt“ für alle Zeilen auf einmal",
-				"ru": "Права на запись: кнопки над таблицей переключают колонку «Запись», «Подтверждение» или «Перезапуск» сразу для всех строк",
-				"pt": "Permissões de escrita: botões acima da tabela alternam a coluna \"Escrita permitida\", \"Confirmação necessária\" ou \"Reinício permitido\" para todas as linhas de uma vez",
-				"nl": "Schrijfrechten: knoppen boven de tabel schakelen de kolom \"Schrijven toegestaan\", \"Bevestiging vereist\" of \"Herstart toegestaan\" voor alle rijen tegelijk",
-				"fr": "Droits d'écriture : des boutons au-dessus du tableau basculent la colonne « Écriture autorisée », « Confirmation requise » ou « Redémarrage autorisé » pour toutes les lignes à la fois",
-				"it": "Permessi di scrittura: pulsanti sopra la tabella commutano la colonna «Scrittura consentita», «Conferma richiesta» o «Riavvio consentito» per tutte le righe insieme",
-				"es": "Permisos de escritura: botones encima de la tabla cambian la columna «Escritura permitida», «Confirmación necesaria» o «Reinicio permitido» para todas las filas a la vez",
-				"pl": "Uprawnienia do zapisu: przyciski nad tabelą przełączają kolumnę „Zapis dozwolony”, „Wymagane potwierdzenie” lub „Restart dozwolony” dla wszystkich wierszy naraz",
-				"uk": "Права на запис: кнопки над таблицею перемикають колонку «Запис», «Підтвердження» або «Перезапуск» одразу для всіх рядків",
-				"zh-cn": "写入权限：表格上方的按钮可一次性切换所有行的“允许写入”、“需要确认”或“允许重启”列"
 			}
 		},
 		"titleLang": {

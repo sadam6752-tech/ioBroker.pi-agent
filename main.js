@@ -680,11 +680,15 @@ class PiAgent extends utils.Adapter {
         if (changed) {
             await this.setStateAsync('telegram.chats', { val: JSON.stringify(this.chats), ack: true });
         }
-        // Chats keep their own conversation; a model change in the settings reaches them too.
+        // Chats keep their own conversation; a model change in the settings reaches them too, also the conversations
+        // of sendTo callers (their instructions come with the next request), before cut-off requests are sent again.
         for (const [key, id] of Object.entries(this.chats)) {
             const instructions = this.instructionsOf(parseChatKey(key, this.firstChannel()).instance);
-            const conversation = instructions ? await this.harness.conversation(id, this.context) : undefined;
-            await conversation?.configure({ model: this.model, instructions }, this.context);
+            const conversation = await this.harness.conversation(id, this.context);
+            await conversation?.configure(
+                instructions ? { model: this.model, instructions } : { model: this.model },
+                this.context,
+            );
         }
         for (const { instance, allowed, prefix, driver } of this.channels.values()) {
             if (allowed.size === 0) {

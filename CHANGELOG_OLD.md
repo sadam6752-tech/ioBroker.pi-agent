@@ -1,5 +1,10 @@
 # Older Changelog
 
+### 0.7.3 (2026-11-01)
+
+- Write permissions: buttons above the table switch the column "Write allowed", "Confirmation required" or
+  "Restart allowed" for all rows at once
+
 ### 0.7.2 (2026-10-30)
 
 - Confirmation by text in sendTo conversations (e.g. ioBroker.assistant), off by default: the question is the answer

@@ -1367,6 +1367,19 @@ const DESC = [
 ];
 /** common.news per version, newest first; the repository builder keeps at most seven. */
 const NEWS = {};
+NEWS['0.8.6'] = [
+    'OpenRouter: a model that the catalog does not list yet (e.g. minimax/minimax-m3.1-flash) works with conservative limits; after a model change, requests of assistant cut off by a restart use the new model',
+    'OpenRouter: ein Modell, das der Katalog noch nicht kennt (z. B. minimax/minimax-m3.1-flash), funktioniert mit vorsichtigen Grenzen; nach einem Modellwechsel nutzen durch einen Neustart unterbrochene Anfragen von assistant das neue Modell',
+    'OpenRouter: модель, которой ещё нет в каталоге (например, minimax/minimax-m3.1-flash), работает с осторожными лимитами; после смены модели прерванные перезапуском запросы assistant идут на новую модель',
+    'OpenRouter: um modelo que o catálogo ainda não lista (p. ex. minimax/minimax-m3.1-flash) funciona com limites prudentes; após mudar o modelo, os pedidos do assistant interrompidos por um reinício usam o novo modelo',
+    'OpenRouter: een model dat de catalogus nog niet kent (bijv. minimax/minimax-m3.1-flash) werkt met voorzichtige limieten; na een modelwissel gebruiken door een herstart onderbroken verzoeken van assistant het nieuwe model',
+    "OpenRouter : un modèle que le catalogue ne liste pas encore (p. ex. minimax/minimax-m3.1-flash) fonctionne avec des limites prudentes ; après un changement de modèle, les requêtes d'assistant interrompues par un redémarrage utilisent le nouveau modèle",
+    'OpenRouter: un modello che il catalogo non elenca ancora (ad es. minimax/minimax-m3.1-flash) funziona con limiti prudenti; dopo un cambio di modello, le richieste di assistant interrotte da un riavvio usano il nuovo modello',
+    'OpenRouter: un modelo que el catálogo aún no incluye (p. ej. minimax/minimax-m3.1-flash) funciona con límites prudentes; tras cambiar de modelo, las peticiones de assistant cortadas por un reinicio usan el nuevo modelo',
+    'OpenRouter: model, którego katalog jeszcze nie zna (np. minimax/minimax-m3.1-flash), działa z ostrożnymi limitami; po zmianie modelu żądania assistant przerwane restartem używają nowego modelu',
+    'OpenRouter: модель, якої ще немає в каталозі (наприклад, minimax/minimax-m3.1-flash), працює з обережними лімітами; після зміни моделі перервані перезапуском запити assistant ідуть на нову модель',
+    'OpenRouter：目录中尚未列出的模型（例如 minimax/minimax-m3.1-flash）以保守的限制运行；更换模型后，因重启而中断的 assistant 请求会使用新模型',
+];
 NEWS['0.8.5'] = [
     'Backups: the lists of backups show the time in the time zone of the house instead of UTC, so the right backup is restored',
     'Backups: die Listen der Backups zeigen die Zeit in der Zeitzone des Hauses statt in UTC, damit das richtige Backup wiederhergestellt wird',
