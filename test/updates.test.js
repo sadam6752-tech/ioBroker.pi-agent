@@ -370,3 +370,46 @@ test('update_adapter is refused in a sendTo conversation: nobody there can confi
     );
     await stopAgent(agent);
 });
+
+test('findInstalled: by name, instance or package name, else by title', () => {
+    const { findInstalled } = require('../lib/updates');
+    const list = [
+        { name: 'fingerprint', title: 'FingerprintDoorbell' },
+        { name: 'telegram', title: 'Telegram' },
+    ];
+    assert.equal(findInstalled(list, 'fingerprint.0')?.name, 'fingerprint');
+    assert.equal(findInstalled(list, 'iobroker.telegram')?.name, 'telegram');
+    assert.equal(findInstalled(list, 'fingerprintDoorbell')?.name, 'fingerprint');
+    assert.equal(findInstalled(list, 'Fingerprint Doorbell')?.name, 'fingerprint');
+    assert.equal(findInstalled(list, 'zigbee'), undefined);
+});
+
+test('list_updates with npm: every installed adapter is compared with npm, pi-agent included', async () => {
+    const f = await faux();
+    const { agent } = await startAgent({
+        dataDir: tmp(),
+        seed: SEED(),
+        config: ALLOWED,
+        responses: [
+            f.fauxAssistantMessage(f.fauxToolCall('list_updates', { npm: true }), { stopReason: 'toolUse' }),
+            f.fauxAssistantMessage('ok'),
+        ],
+    });
+    const NPM = { telegram: '1.0.0', zigbee: '2.1.0', admin: '7.0.0', 'pi-agent': '0.6.5' };
+    agent.fetch = async url => {
+        const name = decodeURIComponent(String(url).match(/iobroker\.([^/]+)\/latest$/)?.[1] ?? '');
+        return NPM[name]
+            ? { status: 200, ok: true, json: async () => ({ version: NPM[name] }) }
+            : { status: 404, ok: false, json: async () => ({}) };
+    };
+    await ask(agent, 'check all updates on npm');
+    const result = JSON.parse((await toolResults(agent)).at(-1));
+    const by = Object.fromEntries(result.updates.map(u => [u.adapter, u]));
+    assert.deepEqual(Object.keys(by).sort(), ['admin', 'pi-agent', 'telegram', 'zigbee']);
+    assert.deepEqual([by['pi-agent'].available, by['pi-agent'].npm, by['pi-agent'].allowed], [null, '0.6.5', true]);
+    assert.deepEqual([by.telegram.available, by.telegram.npm], ['1.1.0', '1.0.0'], 'newer in the repository only');
+    assert.deepEqual([by.zigbee.available, by.zigbee.npm], ['2.0.0', '2.1.0']);
+    assert.equal(result.checkedOnNpm, 4);
+    assert.deepEqual(result.notOnNpm, []);
+    await stopAgent(agent);
+});

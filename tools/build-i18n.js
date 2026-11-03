@@ -1434,6 +1434,19 @@ const DESC = [
 ];
 /** common.news per version, newest first; the repository builder keeps at most seven. */
 const NEWS = {};
+NEWS['0.8.9'] = [
+    'Updates: list_updates compares every installed adapter with npm in one call, pi-agent included; an adapter is also found by its title; asked to check again, the agent reads the versions anew instead of answering from earlier results',
+    'Updates: list_updates vergleicht alle installierten Adapter in einem Aufruf mit npm, pi-agent eingeschlossen; ein Adapter wird auch über seinen Titel gefunden; soll erneut geprüft werden, liest der Agent die Versionen neu, statt aus früheren Ergebnissen zu antworten',
+    'Обновления: list_updates одним вызовом сравнивает все установленные адаптеры с npm, включая pi-agent; адаптер находится и по заголовку; при просьбе проверить снова агент читает версии заново, а не отвечает по прежним результатам',
+    'Atualizações: list_updates compara numa só chamada todos os adaptadores instalados com o npm, incluindo o pi-agent; um adaptador também é encontrado pelo título; ao pedir nova verificação, o agente lê as versões de novo em vez de responder com resultados anteriores',
+    'Updates: list_updates vergelijkt in één aanroep alle geïnstalleerde adapters met npm, pi-agent inbegrepen; een adapter wordt ook op zijn titel gevonden; gevraagd om opnieuw te controleren leest de agent de versies opnieuw in plaats van uit eerdere resultaten te antwoorden',
+    "Mises à jour : list_updates compare en un seul appel tous les adaptateurs installés avec npm, pi-agent compris ; un adaptateur est aussi trouvé par son titre ; prié de revérifier, l'agent relit les versions au lieu de répondre avec des résultats antérieurs",
+    "Aggiornamenti: list_updates confronta in una sola chiamata tutti gli adattatori installati con npm, pi-agent incluso; un adattatore viene trovato anche dal titolo; quando si chiede di ricontrollare, l'agente rilegge le versioni invece di rispondere con risultati precedenti",
+    'Actualizaciones: list_updates compara en una sola llamada todos los adaptadores instalados con npm, pi-agent incluido; un adaptador también se encuentra por su título; al pedir que compruebe de nuevo, el agente vuelve a leer las versiones en lugar de responder con resultados anteriores',
+    'Aktualizacje: list_updates jednym wywołaniem porównuje wszystkie zainstalowane adaptery z npm, łącznie z pi-agent; adapter jest znajdowany także po tytule; poproszony o ponowne sprawdzenie agent czyta wersje od nowa zamiast odpowiadać wcześniejszymi wynikami',
+    'Оновлення: list_updates одним викликом порівнює всі встановлені адаптери з npm, включно з pi-agent; адаптер знаходиться й за заголовком; коли просять перевірити знову, агент читає версії заново, а не відповідає за попередніми результатами',
+    '更新：list_updates 一次调用即可将所有已安装的适配器与 npm 比较，包括 pi-agent；也可以按标题找到适配器；被要求再次检查时，代理会重新读取版本，而不是用之前的结果回答',
+];
 NEWS['0.8.8'] = [
     'Limits: at most 10 requests per minute per conversation (setting) stop a loop before the model is asked; an optional limit of tokens per day; OpenRouter models outside the catalog get their prices from OpenRouter',
     'Grenzen: höchstens 10 Anfragen pro Minute und Gespräch (Einstellung) stoppen eine Schleife, bevor das Modell gefragt wird; optionale Grenze an Tokens pro Tag; OpenRouter-Modelle außerhalb des Katalogs bekommen ihre Preise von OpenRouter',

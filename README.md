@@ -385,8 +385,11 @@ With **Allow adapter updates** (tab "Write permissions", off by default) the age
 there updates?" or "update telegram":
 
 - `list_updates` shows the installed adapters with a newer version in the repository chosen in ioBroker (as admin
-  shows it), and whether the agent may update them. `check_npm` shows the newest version on npm, for an adapter
-  whose update is not in the repository yet; the agent then offers the update from npm.
+  shows it), and whether the agent may update them. Asked about npm or the newest versions ("check all updates on
+  npm"), it compares every installed adapter with npm in one call, pi-agent included. `check_npm` shows the newest
+  version on npm for one adapter; it also finds an adapter by its title (FingerprintDoorbell → `fingerprint`).
+- Versions, states and logs read earlier in the conversation are not reused: asked to check again, the agent reads
+  them again.
 - Only adapters with an instance that has **Write allowed** in the write permissions, and pi-agent itself. Never
   admin or js-controller, and only adapters on the host of pi-agent.
 - Every update is confirmed with ✅/❌ in the chat of the conversation, also without "Confirmation required". A
@@ -470,6 +473,12 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.8.9 (2026-11-03)
+
+- Updates: `list_updates` with `npm: true` compares every installed adapter with npm in one call, pi-agent included;
+  `check_npm` and `update_adapter` also find an adapter by its title. The agent is told to call the tools again when
+  asked to check, instead of answering from earlier results of the conversation
+
 ### 0.8.8 (2026-11-03)
 
 - Limits: at most 10 requests per minute per conversation (setting) stop a loop of a script or another adapter
@@ -515,16 +524,6 @@ the last copy.
   Actions of a job are always confirmed with ✅/❌. At most 5 jobs, paused after 20 wake-ups in one day; `list_jobs`,
   `stop_job`, `resume_job`, and a panel of the jobs in the chat of the admin
 - The instance row in admin has a link that opens the chat (`common.localLinks`), at the address of the admin
-
-### 0.8.2 (2026-11-02)
-
-- Confirmation by text: the question is in the `language` the caller sends with `ask` (ioBroker.assistant: the
-  language of its satellites) instead of the system language; a satellite listening in Russian could not hear the
-  German "Ja" it was asked for. The same yes twice ("Да да.", what speech recognition made of one "Да") is yes; the log
-  shows what was heard
-- One language in the question about a script: the summary the model writes follows the language of the user (it was
-  German in a Russian conversation), and the warnings ("file access", "setState with a computed id" …) are spoken in
-  the language of the question; the messenger chat and the log keep them in English
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

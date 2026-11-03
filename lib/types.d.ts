@@ -96,7 +96,12 @@ export interface Policy {
     schedulers?: () => string[];
     /** Updates of adapters (lib/updates.js, main.js). */
     updates?: {
-        list: () => Promise<{ repositories: string[]; updates: Array<Record<string, unknown>> }>;
+        list: (withNpm?: boolean) => Promise<{
+            repositories: string[];
+            checkedOnNpm?: number;
+            notOnNpm?: string[];
+            updates: Array<Record<string, unknown>>;
+        }>;
         npm: (
             adapter: unknown,
         ) => Promise<{ adapter: string; installed: string; repository: string | null; npm: string; newer: boolean }>;

@@ -43,6 +43,7 @@ const {
     adapterNameOf,
     repositoryJson,
     installedAdapters,
+    findInstalled,
     updateRefusal,
     npmLatest,
     createHostCommands,
@@ -634,7 +635,7 @@ class PiAgent extends utils.Adapter {
                 logFile: () => findLogFile(utils.getAbsoluteDefaultDataDir()),
                 schedulers: () => this.schedulers,
                 updates: {
-                    list: () => this.listUpdates(),
+                    list: withNpm => this.listUpdates(withNpm),
                     npm: name => this.npmVersions(name),
                     plan: (name, version, source) => this.planUpdate(name, version, source),
                     run: (plan, conversationId) => this.runUpdate(plan, conversationId),
@@ -1581,28 +1582,47 @@ class PiAgent extends utils.Adapter {
     // ── Updates of adapters (lib/updates.js) ──────────────────────────────────────────────────────────
 
     /**
-     * The installed adapters that have a newer version in the active repositories.
+     * The installed adapters that have a newer version in the active repositories, or with withNpm also on npm.
      *
-     * @returns {Promise<{ repositories: string[], updates: Array<Record<string, unknown>> }>} updates for the model
+     * @param {boolean} [withNpm] also ask npm for every installed adapter
+     * @returns {Promise<{ repositories: string[], checkedOnNpm?: number, notOnNpm?: string[], updates: Array<Record<string, unknown>> }>} updates for the model
      */
-    async listUpdates() {
+    async listUpdates(withNpm = false) {
         const { names, json } = await repositoryJson(this);
+        const installedList = await installedAdapters(this);
+        // npm is asked for every installed adapter at once; one that is not on npm (or not reachable) is listed apart
+        const onNpm = withNpm
+            ? await Promise.all(installedList.map(a => npmLatest(a.name, this.fetch).catch(() => '')))
+            : [];
         const updates = [];
-        for (const installed of await installedAdapters(this)) {
+        const notOnNpm = [];
+        installedList.forEach((installed, i) => {
             const available = String(Object(json[installed.name]).version || '');
-            if (available && installed.version && compareVersions(available, installed.version) > 0) {
-                const refusal = this.updateRefusalOf(installed);
-                updates.push({
-                    adapter: installed.name,
-                    title: installed.title,
-                    installed: installed.version,
-                    available,
-                    allowed: !refusal,
-                    ...(refusal ? { reason: refusal } : {}),
-                });
+            const npm = onNpm[i] || '';
+            if (withNpm && !npm) {
+                notOnNpm.push(installed.name);
             }
-        }
-        return { repositories: names, updates };
+            const newer = version =>
+                Boolean(version && installed.version && compareVersions(version, installed.version) > 0);
+            if (!newer(available) && !newer(npm)) {
+                return;
+            }
+            const refusal = this.updateRefusalOf(installed);
+            updates.push({
+                adapter: installed.name,
+                title: installed.title,
+                installed: installed.version,
+                available: newer(available) ? available : null,
+                ...(withNpm ? { npm: npm || null } : {}),
+                allowed: !refusal,
+                ...(refusal ? { reason: refusal } : {}),
+            });
+        });
+        return {
+            repositories: names,
+            ...(withNpm ? { checkedOnNpm: installedList.length - notOnNpm.length, notOnNpm } : {}),
+            updates,
+        };
     }
 
     /**
@@ -1633,8 +1653,8 @@ class PiAgent extends utils.Adapter {
      * @returns {Promise<{ adapter: string, installed: string, repository: string | null, npm: string, newer: boolean }>} versions
      */
     async npmVersions(value) {
-        const name = adapterNameOf(value);
-        const installed = (await installedAdapters(this)).find(a => a.name === name);
+        const installed = findInstalled(await installedAdapters(this), value);
+        const name = installed?.name || adapterNameOf(value);
         const { json } = await repositoryJson(this);
         const npm = await npmLatest(name, this.fetch);
         return {
@@ -1655,10 +1675,10 @@ class PiAgent extends utils.Adapter {
      * @returns {Promise<{ name: string, from: string, to: string, source: string, refusal: string }>} plan
      */
     async planUpdate(value, version, sourceArg) {
-        const name = adapterNameOf(value);
+        const installed = findInstalled(await installedAdapters(this), value);
+        const name = installed?.name || adapterNameOf(value);
         const source = String(sourceArg || 'repository').toLowerCase() === 'npm' ? 'npm' : 'repository';
         const plan = { name, from: '', to: '', source, refusal: '' };
-        const installed = (await installedAdapters(this)).find(a => a.name === name);
         if (!installed) {
             return { ...plan, refusal: `${name} is not installed` };
         }
