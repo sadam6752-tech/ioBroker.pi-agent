@@ -36,10 +36,18 @@ test('unknown provider is refused', async () => {
     await assert.rejects(loadProvider('nope'), /Unknown provider/);
 });
 
+/**
+ * Stand-in for GET /models of OpenRouter.
+ *
+ * @param {object[]} data model entries
+ * @returns {typeof fetch} fetch that answers with the list
+ */
+const openRouterList = data => /** @type {any} */ (async () => ({ ok: true, json: async () => ({ data }) }));
+
 test('openrouter: a model outside the catalog is added, a catalog model stays as it is', async () => {
     const { createModels } = await import('@earendil-works/pi-ai/models');
-    const lookup = async modelId => {
-        const { provider } = await loadProvider('openrouter', { modelId });
+    const lookup = async (modelId, fetch = openRouterList([])) => {
+        const { provider } = await loadProvider('openrouter', { modelId, fetch });
         const models = createModels();
         models.setProvider(provider);
         return models.getModel('openrouter', modelId);
@@ -48,10 +56,51 @@ test('openrouter: a model outside the catalog is added, a catalog model stays as
     assert.equal(extra.provider, 'openrouter');
     assert.equal(extra.api, 'openai-completions');
     assert.equal(extra.baseUrl, 'https://openrouter.ai/api/v1');
+    assert.deepEqual(extra.cost, { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, 'not listed: no prices');
+    assert.equal(extra.contextWindow, 128000);
     const known = await lookup(PROVIDERS.openrouter.defaultModel);
     assert.notEqual(known.name, known.id, 'the catalog entry with its own name is used');
     const { provider } = await loadProvider('openrouter', { modelId: PROVIDERS.openrouter.defaultModel });
     assert.equal(provider.getModels().filter(m => m.id === PROVIDERS.openrouter.defaultModel).length, 1);
+});
+
+test('openrouter: a model outside the catalog takes prices and limits from the model list of OpenRouter', async () => {
+    const { createModels } = await import('@earendil-works/pi-ai/models');
+    const entry = {
+        id: 'vendor/priced-model',
+        name: 'Vendor: Priced Model',
+        context_length: 1048576,
+        architecture: { input_modalities: ['text', 'image'] },
+        pricing: { prompt: '0.00000015', completion: '0.0000006', input_cache_read: '0.000000015' },
+        top_provider: { context_length: 1048576, max_completion_tokens: 65536 },
+    };
+    const { provider } = await loadProvider('openrouter', { modelId: entry.id, fetch: openRouterList([entry]) });
+    const models = createModels();
+    models.setProvider(provider);
+    const model = models.getModel('openrouter', entry.id);
+    assert.equal(model.name, 'Vendor: Priced Model');
+    assert.ok(Math.abs(model.cost.input - 0.15) < 1e-9, `input ${model.cost.input}`);
+    assert.ok(Math.abs(model.cost.output - 0.6) < 1e-9, `output ${model.cost.output}`);
+    assert.ok(Math.abs(model.cost.cacheRead - 0.015) < 1e-9, `cacheRead ${model.cost.cacheRead}`);
+    assert.equal(model.contextWindow, 1048576);
+    assert.equal(model.maxTokens, 65536);
+    assert.deepEqual(model.input, ['text', 'image']);
+    assert.equal(model.reasoning, false);
+
+    const warnings = [];
+    const failing = /** @type {any} */ (
+        async () => {
+            throw new Error('offline');
+        }
+    );
+    const fallback = await loadProvider('openrouter', {
+        modelId: entry.id,
+        fetch: failing,
+        log: { warn: msg => warnings.push(msg) },
+    });
+    const offline = fallback.provider.getModels().find(m => m.id === entry.id);
+    assert.equal(offline.cost.input, 0, 'without the list: no prices, but the model works');
+    assert.match(warnings.join('\n'), /No prices for vendor\/priced-model: offline/);
 });
 
 test('listModels: default first, then unique catalog ids with readable labels', async () => {

@@ -34,6 +34,7 @@ const { queuedPurges, queuePurge, purgeQueued } = require('./lib/purge');
 const { createMemory } = require('./lib/memory');
 const { createWatches } = require('./lib/watches');
 const { createJobs, localDay, MAX_WAKES_PER_DAY } = require('./lib/jobs');
+const { createLimits } = require('./lib/limits');
 const { findLogFile } = require('./lib/diagnostics');
 const {
     OUTPUT_LINES,
@@ -190,6 +191,8 @@ class PiAgent extends utils.Adapter {
         this.allowlist = [];
         /** IANA time zone of the house (setting, else the server's). */
         this.timeZone = 'UTC';
+        /** Requests per minute and conversation, tokens per day (lib/limits.js); null until the start. */
+        this.limits = null;
         /** States whose write the user must confirm in the messenger chat first. */
         this.confirmList = [];
         /** Messenger instances the agent listens on ("telegram.0" -> allowed users and prefix); empty when off. */
@@ -288,6 +291,7 @@ class PiAgent extends utils.Adapter {
             ];
             this.timeZone = resolveTimeZone(this.config.timeZone, this.log);
             this.log.info(`Time zone: ${this.timeZone}`);
+            await this.startLimits();
             this.confirmList = [
                 ...rules.confirm,
                 ...parseAllowlist(this.config.confirmRequired, (line, msg) =>
@@ -566,7 +570,11 @@ class PiAgent extends utils.Adapter {
             throw new Error('No model configured for the OpenAI-compatible server');
         }
         // The key goes into an in-memory credential store of this instance, never into the process environment.
-        const { spec, models } = await createModelsWithKey(provider, apiKey, { baseUrl, modelId: configuredModel });
+        const { spec, models } = await createModelsWithKey(provider, apiKey, {
+            baseUrl,
+            modelId: configuredModel,
+            log: this.log,
+        });
         const modelId = configuredModel || spec.defaultModel;
 
         const [{ BACKGROUND_CONTEXT }, durable, schema] = await Promise.all([
@@ -1899,6 +1907,26 @@ class PiAgent extends utils.Adapter {
         return true;
     }
 
+    /** Read the limits of the settings and continue the count of tokens of the day where the last run stopped. */
+    async startLimits() {
+        const number = (value, fallback) => {
+            const n = Number(value ?? fallback);
+            return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+        };
+        this.limits = createLimits({
+            perMinute: number(this.config.requestsPerMinute, 10),
+            dailyTokens: number(this.config.dailyTokens, 0),
+            timeZone: this.timeZone,
+            log: this.log,
+        });
+        const [today, total] = await Promise.all([
+            this.getStateAsync('usage.tokensToday'),
+            this.getStateAsync('usage.tokensTotal'),
+        ]);
+        this.limits.restore(Number(today?.val) || 0, today?.ts || 0, total ? Number(total.val) || 0 : null);
+        await this.setStateAsync('usage.limitReached', { val: this.limits.reached(), ack: true });
+    }
+
     /** Publish the token use and cost of all conversations in usage.*. */
     async updateUsage() {
         try {
@@ -1908,6 +1936,11 @@ class PiAgent extends utils.Adapter {
             await this.setStateAsync('usage.tokensInput', { val: sum(u => u.input), ack: true });
             await this.setStateAsync('usage.tokensOutput', { val: sum(u => u.output), ack: true });
             await this.setStateAsync('usage.tokensTotal', { val: sum(u => u.totalTokens), ack: true });
+            if (this.limits) {
+                const today = this.limits.count(sum(u => u.totalTokens));
+                await this.setStateAsync('usage.tokensToday', { val: today.tokens, ack: true });
+                await this.setStateAsync('usage.limitReached', { val: today.reached, ack: true });
+            }
             await this.setStateAsync('usage.cost', { val: Math.round(sum(u => u.cost?.total) * 1e6) / 1e6, ack: true });
             await this.setStateAsync('usage.json', { val: JSON.stringify(state), ack: true });
         } catch (e) {
@@ -1936,9 +1969,19 @@ class PiAgent extends utils.Adapter {
      * @param {string} content user text
      * @param {string} requestId stable id, so a retry finds the original submission
      * @param {{ kind: string, instance?: string, chatId?: string }} [target] where the answer goes (kept for a restart)
+     * @param {{ resumed?: boolean }} [options] resumed: a request accepted before a restart, which no limit refuses
      * @returns {Promise<string>} answer text
      */
-    ask(content, requestId, target = { kind: 'state' }) {
+    ask(content, requestId, target = { kind: 'state' }, options = {}) {
+        // One queue per conversation: a chat waits for its own earlier request, not for other chats.
+        const key = this.chatKeyOf(target) || 'root';
+        if (!options.resumed) {
+            try {
+                this.limits?.admit(key);
+            } catch (e) {
+                return Promise.reject(e);
+            }
+        }
         // Recorded before the request waits in the queue, so a queued request also survives a restart.
         const admitted = (async () => {
             await this.readyPromise;
@@ -1948,8 +1991,6 @@ class PiAgent extends utils.Adapter {
             this.pending = this.pending.filter(p => p.requestId !== requestId).concat({ requestId, content, target });
             await this.savePending();
         })();
-        // One queue per conversation: a chat waits for its own earlier request, not for other chats.
-        const key = this.chatKeyOf(target) || 'root';
         const previous = this.queues.get(key) || Promise.resolve();
         const run = Promise.all([admitted, previous]).then(async () => {
             try {
@@ -2008,10 +2049,11 @@ class PiAgent extends utils.Adapter {
      * Run a request and deliver the answer (or the error) to its target.
      *
      * @param {{ requestId: string, content: string, target: { kind: string, instance?: string, chatId?: string } }} entry request
+     * @param {{ resumed?: boolean }} [options] resumed: continued after a restart
      */
-    async process(entry) {
+    async process(entry, options = {}) {
         try {
-            const answer = await this.ask(entry.content, entry.requestId, entry.target);
+            const answer = await this.ask(entry.content, entry.requestId, entry.target, options);
             await this.deliver(entry.target, answer);
         } catch (e) {
             if (this.stopping) {
@@ -2087,7 +2129,7 @@ class PiAgent extends utils.Adapter {
             }
             this.log.info(`Continuing request ${entry.requestId} after restart`);
         }
-        await Promise.all(entries.map(entry => this.process(entry)));
+        await Promise.all(entries.map(entry => this.process(entry, { resumed: true })));
     }
 
     /**

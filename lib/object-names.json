@@ -64,6 +64,32 @@
 		"uk": "Вартість",
 		"zh-cn": "费用"
 	},
+	"usage.tokensToday": {
+		"en": "Tokens today",
+		"de": "Tokens heute",
+		"ru": "Токены за сегодня",
+		"pt": "Tokens hoje",
+		"nl": "Tokens vandaag",
+		"fr": "Jetons aujourd'hui",
+		"it": "Token oggi",
+		"es": "Tokens hoy",
+		"pl": "Tokeny dzisiaj",
+		"uk": "Токени за сьогодні",
+		"zh-cn": "今日令牌"
+	},
+	"usage.limitReached": {
+		"en": "Daily token limit reached",
+		"de": "Tageslimit der Tokens erreicht",
+		"ru": "Дневной лимит токенов достигнут",
+		"pt": "Limite diário de tokens atingido",
+		"nl": "Daglimiet van tokens bereikt",
+		"fr": "Limite quotidienne de jetons atteinte",
+		"it": "Limite giornaliero di token raggiunto",
+		"es": "Límite diario de tokens alcanzado",
+		"pl": "Dzienny limit tokenów osiągnięty",
+		"uk": "Денний ліміт токенів досягнуто",
+		"zh-cn": "已达到每日令牌限制"
+	},
 	"usage.json": {
 		"en": "Usage per model (JSON)",
 		"de": "Verbrauch je Modell (JSON)",

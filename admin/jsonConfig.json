@@ -219,6 +219,42 @@
                     "md": 4,
                     "lg": 4,
                     "xl": 4
+                },
+                "_limitsHeader": {
+                    "type": "header",
+                    "text": "Limits",
+                    "size": 4,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "requestsPerMinute": {
+                    "type": "number",
+                    "label": "Requests per minute per conversation",
+                    "help": "Protects against loops: a script or another adapter that asks again right after every answer. Further requests of the same conversation (messenger chat, user of the admin chat, satellite, sendTo conversation, job) are refused without asking the model. 0 = no limit.",
+                    "min": 0,
+                    "default": 10,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "dailyTokens": {
+                    "type": "number",
+                    "label": "Tokens per day",
+                    "help": "When the tokens of the day (from midnight in the time zone of the house, state usage.tokensToday) reach this number, the agent stops asking the model until midnight and answers every request with a note; usage.limitReached is then true. 0 = no limit.",
+                    "min": 0,
+                    "default": 0,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
                 }
             }
         },

@@ -1,5 +1,9 @@
 # Older Changelog
 
+### 0.8.1 (2026-11-02)
+
+- Scripts: new scripts in TypeScript when the user asks for it; TypeScript is checked for syntax errors too
+
 ### 0.8.0 (2026-11-02)
 
 - Scripts of the javascript adapter, off by default: the agent creates and changes scripts in the folder

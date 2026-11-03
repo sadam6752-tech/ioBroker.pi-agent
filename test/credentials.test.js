@@ -106,7 +106,12 @@ test('OpenAI-compatible server: starts without a key, with base URL and model', 
         config: { provider: 'custom', apiKey: '', baseUrl: 'http://127.0.0.1:11434/v1', modelId: 'qwen3:8b' },
         responses: [f.fauxAssistantMessage('hi')],
     });
-    assert.deepEqual(providerCalls[0], ['custom', '', { baseUrl: 'http://127.0.0.1:11434/v1', modelId: 'qwen3:8b' }]);
+    const [name, key, { log, ...options }] = providerCalls[0];
+    assert.deepEqual(
+        [name, key, options],
+        ['custom', '', { baseUrl: 'http://127.0.0.1:11434/v1', modelId: 'qwen3:8b' }],
+    );
+    assert.equal(typeof log?.warn, 'function');
     await stopAgent(agent);
 });
 

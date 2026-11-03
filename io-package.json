@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.8.7",
+		"version": "0.8.8",
 		"news": {
+			"0.8.8": {
+				"en": "Limits: at most 10 requests per minute per conversation (setting) stop a loop before the model is asked; an optional limit of tokens per day; OpenRouter models outside the catalog get their prices from OpenRouter",
+				"de": "Grenzen: höchstens 10 Anfragen pro Minute und Gespräch (Einstellung) stoppen eine Schleife, bevor das Modell gefragt wird; optionale Grenze an Tokens pro Tag; OpenRouter-Modelle außerhalb des Katalogs bekommen ihre Preise von OpenRouter",
+				"ru": "Лимиты: не больше 10 запросов в минуту на разговор (настройка) останавливают петлю до обращения к модели; необязательный лимит токенов в день; модели OpenRouter вне каталога получают цены от OpenRouter",
+				"pt": "Limites: no máximo 10 pedidos por minuto e conversa (definição) param um ciclo antes de perguntar ao modelo; limite opcional de tokens por dia; modelos do OpenRouter fora do catálogo recebem os preços do OpenRouter",
+				"nl": "Limieten: hoogstens 10 verzoeken per minuut per gesprek (instelling) stoppen een lus voordat het model wordt gevraagd; optionele limiet van tokens per dag; OpenRouter-modellen buiten de catalogus krijgen hun prijzen van OpenRouter",
+				"fr": "Limites : au plus 10 requêtes par minute et conversation (paramètre) arrêtent une boucle avant d'interroger le modèle ; limite optionnelle de jetons par jour ; les modèles OpenRouter hors catalogue reçoivent leurs prix d'OpenRouter",
+				"it": "Limiti: al massimo 10 richieste al minuto per conversazione (impostazione) fermano un ciclo prima di interpellare il modello; limite opzionale di token al giorno; i modelli OpenRouter fuori catalogo ricevono i prezzi da OpenRouter",
+				"es": "Límites: como máximo 10 peticiones por minuto y conversación (ajuste) detienen un bucle antes de preguntar al modelo; límite opcional de tokens por día; los modelos de OpenRouter fuera del catálogo reciben sus precios de OpenRouter",
+				"pl": "Limity: najwyżej 10 żądań na minutę na rozmowę (ustawienie) zatrzymuje pętlę, zanim model zostanie zapytany; opcjonalny limit tokenów dziennie; modele OpenRouter spoza katalogu dostają ceny z OpenRouter",
+				"uk": "Ліміти: не більше 10 запитів за хвилину на розмову (налаштування) зупиняють петлю до звернення до моделі; необовʼязковий ліміт токенів на день; моделі OpenRouter поза каталогом отримують ціни від OpenRouter",
+				"zh-cn": "限制：每个对话每分钟最多 10 个请求（设置），在询问模型之前阻止循环；可选的每日令牌限制；目录外的 OpenRouter 模型从 OpenRouter 获取价格"
+			},
 			"0.8.7": {
 				"en": "Update of the agent runtime to pi-durable 1.5.0: the tool schemas are built with pi-schema (the same JSON Schema), the chat history is read from the active context of the conversation",
 				"de": "Aktualisierung der Agenten-Laufzeit auf pi-durable 1.5.0: die Schemas der Werkzeuge entstehen mit pi-schema (dasselbe JSON Schema), der Chatverlauf wird aus dem aktiven Kontext des Gesprächs gelesen",
@@ -80,19 +93,6 @@
 				"pl": "Potwierdzenie tekstem: pytanie jest w języku, który przesyła wywołujący (ioBroker.assistant: język jego satelitów); to samo „tak” dwa razy to „tak”; log pokazuje, co usłyszano; pytanie o skrypt jest w jednym języku",
 				"uk": "Підтвердження текстом: питання ставиться мовою, яку передає той, хто викликає (ioBroker.assistant — мова його сателітів); «так» двічі теж «так»; у лозі видно, що було почуто; питання про скрипт однією мовою",
 				"zh-cn": "文字确认：问题使用调用方发送的语言（ioBroker.assistant：其卫星设备的语言）；同一个“是”说两遍也算是；日志显示听到的内容；关于脚本的问题只用一种语言"
-			},
-			"0.8.1": {
-				"en": "Scripts: new scripts in TypeScript when the user asks for it; TypeScript is checked for syntax errors too",
-				"de": "Skripte: neue Skripte in TypeScript, wenn der Benutzer es wünscht; auch TypeScript wird auf Syntaxfehler geprüft",
-				"ru": "Скрипты: новые скрипты на TypeScript, если пользователь об этом просит; TypeScript тоже проверяется на синтаксические ошибки",
-				"pt": "Scripts: novos scripts em TypeScript quando o utilizador o pede; o TypeScript também é verificado quanto a erros de sintaxe",
-				"nl": "Scripts: nieuwe scripts in TypeScript als de gebruiker erom vraagt; ook TypeScript wordt op syntaxfouten gecontroleerd",
-				"fr": "Scripts : nouveaux scripts en TypeScript si l'utilisateur le demande ; le TypeScript est aussi vérifié pour les erreurs de syntaxe",
-				"it": "Script: nuovi script in TypeScript quando l'utente lo chiede; anche il TypeScript viene controllato per gli errori di sintassi",
-				"es": "Scripts: nuevos scripts en TypeScript cuando el usuario lo pide; el TypeScript también se comprueba en busca de errores de sintaxis",
-				"pl": "Skrypty: nowe skrypty w TypeScript, gdy użytkownik o to poprosi; TypeScript też jest sprawdzany pod kątem błędów składni",
-				"uk": "Скрипти: нові скрипти на TypeScript, якщо користувач про це просить; TypeScript теж перевіряється на синтаксичні помилки",
-				"zh-cn": "脚本：用户要求时可用 TypeScript 新建脚本；TypeScript 也会检查语法错误"
 			}
 		},
 		"titleLang": {
@@ -223,6 +223,8 @@
 		"dryRun": true,
 		"longTermMemory": true,
 		"codeMode": false,
+		"requestsPerMinute": 10,
+		"dailyTokens": 0,
 		"messengers": [],
 		"confirmRequired": "",
 		"historyInstance": "",

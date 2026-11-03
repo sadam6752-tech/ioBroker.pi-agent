@@ -62,6 +62,7 @@ The settings have four tabs: **General**, **Write permissions**, **Messengers** 
 | Scripts | **The agent may create and change scripts** (off by default), the javascript instance of new scripts, **Also change other scripts** and **Confirm scripts by voice**, see below. |
 | Write allowlist, Confirmation required | Under "Advanced": regular expressions, one per line, in addition to the table (the settings of 0.0.5 and earlier keep working). |
 | Time zone       | IANA name such as `Europe/Berlin` for reminders, `get_time` and history times, chosen from a list with the current UTC offsets (the instance must be running for the list) or typed in. Empty: the time zone of the ioBroker server. |
+| Limits          | **Requests per minute per conversation** (default 10, 0 = no limit) and **Tokens per day** (default 0 = no limit), see "Limits" below. |
 | History instance | `history`, `sql` or `influxdb` instance for `get_history`. Empty: the default history of the system settings. |
 | Instructions    | Text appended to the system prompt, for example room names and house rules. The agent answers in the language of the question; a language named here (e.g. "Always answer in German.") wins. |
 | Messengers      | Table, one row per `telegram` or `max` instance (bot): active, instance, allowed users, prefix. No row: no messenger is used. |
@@ -169,7 +170,24 @@ middle, they continue on the next start. The answer of a request from `chat.inpu
 - **History:** `get_history` reads past values (up to 31 days, averaged to at most 200 values) from the history
   instance.
 - **Usage:** `pi-agent.0.usage.*` shows input, output and total tokens and the cost in USD over all conversations
-  (the cost needs prices in the model catalog; it can stay 0 for a provider without them), `usage.json` per model.
+  (the cost needs prices in the model catalog; it can stay 0 for a provider without them), `usage.json` per model,
+  `usage.tokensToday` the tokens since midnight in the time zone of the house.
+
+### Limits
+
+Two limits stop a request before the model is asked, so a runaway costs no tokens:
+
+- **Requests per minute per conversation** (default 10): a loop, e.g. a script or another adapter that asks again
+  right after every answer, is stopped at the request over the limit. Every conversation counts on its own (a messenger
+  chat, a user of the admin chat, a satellite or conversation of a sendTo caller, a background job); a person does not
+  reach 10 requests a minute. The refused request gets the error `Too many requests from this conversation (at most 10
+  per minute)`, and the log gets one warning per run with the name of the conversation, e.g.
+  `sendTo:assistant.0/chat`. Requests continued after a restart do not count.
+- **Tokens per day** (default 0 = off): when the tokens since midnight (`usage.tokensToday`) reach the number, every
+  request is answered with `The daily token limit (…) is reached; the agent answers again after midnight` until
+  midnight, the log gets one warning, and `usage.limitReached` is `true` until the first request after midnight.
+  A request that started before the limit is finished, so the day can end a little above it. Answers to ✅/❌
+  questions keep working, they need no model.
 
 ### Messengers: Telegram and MAX
 
@@ -203,8 +221,10 @@ Select **DeepSeek** as provider and enter a key from the DeepSeek platform. Avai
 
 Select **OpenRouter** and enter an OpenRouter key. The model field lists the OpenRouter models that the installed
 version knows, with their limits and prices. OpenRouter adds models faster than that list grows: a model ID that is not
-listed (e.g. `minimax/minimax-m3.1-flash`) still works through the OpenAI API of OpenRouter, with the same assumptions
-as for an OpenAI-compatible server (context of 128k tokens, at most 8192 tokens per answer, no cost, no reasoning).
+listed (e.g. `minimax/minimax-m3.1-flash`) still works through the OpenAI API of OpenRouter. Its prices, context
+window, answer length and image input come from the public model list of OpenRouter, read at the start; reasoning stays
+off. When the list cannot be read, the model works with the assumptions of an OpenAI-compatible server (context of 128k
+tokens, at most 8192 tokens per answer, no cost), and the log says so.
 
 ### OpenAI-compatible servers
 
@@ -450,6 +470,14 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.8.8 (2026-11-03)
+
+- Limits: at most 10 requests per minute per conversation (setting) stop a loop of a script or another adapter
+  before the model is asked; an optional limit of tokens per day stops all requests until midnight. New states
+  `usage.tokensToday` and `usage.limitReached`
+- OpenRouter: a model outside the catalog gets its prices, context window and answer length from the public model
+  list of OpenRouter, so its cost is counted
+
 ### 0.8.7 (2026-11-03)
 
 - Update of the agent runtime to pi-durable 1.5.0 (`@earendil-works/*` 1.5.0): the tool schemas are built with
@@ -497,10 +525,6 @@ the last copy.
 - One language in the question about a script: the summary the model writes follows the language of the user (it was
   German in a Russian conversation), and the warnings ("file access", "setState with a computed id" …) are spoken in
   the language of the question; the messenger chat and the log keep them in English
-
-### 0.8.1 (2026-11-02)
-
-- Scripts: new scripts in TypeScript when the user asks for it; TypeScript is checked for syntax errors too
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 
