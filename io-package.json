@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.9.0",
+		"version": "0.9.1",
 		"news": {
+			"0.9.1": {
+				"en": "Confirmation by voice: besides the plain yes word, \"okay\", \"klar\", \"конечно\" and the like count as yes, also with \"bitte\" or \"please\", and so do \"Ya\" and \"Yup\", which Whisper made of a short spoken \"Ja\"; the model no longer tells a voice user to press a button",
+				"de": "Bestätigung per Sprache: neben dem reinen Ja-Wort zählen auch „okay“, „klar“, „конечно“ und ähnliche als Ja, auch mit „bitte“ oder „please“, ebenso „Ya“ und „Yup“, die Whisper aus einem kurz gesprochenen „Ja“ machte; das Modell fordert Sprachnutzer nicht mehr auf, eine Schaltfläche zu drücken",
+				"ru": "Подтверждение голосом: кроме самого слова «да», как «да» засчитываются «okay», «klar», «конечно» и подобные, также с «bitte» или «please», а ещё «Ya» и «Yup», которые Whisper сделал из короткого «Ja»; модель больше не просит голосового пользователя нажать кнопку",
+				"pt": "Confirmação por voz: além da palavra sim, “okay”, “klar”, “конечно” e semelhantes contam como sim, também com “bitte” ou “please”, assim como “Ya” e “Yup”, que o Whisper fez de um “Ja” curto; o modelo já não pede a um utilizador de voz que prima um botão",
+				"nl": "Bevestiging met spraak: naast het woord ja tellen ook “okay”, “klar”, “конечно” en dergelijke als ja, ook met “bitte” of “please”, en ook “Ya” en “Yup”, die Whisper van een kort gesproken “Ja” maakte; het model vraagt een spraakgebruiker niet meer op een knop te drukken",
+				"fr": "Confirmation vocale : outre le simple mot oui, « okay », « klar », « конечно » et similaires comptent comme oui, aussi avec « bitte » ou « please », ainsi que « Ya » et « Yup », que Whisper a tirés d’un « Ja » bref ; le modèle ne demande plus à un utilisateur vocal d’appuyer sur un bouton",
+				"it": "Conferma vocale: oltre alla parola sì, contano come sì anche “okay”, “klar”, “конечно” e simili, anche con “bitte” o “please”, e così “Ya” e “Yup”, che Whisper ha ricavato da un breve “Ja”; il modello non chiede più a un utente vocale di premere un pulsante",
+				"es": "Confirmación por voz: además de la palabra sí, cuentan como sí «okay», «klar», «конечно» y similares, también con «bitte» o «please», así como «Ya» y «Yup», que Whisper sacó de un «Ja» corto; el modelo ya no pide a un usuario de voz que pulse un botón",
+				"pl": "Potwierdzanie głosem: oprócz samego słowa tak jako tak liczą się też „okay”, „klar”, „конечно” i podobne, również z „bitte” lub „please”, a także „Ya” i „Yup”, które Whisper zrobił z krótkiego „Ja”; model nie prosi już użytkownika głosowego o naciśnięcie przycisku",
+				"uk": "Підтвердження голосом: крім самого слова «так», як «так» зараховуються «okay», «klar», «конечно» та подібні, також з «bitte» або «please», а ще «Ya» і «Yup», які Whisper зробив з короткого «Ja»; модель більше не просить голосового користувача натиснути кнопку",
+				"zh-cn": "语音确认：除了“是”本身，“okay”“klar”“конечно”等也算作是，也可带“bitte”或“please”，Whisper 把简短的“Ja”识别成的“Ya”和“Yup”同样算作是；模型不再要求语音用户按按钮"
+			},
 			"0.9.0": {
 				"en": "Voice messages: voice messages of Telegram and MAX are turned into text by a local server with the transcription API of OpenAI (e.g. speaches with faster-whisper) or by OpenRouter, shown in the chat and answered like a written message; new block \"Speech recognition\" and column \"Voice\" on the tab \"Messengers\"",
 				"de": "Sprachnachrichten: Sprachnachrichten von Telegram und MAX werden von einem lokalen Server mit der Transkriptions-API von OpenAI (z. B. speaches mit faster-whisper) oder von OpenRouter in Text umgewandelt, im Chat angezeigt und wie eine geschriebene Nachricht beantwortet; neuer Block „Spracherkennung“ und Spalte „Sprachnachrichten“ im Reiter „Messenger“",
@@ -80,19 +93,6 @@
 				"pl": "Kopie zapasowe: listy kopii pokazują czas w strefie czasowej domu zamiast UTC, aby przywrócić właściwą kopię",
 				"uk": "Бекапи: у списках бекапів час показано в часовому поясі дому, а не в UTC, щоб відновлювався потрібний бекап",
 				"zh-cn": "备份：备份列表按家中的时区显示时间，而不是 UTC，以便恢复正确的备份"
-			},
-			"0.8.4": {
-				"en": "Code mode (setting, off by default): for a question with several steps the agent writes a short script that calls its tools in a sandbox, and only the result goes to the model; write permissions, simulation mode and confirmations hold for every call; it saves tokens only on questions with several steps",
-				"de": "Code-Modus (Einstellung, ab Werk aus): bei einer Frage mit mehreren Schritten schreibt der Agent ein kurzes Skript, das seine Werkzeuge in einer Sandbox aufruft, und nur das Ergebnis geht an das Modell; Schreibrechte, Simulationsmodus und Bestätigungen gelten für jeden Aufruf; Tokens spart er nur bei Fragen mit mehreren Schritten",
-				"ru": "Code Mode (настройка, по умолчанию выключена): на вопрос из нескольких шагов агент пишет короткий скрипт, который вызывает его инструменты в песочнице, и модели передаётся только результат; права записи, режим симуляции и подтверждения действуют для каждого вызова; токены экономятся только на вопросах из нескольких шагов",
-				"pt": "Modo de código (definição, desligado por omissão): numa pergunta com vários passos o agente escreve um script curto que chama as suas ferramentas numa sandbox, e só o resultado vai para o modelo; permissões de escrita, modo de simulação e confirmações valem para cada chamada; só poupa tokens em perguntas com vários passos",
-				"nl": "Codemodus (instelling, standaard uit): bij een vraag met meerdere stappen schrijft de agent een kort script dat zijn tools in een sandbox aanroept, en alleen het resultaat gaat naar het model; schrijfrechten, simulatiemodus en bevestigingen gelden voor elke aanroep; hij bespaart alleen tokens bij vragen met meerdere stappen",
-				"fr": "Mode code (paramètre, désactivé par défaut) : pour une question en plusieurs étapes, l'agent écrit un court script qui appelle ses outils dans un bac à sable, et seul le résultat va au modèle ; droits d'écriture, mode simulation et confirmations valent pour chaque appel ; il n'économise des jetons que pour les questions en plusieurs étapes",
-				"it": "Modalità codice (impostazione, disattivata di default): per una domanda con più passaggi l'agente scrive un breve script che chiama i suoi strumenti in una sandbox, e al modello va solo il risultato; permessi di scrittura, modalità simulazione e conferme valgono per ogni chiamata; risparmia token solo nelle domande con più passaggi",
-				"es": "Modo código (ajuste, desactivado por defecto): ante una pregunta con varios pasos el agente escribe un script corto que llama a sus herramientas en un sandbox, y al modelo solo llega el resultado; permisos de escritura, modo de simulación y confirmaciones valen para cada llamada; solo ahorra tokens en preguntas con varios pasos",
-				"pl": "Tryb kodu (ustawienie, domyślnie wyłączone): przy pytaniu wieloetapowym agent pisze krótki skrypt, który wywołuje jego narzędzia w piaskownicy, a do modelu trafia tylko wynik; uprawnienia zapisu, tryb symulacji i potwierdzenia obowiązują przy każdym wywołaniu; tokeny oszczędza tylko przy pytaniach wieloetapowych",
-				"uk": "Code Mode (налаштування, типово вимкнене): на питання з кількох кроків агент пише короткий скрипт, який викликає його інструменти в пісочниці, і моделі передається лише результат; права запису, режим симуляції та підтвердження діють для кожного виклику; токени заощаджуються лише на питаннях із кількох кроків",
-				"zh-cn": "代码模式（设置，默认关闭）：对于多步骤的问题，代理会编写一个在沙箱中调用其工具的短脚本，只有结果会发给模型；写入权限、模拟模式和确认对每次调用都有效；只有多步骤的问题才能节省 token"
 			}
 		},
 		"titleLang": {

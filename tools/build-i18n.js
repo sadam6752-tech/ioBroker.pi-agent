@@ -1584,6 +1584,19 @@ const DESC = [
 ];
 /** common.news per version, newest first; the repository builder keeps at most seven. */
 const NEWS = {};
+NEWS['0.9.1'] = [
+    'Confirmation by voice: besides the plain yes word, "okay", "klar", "конечно" and the like count as yes, also with "bitte" or "please", and so do "Ya" and "Yup", which Whisper made of a short spoken "Ja"; the model no longer tells a voice user to press a button',
+    'Bestätigung per Sprache: neben dem reinen Ja-Wort zählen auch „okay“, „klar“, „конечно“ und ähnliche als Ja, auch mit „bitte“ oder „please“, ebenso „Ya“ und „Yup“, die Whisper aus einem kurz gesprochenen „Ja“ machte; das Modell fordert Sprachnutzer nicht mehr auf, eine Schaltfläche zu drücken',
+    'Подтверждение голосом: кроме самого слова «да», как «да» засчитываются «okay», «klar», «конечно» и подобные, также с «bitte» или «please», а ещё «Ya» и «Yup», которые Whisper сделал из короткого «Ja»; модель больше не просит голосового пользователя нажать кнопку',
+    'Confirmação por voz: além da palavra sim, “okay”, “klar”, “конечно” e semelhantes contam como sim, também com “bitte” ou “please”, assim como “Ya” e “Yup”, que o Whisper fez de um “Ja” curto; o modelo já não pede a um utilizador de voz que prima um botão',
+    'Bevestiging met spraak: naast het woord ja tellen ook “okay”, “klar”, “конечно” en dergelijke als ja, ook met “bitte” of “please”, en ook “Ya” en “Yup”, die Whisper van een kort gesproken “Ja” maakte; het model vraagt een spraakgebruiker niet meer op een knop te drukken',
+    'Confirmation vocale : outre le simple mot oui, « okay », « klar », « конечно » et similaires comptent comme oui, aussi avec « bitte » ou « please », ainsi que « Ya » et « Yup », que Whisper a tirés d’un « Ja » bref ; le modèle ne demande plus à un utilisateur vocal d’appuyer sur un bouton',
+    'Conferma vocale: oltre alla parola sì, contano come sì anche “okay”, “klar”, “конечно” e simili, anche con “bitte” o “please”, e così “Ya” e “Yup”, che Whisper ha ricavato da un breve “Ja”; il modello non chiede più a un utente vocale di premere un pulsante',
+    'Confirmación por voz: además de la palabra sí, cuentan como sí «okay», «klar», «конечно» y similares, también con «bitte» o «please», así como «Ya» y «Yup», que Whisper sacó de un «Ja» corto; el modelo ya no pide a un usuario de voz que pulse un botón',
+    'Potwierdzanie głosem: oprócz samego słowa tak jako tak liczą się też „okay”, „klar”, „конечно” i podobne, również z „bitte” lub „please”, a także „Ya” i „Yup”, które Whisper zrobił z krótkiego „Ja”; model nie prosi już użytkownika głosowego o naciśnięcie przycisku',
+    'Підтвердження голосом: крім самого слова «так», як «так» зараховуються «okay», «klar», «конечно» та подібні, також з «bitte» або «please», а ще «Ya» і «Yup», які Whisper зробив з короткого «Ja»; модель більше не просить голосового користувача натиснути кнопку',
+    '语音确认：除了“是”本身，“okay”“klar”“конечно”等也算作是，也可带“bitte”或“please”，Whisper 把简短的“Ja”识别成的“Ya”和“Yup”同样算作是；模型不再要求语音用户按按钮',
+];
 NEWS['0.9.0'] = [
     'Voice messages: voice messages of Telegram and MAX are turned into text by a local server with the transcription API of OpenAI (e.g. speaches with faster-whisper) or by OpenRouter, shown in the chat and answered like a written message; new block "Speech recognition" and column "Voice" on the tab "Messengers"',
     'Sprachnachrichten: Sprachnachrichten von Telegram und MAX werden von einem lokalen Server mit der Transkriptions-API von OpenAI (z. B. speaches mit faster-whisper) oder von OpenRouter in Text umgewandelt, im Chat angezeigt und wie eine geschriebene Nachricht beantwortet; neuer Block „Spracherkennung“ und Spalte „Sprachnachrichten“ im Reiter „Messenger“',

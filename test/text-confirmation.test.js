@@ -49,7 +49,37 @@ test('isYes: what the user said is a yes word of any language, apart from case a
     for (const yes of ['да', 'Да.', ' ДА! ', 'yes', 'Yes!', 'Ja', 'ja', 'Sí.', 'так']) {
         assert.equal(isYes(yes), true, yes);
     }
-    for (const no of ['нет', 'nein', 'да, но сначала скажи', 'ja bitte', 'ok', '', 'конечно', 'jaja', 'да нет']) {
+    for (const no of ['нет', 'nein', 'да, но сначала скажи', '', 'jaja', 'да нет', 'Я', 'bitte', 'please']) {
+        assert.equal(isYes(no), false, no);
+    }
+});
+
+test('isYes: what people say instead of yes, with polite fillers; what Whisper made of a short "Ja"', () => {
+    for (const yes of [
+        'ok',
+        'Okay.',
+        'конечно',
+        'Ага',
+        'давай',
+        'klar',
+        'Jawohl!',
+        'ja bitte',
+        'Да, пожалуйста',
+        'yes please',
+    ]) {
+        assert.equal(isYes(yes), true, yes);
+    }
+    // from the log of 2026-11-03: a spoken "Ja" came back from faster-whisper large-v3-turbo as these
+    for (const yes of ['Yup.', 'Ya']) {
+        assert.equal(isYes(yes), true, yes);
+    }
+    // a new question while the confirmation waits is no, as before
+    for (const no of [
+        'Hastudii Max Adapter Aktualisiert',
+        'Актуализируем',
+        'ja, aber erst die Temperatur',
+        'sicher nicht',
+    ]) {
         assert.equal(isYes(no), false, no);
     }
 });
@@ -104,7 +134,10 @@ test('the language of the caller wins over the system language: a satellite that
     assert.deepEqual(question, { answer: 'Kitchen lamp auf true setzen? Sag ja oder nein. [[LISTEN]]' });
     assert.deepEqual(await ask(agent, 'Ja, ja.', { language: 'de' }), { answer: 'Die Lampe ist an.' });
     assert.deepEqual(db.writes, [[LAMP, true]]);
-    assert.ok(agent.logs.some(([, msg]) => /Answer by text in .*: "Ja, ja\." → yes/.test(msg)), 'what was heard is logged');
+    assert.ok(
+        agent.logs.some(([, msg]) => /Answer by text in .*: "Ja, ja\." → yes/.test(msg)),
+        'what was heard is logged',
+    );
     await stopAgent(agent);
 });
 

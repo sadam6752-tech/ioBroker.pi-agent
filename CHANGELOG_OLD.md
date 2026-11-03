@@ -1,5 +1,14 @@
 # Older Changelog
 
+### 0.8.4 (2026-11-02)
+
+- Code mode (setting, off by default): for a question with several steps the agent writes a short script that calls
+  its tools in a QuickJS sandbox; only the result goes to the model. Write permissions, simulation mode and
+  confirmations hold for every call of the script, also in background jobs; a script survives a restart without
+  running its finished calls again. The read tools give their values to scripts as objects. The instructions tell the
+  model to write a script only when one call is not enough and to print only the result; it saves tokens only on
+  questions with several steps, a simple question costs a little more
+
 ### 0.8.3 (2026-11-02)
 
 - Background jobs: `create_job` sets up a task that runs up to 30 days ("while I am away, tell me when a window stays

@@ -145,12 +145,14 @@ agent asks by text instead:
   with its last request of the conversation (ioBroker.assistant sends the language its satellites listen in), else in
   the language of the ioBroker system. A satellite that listens in Russian does not understand a German "Ja": its
   speech recognition returns nothing or "Я".
-- The next request of the same conversation is the answer. pi-agent checks it itself, not the model: only "yes" (or
-  the word for it in one of the languages of the adapter, e.g. "ja", "да", "oui") as the whole answer confirms, apart
-  from case and punctuation; the same word twice ("да да", "Ja, ja."), as speech recognition sometimes writes a
-  single "да", counts too. Context a caller puts in front, separated by an empty line (ioBroker.assistant sends time,
-  weather and presence first), does not count. Anything else is no, and so are 2 minutes without an answer. The log
-  shows what was heard and how it was decided.
+- The next request of the same conversation is the answer. pi-agent checks it itself, not the model: the answer must
+  consist of yes words, apart from case and punctuation: "yes" or the word for it in one of the languages of the
+  adapter ("ja", "да", "oui"), what people say instead ("okay", "klar", "jawohl", "конечно", "ага") and what speech
+  recognition makes of a short "Ja" ("Ya", "Yup"). Polite words may stand next to them ("ja bitte", "да,
+  пожалуйста"); the same word twice ("да да", "Ja, ja.") counts too. Any other word makes it a no ("ja, aber erst …",
+  a new question), and so do 2 minutes without an answer. Context a caller puts in front, separated by an empty line
+  (ioBroker.assistant sends time, weather and presence first), does not count. The log shows what was heard and how
+  it was decided.
 - The answer of that next request is the result: what the agent says after the action, or the next question.
 - By voice anyone in the room can say yes. Only switch it on where that is acceptable.
 
@@ -496,6 +498,12 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.9.1 (2026-11-03)
+
+- Confirmation by voice: besides the plain yes word, "okay", "klar", "конечно" and the like count as yes, also with
+  "bitte" or "please", and so do "Ya" and "Yup", which Whisper made of a short spoken "Ja". The model no longer tells
+  a voice user to press a button
+
 ### 0.9.0 (2026-11-03)
 
 - Voice messages: voice messages of Telegram and MAX (max 0.1.13 or newer) are turned into text by a local server with the transcription API of OpenAI
@@ -534,15 +542,6 @@ the last copy.
 - Backups: the lists of backups show the time in the time zone of the house (e.g. `2026-11-02 18:31:40
   (Europe/Berlin) · by hand`) instead of UTC; a backup made at 18:31 read "17:31 UTC", and the wrong one was easily
   restored
-
-### 0.8.4 (2026-11-02)
-
-- Code mode (setting, off by default): for a question with several steps the agent writes a short script that calls
-  its tools in a QuickJS sandbox; only the result goes to the model. Write permissions, simulation mode and
-  confirmations hold for every call of the script, also in background jobs; a script survives a restart without
-  running its finished calls again. The read tools give their values to scripts as objects. The instructions tell the
-  model to write a script only when one call is not enough and to print only the result; it saves tokens only on
-  questions with several steps, a simple question costs a little more
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 
