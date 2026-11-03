@@ -305,3 +305,113 @@ test('sendTo "listMessengerInstances" lists the installed telegram and max insta
     ]);
     await stopAgent(agent);
 });
+
+test('a voice message is recognized, shown in the chat and answered; refused senders and photos are not', async () => {
+    const f = await faux();
+    const seen = [];
+    const dataDir = tmp();
+    const { agent, db } = await startAgent({
+        dataDir,
+        config: {
+            ...CONFIG,
+            speechService: 'server',
+            speechBaseUrl: 'http://nas:8000/v1',
+            speechModel: 'Systran/faster-whisper-small',
+        },
+        responses: [
+            context => {
+                seen.push(JSON.stringify(context));
+                return f.fauxAssistantMessage('The light is off');
+            },
+        ],
+    });
+    assert.deepEqual(agent.foreignSubscriptions, [`${TG}.communicate.request`, `${TG}.communicate.pathFile`]);
+    const posted = [];
+    agent.fetch = async (url, init) => {
+        posted.push({ url, file: init.body.get('file'), model: init.body.get('model') });
+        return new Response(JSON.stringify({ text: 'switch the light off' }), { status: 200 });
+    };
+    fs.mkdirSync(path.join(dataDir, 'voice'));
+    const voice = path.join(dataDir, 'voice', 'temp.ogg');
+    fs.writeFileSync(voice, 'OggS fake opus');
+    const deliver = async (userId, messageId, file = voice) => {
+        const ts = Date.now();
+        db.setState(`${TG}.communicate.requestChatId`, { val: 100, ack: true, ts });
+        db.setState(`${TG}.communicate.requestUserId`, { val: userId, ack: true, ts });
+        db.setState(`${TG}.communicate.requestMessageId`, { val: messageId, ack: true, ts });
+        db.setState(`${TG}.communicate.users`, { val: USERS, ack: true, ts });
+        await agent.onStateChange(`${TG}.communicate.pathFile`, { val: file, ack: true, ts });
+    };
+
+    await deliver(3, 20); // not allowed
+    await deliver(1, 21, path.join(dataDir, 'photo', 'p.jpg')); // a photo, not a voice message
+    assert.deepEqual(posted, []);
+    assert.deepEqual(sentToTelegram(agent), []);
+
+    await deliver(1, 22);
+    assert.equal(posted.length, 1);
+    assert.equal(posted[0].url, 'http://nas:8000/v1/audio/transcriptions');
+    assert.equal(posted[0].model, 'Systran/faster-whisper-small');
+    assert.equal(posted[0].file.name, 'temp.ogg');
+    assert.deepEqual(sentToTelegram(agent), [
+        { text: '🎤 «switch the light off»', chatId: '100', parse_mode: 'HTML' },
+        { text: 'The light is off', chatId: '100', parse_mode: 'HTML' },
+    ]);
+    assert.match(seen[0], /🎤 switch the light off/, 'the model gets the text marked as a voice message');
+    assert.match(seen[0], /voice message turned into text/, 'and the instruction how to read it');
+    await stopAgent(agent);
+});
+
+test('a failed speech recognition is reported in the chat; "Voice" off or no service: no subscription', async () => {
+    const dataDir = tmp();
+    const speech = { speechService: 'server', speechBaseUrl: 'http://nas:8000/v1', speechModel: 'm' };
+    const { agent, db } = await startAgent({ dataDir, config: { ...CONFIG, ...speech }, responses: [] });
+    agent.fetch = async () =>
+        new Response(JSON.stringify({ detail: "Model 'm' is not installed locally" }), { status: 404 });
+    fs.mkdirSync(path.join(dataDir, 'voice'));
+    const voice = path.join(dataDir, 'voice', 'temp.ogg');
+    fs.writeFileSync(voice, 'OggS');
+    db.setState(`${TG}.communicate.requestChatId`, { val: 100, ack: true });
+    db.setState(`${TG}.communicate.requestUserId`, { val: 1, ack: true });
+    db.setState(`${TG}.communicate.requestMessageId`, { val: 30, ack: true });
+    db.setState(`${TG}.communicate.users`, { val: USERS, ack: true });
+    await agent.onStateChange(`${TG}.communicate.pathFile`, { val: voice, ack: true, ts: Date.now() });
+    assert.deepEqual(sentToTelegram(agent), [
+        {
+            text: "🎤 Speech recognition failed: HTTP 404: Model 'm' is not installed locally",
+            chatId: '100',
+            parse_mode: 'HTML',
+        },
+    ]);
+    assert.ok(agent.logs.some(([lvl, m]) => lvl === 'warn' && m.includes('speech recognition failed')));
+    await stopAgent(agent);
+
+    for (const config of [
+        { messengers: [{ ...CONFIG.messengers[0], voice: false }], ...speech },
+        { ...CONFIG, speechService: '' },
+    ]) {
+        const other = await startAgent({ dataDir: tmp(), config, responses: [] });
+        assert.deepEqual(other.agent.foreignSubscriptions, [`${TG}.communicate.request`]);
+        await stopAgent(other.agent);
+    }
+});
+
+test('sendTo "testSpeech" checks the unsaved form; OpenRouter without any key says where to enter one', async () => {
+    const { agent } = await startAgent({ dataDir: tmp(), config: { provider: 'deepseek', apiKey: 'x' }, responses: [] });
+    const ask = message =>
+        new Promise(resolve => {
+            agent.sendTo = (to, command, answer) => resolve(answer);
+            agent.onMessage({ command: 'testSpeech', from: 'system.adapter.admin.0', callback: {}, message });
+        });
+    agent.fetch = async (url, init) => {
+        assert.equal(init.body.get('file').name, 'test.wav');
+        return new Response(JSON.stringify({ text: '' }), { status: 200 });
+    };
+    const ok = await ask({ speechService: 'server', speechBaseUrl: 'http://nas:8000/v1', speechModel: 'm' });
+    assert.match(ok.result, /^OK: m answered in \d+\.\d s$/);
+    const noKey = await ask({ speechService: 'openrouter' });
+    assert.match(noKey.error, /no OpenRouter key/);
+    const noUrl = await ask({ speechService: 'server', speechModel: 'm' });
+    assert.match(noUrl.error, /no server URL/);
+    await stopAgent(agent);
+});

@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.8.9",
+		"version": "0.9.0",
 		"news": {
+			"0.9.0": {
+				"en": "Voice messages: voice messages of Telegram and MAX are turned into text by a local server with the transcription API of OpenAI (e.g. speaches with faster-whisper) or by OpenRouter, shown in the chat and answered like a written message; new block \"Speech recognition\" and column \"Voice\" on the tab \"Messengers\"",
+				"de": "Sprachnachrichten: Sprachnachrichten von Telegram und MAX werden von einem lokalen Server mit der Transkriptions-API von OpenAI (z. B. speaches mit faster-whisper) oder von OpenRouter in Text umgewandelt, im Chat angezeigt und wie eine geschriebene Nachricht beantwortet; neuer Block „Spracherkennung“ und Spalte „Sprachnachrichten“ im Reiter „Messenger“",
+				"ru": "Голосовые сообщения: голосовые сообщения Telegram и MAX превращаются в текст локальным сервером с API распознавания OpenAI (например, speaches с faster-whisper) или через OpenRouter, показываются в чате и обрабатываются как написанное сообщение; новый блок «Распознавание речи» и колонка «Голос» на вкладке «Мессенджеры»",
+				"pt": "Mensagens de voz: as mensagens de voz do Telegram e do MAX são convertidas em texto por um servidor local com a API de transcrição da OpenAI (p. ex. speaches com faster-whisper) ou pelo OpenRouter, mostradas no chat e respondidas como uma mensagem escrita; novo bloco “Reconhecimento de voz” e coluna “Voz” no separador “Mensageiros”",
+				"nl": "Spraakberichten: spraakberichten van Telegram en MAX worden door een lokale server met de transcriptie-API van OpenAI (bijv. speaches met faster-whisper) of door OpenRouter omgezet in tekst, in de chat getoond en beantwoord als een geschreven bericht; nieuw blok “Spraakherkenning” en kolom “Spraak” op het tabblad “Messengers”",
+				"fr": "Messages vocaux : les messages vocaux de Telegram et de MAX sont transcrits par un serveur local offrant l’API de transcription d’OpenAI (p. ex. speaches avec faster-whisper) ou par OpenRouter, affichés dans le chat et traités comme un message écrit ; nouveau bloc « Reconnaissance vocale » et colonne « Voix » dans l’onglet « Messageries »",
+				"it": "Messaggi vocali: i messaggi vocali di Telegram e MAX vengono trasformati in testo da un server locale con l’API di trascrizione di OpenAI (ad es. speaches con faster-whisper) o da OpenRouter, mostrati nella chat e trattati come un messaggio scritto; nuovo blocco “Riconoscimento vocale” e colonna “Voce” nella scheda “Messenger”",
+				"es": "Mensajes de voz: los mensajes de voz de Telegram y MAX se convierten en texto con un servidor local con la API de transcripción de OpenAI (p. ej. speaches con faster-whisper) o con OpenRouter, se muestran en el chat y se responden como un mensaje escrito; nuevo bloque «Reconocimiento de voz» y columna «Voz» en la pestaña «Mensajería»",
+				"pl": "Wiadomości głosowe: wiadomości głosowe z Telegrama i MAX są zamieniane na tekst przez lokalny serwer z API transkrypcji OpenAI (np. speaches z faster-whisper) lub przez OpenRouter, pokazywane w czacie i obsługiwane jak wiadomość pisana; nowy blok „Rozpoznawanie mowy” i kolumna „Głos” na karcie „Komunikatory”",
+				"uk": "Голосові повідомлення: голосові повідомлення Telegram і MAX перетворюються на текст локальним сервером з API розпізнавання OpenAI (наприклад, speaches з faster-whisper) або через OpenRouter, показуються в чаті та обробляються як написане повідомлення; новий блок «Розпізнавання мовлення» і колонка «Голос» на вкладці «Месенджери»",
+				"zh-cn": "语音消息：Telegram 和 MAX 的语音消息由提供 OpenAI 转录 API 的本地服务器（例如带 faster-whisper 的 speaches）或 OpenRouter 转换为文字，显示在聊天中，并像文字消息一样得到回答；“消息应用”选项卡中新增“语音识别”区块和“语音”列"
+			},
 			"0.8.9": {
 				"en": "Updates: list_updates compares every installed adapter with npm in one call, pi-agent included; an adapter is also found by its title; asked to check again, the agent reads the versions anew instead of answering from earlier results",
 				"de": "Updates: list_updates vergleicht alle installierten Adapter in einem Aufruf mit npm, pi-agent eingeschlossen; ein Adapter wird auch über seinen Titel gefunden; soll erneut geprüft werden, liest der Agent die Versionen neu, statt aus früheren Ergebnissen zu antworten",
@@ -80,19 +93,6 @@
 				"pl": "Tryb kodu (ustawienie, domyślnie wyłączone): przy pytaniu wieloetapowym agent pisze krótki skrypt, który wywołuje jego narzędzia w piaskownicy, a do modelu trafia tylko wynik; uprawnienia zapisu, tryb symulacji i potwierdzenia obowiązują przy każdym wywołaniu; tokeny oszczędza tylko przy pytaniach wieloetapowych",
 				"uk": "Code Mode (налаштування, типово вимкнене): на питання з кількох кроків агент пише короткий скрипт, який викликає його інструменти в пісочниці, і моделі передається лише результат; права запису, режим симуляції та підтвердження діють для кожного виклику; токени заощаджуються лише на питаннях із кількох кроків",
 				"zh-cn": "代码模式（设置，默认关闭）：对于多步骤的问题，代理会编写一个在沙箱中调用其工具的短脚本，只有结果会发给模型；写入权限、模拟模式和确认对每次调用都有效；只有多步骤的问题才能节省 token"
-			},
-			"0.8.3": {
-				"en": "Background jobs: a task that runs up to 30 days (watch the house while away, a report every morning); the adapter watches the triggers and wakes the job only when one fires; it reports in the chat, the admin chat, a messenger or by voice, and asks before every action; a panel in the admin chat; a link to the chat in the instance row",
-				"de": "Hintergrundaufträge: eine Aufgabe, die bis zu 30 Tage läuft (das Haus im Urlaub beobachten, jeden Morgen ein Bericht); der Adapter beobachtet die Auslöser und weckt den Auftrag nur, wenn einer auslöst; er meldet sich im Chat, im Admin-Chat, im Messenger oder per Sprache und fragt vor jeder Aktion; eine Übersicht im Admin-Chat; ein Link zum Chat in der Instanzzeile",
-				"ru": "Фоновые задания: задача на срок до 30 дней (следить за домом в отпуске, отчёт каждое утро); адаптер сам следит за триггерами и будит задание, только когда триггер срабатывает; оно пишет в чат, админ-чат, мессенджер или голосом и спрашивает перед каждым действием; панель в админ-чате; ссылка на чат в строке инстанса",
-				"pt": "Tarefas em segundo plano: uma tarefa que dura até 30 dias (vigiar a casa nas férias, um relatório todas as manhãs); o adaptador vigia os gatilhos e acorda a tarefa só quando um dispara; ela informa no chat, no chat do admin, num mensageiro ou por voz e pergunta antes de cada ação; um painel no chat do admin; um link para o chat na linha da instância",
-				"nl": "Achtergrondtaken: een taak die tot 30 dagen loopt (het huis bewaken tijdens de vakantie, elke ochtend een rapport); de adapter bewaakt de triggers en wekt de taak alleen als er een afgaat; die meldt zich in de chat, de admin-chat, een messenger of via spraak en vraagt vóór elke actie; een paneel in de admin-chat; een link naar de chat in de instantieregel",
-				"fr": "Tâches d'arrière-plan : une tâche qui dure jusqu'à 30 jours (surveiller la maison en vacances, un rapport chaque matin) ; l'adaptateur surveille les déclencheurs et ne réveille la tâche que lorsqu'un se déclenche ; elle informe dans le chat, le chat admin, une messagerie ou par la voix et demande avant chaque action ; un panneau dans le chat admin ; un lien vers le chat dans la ligne de l'instance",
-				"it": "Attività in background: un compito che dura fino a 30 giorni (sorvegliare la casa in vacanza, un rapporto ogni mattina); l'adattatore sorveglia i trigger e risveglia l'attività solo quando uno scatta; essa avvisa nella chat, nella chat admin, in un messenger o a voce e chiede prima di ogni azione; un pannello nella chat admin; un link alla chat nella riga dell'istanza",
-				"es": "Tareas en segundo plano: una tarea que dura hasta 30 días (vigilar la casa en vacaciones, un informe cada mañana); el adaptador vigila los disparadores y despierta la tarea solo cuando uno salta; avisa en el chat, el chat del admin, un mensajero o por voz y pregunta antes de cada acción; un panel en el chat del admin; un enlace al chat en la fila de la instancia",
-				"pl": "Zadania w tle: zadanie działające do 30 dni (pilnowanie domu podczas urlopu, raport każdego ranka); adapter sam pilnuje wyzwalaczy i budzi zadanie tylko wtedy, gdy któryś zadziała; zadanie pisze na czacie, czacie admina, w komunikatorze lub głosem i pyta przed każdą akcją; panel w czacie admina; link do czatu w wierszu instancji",
-				"uk": "Фонові завдання: задача на строк до 30 днів (стежити за домом у відпустці, звіт щоранку); адаптер сам стежить за тригерами і будить завдання, лише коли тригер спрацьовує; воно пише в чат, адмін-чат, месенджер або голосом і питає перед кожною дією; панель в адмін-чаті; посилання на чат у рядку інстансу",
-				"zh-cn": "后台任务：最长运行 30 天的任务（度假时看家、每天早上的报告）；适配器自行监视触发器，只在触发时唤醒任务；任务在聊天、管理聊天、消息应用中或通过语音通知，并在每个操作前询问；管理聊天中的任务面板；实例行中打开聊天的链接"
 			}
 		},
 		"titleLang": {
@@ -198,11 +198,13 @@
 	},
 	"encryptedNative": [
 		"apiKey",
-		"remotePassword"
+		"remotePassword",
+		"speechApiKey"
 	],
 	"protectedNative": [
 		"apiKey",
-		"remotePassword"
+		"remotePassword",
+		"speechApiKey"
 	],
 	"native": {
 		"provider": "anthropic",
@@ -226,6 +228,11 @@
 		"requestsPerMinute": 10,
 		"dailyTokens": 0,
 		"messengers": [],
+		"speechService": "",
+		"speechBaseUrl": "",
+		"speechModel": "",
+		"speechApiKey": "",
+		"speechLanguage": "",
 		"confirmRequired": "",
 		"historyInstance": "",
 		"timeZone": "",

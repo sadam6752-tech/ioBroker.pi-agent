@@ -131,3 +131,41 @@ test('markdownToPlain removes the Markdown marks and keeps the link target', () 
         'Title\nbold and bold, code, docs (https://x.y/z)\nlet a;\n',
     );
 });
+
+test('MAX: a voice message (max 0.1.13 writes communicate.pathFile) is recognized and answered to the user', async () => {
+    const f = await faux();
+    const seen = [];
+    const dataDir = tmp();
+    const { agent, db } = await startAgent({
+        dataDir,
+        config: { ...CONFIG, speechService: 'server', speechBaseUrl: 'http://nas:8000/v1', speechModel: 'm' },
+        seed: knownUser,
+        responses: [
+            context => {
+                seen.push(JSON.stringify(context));
+                return f.fauxAssistantMessage('Done');
+            },
+        ],
+    });
+    assert.deepEqual(agent.foreignSubscriptions, [`${MAX}.communicate.request`, `${MAX}.communicate.pathFile`]);
+    agent.fetch = async (url, init) => {
+        assert.equal(init.body.get('file').name, 'mid-1.m4a');
+        return new Response(JSON.stringify({ text: 'lights off' }), { status: 200 });
+    };
+    // max writes forward slashes on every platform: <data>/max_0/voice/<mid>.<ext>
+    fs.mkdirSync(path.join(dataDir, 'max_0', 'voice'), { recursive: true });
+    const file = path.join(dataDir, 'max_0', 'voice', 'mid-1.m4a');
+    fs.writeFileSync(file, 'm4a');
+    const ts = Date.now();
+    db.setState(`${MAX}.communicate.requestChatId`, { val: 0, ack: true, ts });
+    db.setState(`${MAX}.communicate.requestUserId`, { val: 7, ack: true, ts });
+    db.setState(`${MAX}.communicate.requestMessageId`, { val: 'mid-1', ack: true, ts });
+    await agent.onStateChange(`${MAX}.communicate.pathFile`, { val: file.split(path.sep).join('/'), ack: true, ts });
+    assert.deepEqual(sentToMax(agent), [
+        { command: 'send', userId: '7', text: '🎤 «lights off»' },
+        { command: 'send', userId: '7', text: 'Done' },
+    ]);
+    assert.match(seen[0], /🎤 lights off/);
+    assert.match(seen[0], /voice message turned into text/);
+    await stopAgent(agent);
+});

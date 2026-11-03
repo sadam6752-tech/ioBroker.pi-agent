@@ -212,6 +212,29 @@ Messenger adapters that can only send (e.g. WhatsApp, Signal, Pushover) cannot b
   a group to the group. MAX has no "ask", so a confirmation sends callback buttons; the pressed button comes back as
   `communicate.request`, is answered with `answerCallback` and never reaches the model.
 
+### Voice messages (Telegram and MAX)
+
+The telegram adapter and the max adapter (0.1.13 or newer) save every voice message they receive and write the path
+of the file to `<instance>.communicate.pathFile`. With speech recognition set up (tab "Messengers", block "Speech recognition"),
+pi-agent turns such a message into text, shows it in the chat (`🎤 «…»`) and answers it like a written one: same
+conversation, same confirmations, same limits.
+
+- **Own server:** any server with the transcription API of OpenAI (`POST <url>/audio/transcriptions`), for example
+  [speaches](https://github.com/speaches-ai/speaches) (faster-whisper) in Docker. No key is needed, nothing leaves the
+  house. Enter the URL (`http://<host>:8000/v1`) and pick one of the models the server has installed. On a CPU,
+  `Systran/faster-whisper-small` needs about a third of the length of the speech, `large-v3-turbo` about as long as the
+  speech itself but understands more.
+- **OpenRouter:** its transcription models, `openai/whisper-large-v3-turbo` when none is chosen. Without a key in this
+  block, the OpenRouter key of the agent (provider OpenRouter) or of the system settings of admin (tab "AI") is used.
+- **Language:** two letters (`de`, `ru`) or empty. Empty detects the language of every message, which costs a local
+  server extra time but understands messages in several languages.
+- The column **Voice** of the table chooses the bots that take voice messages; the prefix does not apply to them. Only
+  allowed users are heard. An older max adapter does not save voice messages; they are then ignored.
+- The text goes to the model as `🎤 <text>`; the instructions of the messenger chats tell it that such a text may contain
+  misheard words.
+- **Test speech recognition** sends one second of silence with the values of the form: a wrong URL, key or model shows
+  up at once.
+
 ### DeepSeek
 
 Select **DeepSeek** as provider and enter a key from the DeepSeek platform. Available models: `deepseek-flash`
@@ -473,6 +496,12 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.9.0 (2026-11-03)
+
+- Voice messages: voice messages of Telegram and MAX (max 0.1.13 or newer) are turned into text by a local server with the transcription API of OpenAI
+  (e.g. speaches with faster-whisper) or by OpenRouter, shown in the chat and answered like a written message. New
+  block "Speech recognition" and column "Voice" on the tab "Messengers"
+
 ### 0.8.9 (2026-11-03)
 
 - Updates: `list_updates` with `npm: true` compares every installed adapter with npm in one call, pi-agent included;
@@ -514,16 +543,6 @@ the last copy.
   running its finished calls again. The read tools give their values to scripts as objects. The instructions tell the
   model to write a script only when one call is not enough and to print only the result; it saves tokens only on
   questions with several steps, a simple question costs a little more
-
-### 0.8.3 (2026-11-02)
-
-- Background jobs: `create_job` sets up a task that runs up to 30 days ("while I am away, tell me when a window stays
-  open while the heating runs", "every morning at 7 a report"). The adapter watches its triggers (a state condition,
-  a time of day, an interval) and wakes the job's own conversation only when one fires; the job tells the user in the
-  chat it was set up in, the admin chat, a messenger chat or by voice through ioBroker.assistant, or stays quiet.
-  Actions of a job are always confirmed with ✅/❌. At most 5 jobs, paused after 20 wake-ups in one day; `list_jobs`,
-  `stop_job`, `resume_job`, and a panel of the jobs in the chat of the admin
-- The instance row in admin has a link that opens the chat (`common.localLinks`), at the address of the admin
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

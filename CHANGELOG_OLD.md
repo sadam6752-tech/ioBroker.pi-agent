@@ -1,5 +1,15 @@
 # Older Changelog
 
+### 0.8.3 (2026-11-02)
+
+- Background jobs: `create_job` sets up a task that runs up to 30 days ("while I am away, tell me when a window stays
+  open while the heating runs", "every morning at 7 a report"). The adapter watches its triggers (a state condition,
+  a time of day, an interval) and wakes the job's own conversation only when one fires; the job tells the user in the
+  chat it was set up in, the admin chat, a messenger chat or by voice through ioBroker.assistant, or stays quiet.
+  Actions of a job are always confirmed with ✅/❌. At most 5 jobs, paused after 20 wake-ups in one day; `list_jobs`,
+  `stop_job`, `resume_job`, and a panel of the jobs in the chat of the admin
+- The instance row in admin has a link that opens the chat (`common.localLinks`), at the address of the admin
+
 ### 0.8.2 (2026-11-02)
 
 - Confirmation by text: the question is in the `language` the caller sends with `ask` (ioBroker.assistant: the

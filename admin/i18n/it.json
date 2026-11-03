@@ -104,5 +104,18 @@
 	"The agent may update adapters with an instance that has \"Write allowed\" (and itself), never admin or js-controller; every update is confirmed in the chat": "L'agente può aggiornare gli adattatori con un'istanza che ha «Scrittura consentita» (e sé stesso), mai admin né js-controller; ogni aggiornamento viene confermato nella chat",
 	"Confirmation by text in sendTo conversations": "Conferma via testo nelle conversazioni sendTo",
 	"For callers with a conversation of their own, e.g. ioBroker.assistant: the question is the answer, the next message decides. Only a plain \"yes\" confirms; anything else or 2 minutes of silence is no. By voice anyone in the room can say yes.": "Per i chiamanti con una conversazione propria, ad es. ioBroker.assistant: la domanda è la risposta, il messaggio successivo decide. Solo un semplice «sì» conferma; qualsiasi altra cosa o 2 minuti di silenzio è no. A voce chiunque nella stanza può dire sì.",
-	"Allowed users": "Utenti consentiti"
+	"Allowed users": "Utenti consentiti",
+	"Voice": "Voce",
+	"Speech recognition (voice messages)": "Riconoscimento vocale (messaggi vocali)",
+	"Voice messages to the bots with \"Voice\" ticked are turned into text and answered like a written message; the recognized text is shown in the chat first. The prefix does not apply to them. Own server: any server with the transcription API of OpenAI, for example speaches (faster-whisper) in Docker, usually without a key. OpenRouter: its speech models; without a key here the OpenRouter key of the agent or of the system settings of admin (tab \"AI\") is used. Telegram and MAX (adapter max 0.1.13 or newer) deliver voice messages.": "I messaggi vocali ai bot con “Voce” spuntato vengono trasformati in testo e trattati come un messaggio scritto; il testo riconosciuto appare prima nella chat. Il prefisso non vale per loro. Server proprio: qualsiasi server con l’API di trascrizione di OpenAI, ad esempio speaches (faster-whisper) in Docker, di solito senza chiave. OpenRouter: i suoi modelli vocali; senza chiave qui si usa la chiave OpenRouter dell’agente o delle impostazioni di sistema di admin (scheda “IA”). Telegram e MAX (adattatore max 0.1.13 o più recente) consegnano messaggi vocali.",
+	"Speech recognition": "Riconoscimento vocale",
+	"Own server (OpenAI-compatible)": "Server proprio (compatibile OpenAI)",
+	"Server URL": "URL del server",
+	"Address of the API, for example http://192.168.1.10:8000/v1": "Indirizzo dell’API, ad esempio http://192.168.1.10:8000/v1",
+	"Speech model": "Modello di riconoscimento",
+	"Choose from the list or type a model ID. Empty: openai/whisper-large-v3-turbo with OpenRouter; a server needs one of its models": "Scegliete dall’elenco o digitate l’ID di un modello. Vuoto: openai/whisper-large-v3-turbo con OpenRouter; un server ha bisogno di uno dei suoi modelli",
+	"API key for speech (optional)": "Chiave API per il riconoscimento (facoltativa)",
+	"Two letters, for example de or ru. Empty: detected for every message (a local server then needs longer)": "Due lettere, ad esempio de o ru. Vuoto: rilevata per ogni messaggio (un server locale impiega allora di più)",
+	"Test speech recognition": "Prova il riconoscimento",
+	"Language": "Lingua"
 }

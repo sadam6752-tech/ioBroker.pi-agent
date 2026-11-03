@@ -104,5 +104,18 @@
 	"The agent may update adapters with an instance that has \"Write allowed\" (and itself), never admin or js-controller; every update is confirmed in the chat": "代理可以更新具有“允许写入”实例的适配器（以及它自己），但绝不更新 admin 或 js-controller；每次更新都需在聊天中确认",
 	"Confirmation by text in sendTo conversations": "sendTo 对话中的文字确认",
 	"For callers with a conversation of their own, e.g. ioBroker.assistant: the question is the answer, the next message decides. Only a plain \"yes\" confirms; anything else or 2 minutes of silence is no. By voice anyone in the room can say yes.": "适用于拥有自己对话的调用方，例如 ioBroker.assistant：问题作为回答返回，下一条消息决定。只有简单的“是”才算确认；其他任何内容或 2 分钟无响应均视为否。通过语音，房间里的任何人都可以说“是”。",
-	"Allowed users": "允许的用户"
+	"Allowed users": "允许的用户",
+	"Voice": "语音",
+	"Speech recognition (voice messages)": "语音识别（语音消息）",
+	"Voice messages to the bots with \"Voice\" ticked are turned into text and answered like a written message; the recognized text is shown in the chat first. The prefix does not apply to them. Own server: any server with the transcription API of OpenAI, for example speaches (faster-whisper) in Docker, usually without a key. OpenRouter: its speech models; without a key here the OpenRouter key of the agent or of the system settings of admin (tab \"AI\") is used. Telegram and MAX (adapter max 0.1.13 or newer) deliver voice messages.": "发给勾选了“语音”的机器人的语音消息会被转换为文字，并像文字消息一样得到回答；识别出的文字会先显示在聊天中。前缀对它们不适用。自有服务器：任何提供 OpenAI 转录 API 的服务器，例如 Docker 中的 speaches (faster-whisper)，通常无需密钥。OpenRouter：其语音模型；此处未填密钥时，使用代理或 admin 系统设置（“AI”选项卡）中的 OpenRouter 密钥。Telegram 和 MAX（max 适配器 0.1.13 或更新版本）会传递语音消息。",
+	"Speech recognition": "语音识别",
+	"Own server (OpenAI-compatible)": "自有服务器（兼容 OpenAI）",
+	"Server URL": "服务器地址",
+	"Address of the API, for example http://192.168.1.10:8000/v1": "API 地址，例如 http://192.168.1.10:8000/v1",
+	"Speech model": "识别模型",
+	"Choose from the list or type a model ID. Empty: openai/whisper-large-v3-turbo with OpenRouter; a server needs one of its models": "从列表中选择或输入模型 ID。留空：OpenRouter 使用 openai/whisper-large-v3-turbo；服务器需要其已安装的模型之一",
+	"API key for speech (optional)": "语音识别 API 密钥（可选）",
+	"Two letters, for example de or ru. Empty: detected for every message (a local server then needs longer)": "两个字母，例如 de 或 ru。留空：每条消息自动检测（本地服务器会更慢）",
+	"Test speech recognition": "测试语音识别",
+	"Language": "语言"
 }

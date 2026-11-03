@@ -2,6 +2,7 @@
 
 const utils = require('@iobroker/adapter-core');
 const crypto = require('node:crypto');
+const fs = require('node:fs');
 const path = require('node:path');
 const { parseAllowlist, parseWriteRules, requestIdFor, isWriteAllowed, toggleColumn } = require('./lib/guard');
 const { createIoBrokerExtension } = require('./lib/tools');
@@ -73,6 +74,7 @@ const { ADMIN, ADMIN_INSTRUCTIONS, historyOf, withNotices, createAdminChat } = r
 const { isAllowedUser, stripPrefix, telegramRequestId } = require('./lib/telegram');
 const { TextConfirmations, isYes, spokenAnswer, languageOf, confirmationQuestion } = require('./lib/text-confirmation');
 const { createScriptHistory, scriptName } = require('./lib/scripts');
+const { speechSettings, transcribe, listSpeechModels, silenceWav } = require('./lib/speech');
 
 /**
  * Text blocks of the model messages of one transcript entry.
@@ -699,7 +701,8 @@ class PiAgent extends utils.Adapter {
                 this.context,
             );
         }
-        for (const { instance, allowed, prefix, driver } of this.channels.values()) {
+        const speech = speechSettings(this.config);
+        for (const { instance, allowed, prefix, voice, driver } of this.channels.values()) {
             if (allowed.size === 0) {
                 this.log.warn(`${driver.label} ${instance}: no user is allowed, every message is ignored.`);
             }
@@ -707,7 +710,133 @@ class PiAgent extends utils.Adapter {
             this.log.info(
                 `${driver.label}: listening on ${instance} for ${allowed.size} allowed user(s)${prefix ? `, prefix "${prefix}"` : ''}`,
             );
+            // the telegram adapter saves every voice message and writes its path to communicate.pathFile
+            if (voice && speech.service && driver.voiceMessages) {
+                await this.subscribeForeignStatesAsync(`${instance}.communicate.pathFile`);
+                this.log.info(
+                    `${driver.label}: voice messages on ${instance} are recognized by ${speech.service === 'openrouter' ? 'OpenRouter' : speech.baseUrl} (${speech.model || 'no model'})`,
+                );
+            }
         }
+    }
+
+    /**
+     * The speech settings with the key resolved. OpenRouter without a key of its own takes the key of the agent when
+     * the agent talks to OpenRouter, else the OpenRouter credential of the system-wide AI settings of admin.
+     *
+     * @param {{ speechService?: unknown, speechBaseUrl?: unknown, speechModel?: unknown, speechApiKey?: unknown, speechLanguage?: unknown }} config native configuration or unsaved form values
+     * @returns {Promise<ReturnType<typeof speechSettings>>} settings
+     */
+    async speechSettingsOf(config) {
+        const settings = speechSettings(config);
+        if (settings.service !== 'openrouter' || settings.apiKey) {
+            return settings;
+        }
+        if (this.config.provider === 'openrouter' && !usesSystemAi(this.config)) {
+            settings.apiKey = await resolveApiKey(this, this.config);
+        } else {
+            const system = systemAiForm((await readSystemAi(this))?.native);
+            if (system?.provider === 'openrouter') {
+                settings.apiKey = await resolveApiKey(this, system);
+            }
+        }
+        if (!settings.apiKey) {
+            throw new Error(
+                'no OpenRouter key: enter one under "Speech recognition", or set up OpenRouter in the system settings of admin (tab "AI")',
+            );
+        }
+        return settings;
+    }
+
+    /**
+     * A voice message the telegram adapter saved: check the sender, recognize the speech, show the text in the chat
+     * and answer it like a written message (the prefix does not apply, it cannot be spoken).
+     *
+     * @param {string} instance messenger instance
+     * @param {ioBroker.State | null | undefined} state value of <instance>.communicate.pathFile
+     */
+    async onVoiceMessage(instance, state) {
+        const filePath = String(state?.val || '');
+        // pathFile also names photos and documents when the telegram adapter saves those
+        if (!/[\\/]voice[\\/][^\\/]+$/.test(filePath)) {
+            return;
+        }
+        const { allowed, driver } = this.channels.get(instance);
+        const request = await driver.readRequest(instance, '');
+        const { chatId, messageId } = request;
+        if (!chatId || !this.senderAllowed(instance, driver, allowed, request)) {
+            return;
+        }
+        let text;
+        try {
+            const audio = await this.readVoiceFile(instance, filePath);
+            const started = Date.now();
+            text = await transcribe(
+                await this.speechSettingsOf(this.config),
+                audio,
+                path.basename(filePath),
+                this.fetch,
+            );
+            this.log.info(
+                `${driver.label} ${instance}: voice message (${Math.round(audio.length / 1024)} KB) recognized in ${((Date.now() - started) / 1000).toFixed(1)} s`,
+            );
+        } catch (e) {
+            this.log.warn(`${driver.label} ${instance}: speech recognition failed: ${e.message}`);
+            driver.send(instance, chatId, `🎤 Speech recognition failed: ${e.message}`);
+            return;
+        }
+        if (!text) {
+            driver.send(instance, chatId, '🎤 (nothing recognized)');
+            return;
+        }
+        driver.send(instance, chatId, `🎤 «${text}»`);
+        const requestId =
+            messageId !== null && messageId !== undefined
+                ? telegramRequestId(instance, chatId, messageId)
+                : requestIdFor(crypto, state.ts, filePath);
+        await this.process({ requestId, content: `🎤 ${text}`, target: { kind: 'chat', instance, chatId } });
+    }
+
+    /**
+     * The file of a voice message. The telegram adapter names a path in its data folder; with "save files to
+     * ioBroker" the file is in its file storage instead, under the same name below "voice".
+     *
+     * @param {string} instance messenger instance
+     * @param {string} filePath value of communicate.pathFile
+     * @returns {Promise<Buffer>} the file
+     */
+    async readVoiceFile(instance, filePath) {
+        try {
+            return await fs.promises.readFile(filePath);
+        } catch (e) {
+            if (e.code !== 'ENOENT') {
+                throw e;
+            }
+        }
+        const name = filePath.split(/[\\/]/).pop();
+        const { file } = await this.readFileAsync(instance, `voice/${name}`);
+        return Buffer.isBuffer(file) ? file : Buffer.from(file);
+    }
+
+    /**
+     * Whether the sender of a messenger message may talk to the agent; a refused one is logged.
+     *
+     * @param {string} instance messenger instance
+     * @param {{ label: string }} driver messenger driver
+     * @param {Set<string>} allowed allowed users of the instance
+     * @param {{ name?: string, sender: { userId?: unknown, userName?: unknown, firstName?: unknown, known?: boolean } }} request the message
+     * @returns {boolean} true when allowed
+     */
+    senderAllowed(instance, driver, allowed, request) {
+        const { sender, name } = request;
+        if (isAllowedUser(sender, allowed)) {
+            return true;
+        }
+        const who = [sender.firstName, sender.userName].filter(Boolean).join(' / ') || name || '?';
+        this.log.warn(
+            `${driver.label} message on ${instance} from ${who} (${sender.userId ?? '?'}) ignored: user not allowed`,
+        );
+        return false;
     }
 
     /**
@@ -2161,6 +2290,10 @@ class PiAgent extends utils.Adapter {
         if (this.channels.has(instance)) {
             return this.onChatMessage(instance, state);
         }
+        const voiceOf = id.endsWith('.communicate.pathFile') ? id.slice(0, -'.communicate.pathFile'.length) : '';
+        if (this.channels.get(voiceOf)?.voice) {
+            return this.onVoiceMessage(voiceOf, state);
+        }
         if (this.watches.handles(id)) {
             await this.watches.onState(id, state);
         }
@@ -2195,16 +2328,12 @@ class PiAgent extends utils.Adapter {
         }
         const { allowed, prefix, driver } = this.channels.get(instance);
         const request = await driver.readRequest(instance, state.val);
-        const { chatId, messageId, name, text, sender } = request;
+        const { chatId, messageId, text } = request;
         if (!chatId) {
             this.log.warn(`${driver.label} message on ${instance} without chat id ignored`);
             return;
         }
-        if (!isAllowedUser(sender, allowed)) {
-            const who = [sender.firstName, sender.userName].filter(Boolean).join(' / ') || name || '?';
-            this.log.warn(
-                `${driver.label} message on ${instance} from ${who} (${sender.userId ?? '?'}) ignored: user not allowed`,
-            );
+        if (!this.senderAllowed(instance, driver, allowed, request)) {
             return;
         }
         if (driver.takeButton(instance, request)) {
@@ -2560,6 +2689,30 @@ class PiAgent extends utils.Adapter {
                 answer = await this.onBackupCommand(String(obj.command), Object(obj.message));
             } catch (e) {
                 answer = { error: e.message };
+            }
+            if (obj.callback) {
+                this.sendTo(obj.from, obj.command, answer, obj.callback);
+            }
+            return;
+        }
+        if (obj?.command === 'listSpeechModels' || obj?.command === 'testSpeech') {
+            // block "Speech recognition" of the tab "Messengers", with the unsaved values of the form
+            let answer;
+            try {
+                const form = { ...this.config, ...Object(obj.message) };
+                if (obj.command === 'listSpeechModels') {
+                    answer = await listSpeechModels(speechSettings(form), this.fetch);
+                } else {
+                    const started = Date.now();
+                    const settings = await this.speechSettingsOf(form);
+                    await transcribe(settings, silenceWav(), 'test.wav', this.fetch);
+                    answer = {
+                        result: `OK: ${settings.model} answered in ${((Date.now() - started) / 1000).toFixed(1)} s`,
+                    };
+                }
+            } catch (e) {
+                this.log.debug(`${obj.command}: ${e.message}`);
+                answer = obj.command === 'listSpeechModels' ? [] : { error: e.message };
             }
             if (obj.callback) {
                 this.sendTo(obj.from, obj.command, answer, obj.callback);

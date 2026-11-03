@@ -22,7 +22,14 @@ declare global {
             requestsPerMinute: number;
             dailyTokens: number;
             /** Messenger instances (telegram, max) since 0.1.0: one row per instance. */
-            messengers: Array<{ enabled?: boolean; instance: string; users: string; prefix: string }>;
+            messengers: Array<{ enabled?: boolean; instance: string; users: string; prefix: string; voice?: boolean }>;
+            /** Speech recognition of voice messages since 0.9.0: "" off, "server" (OpenAI-compatible URL) or "openrouter". */
+            speechService: '' | 'server' | 'openrouter';
+            speechBaseUrl: string;
+            speechModel: string;
+            speechApiKey: string;
+            /** Two letters; empty: detected for every message. */
+            speechLanguage: string;
             /** Single fields of 0.0.5 and earlier, moved into messengers at the first start. */
             telegramInstance: string;
             telegramUsers: string;
