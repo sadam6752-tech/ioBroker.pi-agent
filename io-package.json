@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.9.2",
+		"version": "0.9.3",
 		"news": {
+			"0.9.3": {
+				"en": "Pictures in \"ask\": up to 4 pictures (JPEG, PNG, GIF, WebP, up to about 3.9 MB each) go to the model with the text, a request may consist of pictures only; ioBroker.assistant passes on the photos of Telegram this way. Other files and larger pictures are dropped with a warning, so a refused picture cannot block the conversation",
+				"de": "Bilder in „ask“: bis zu 4 Bilder (JPEG, PNG, GIF, WebP, je bis etwa 3,9 MB) gehen mit dem Text an das Modell, eine Anfrage darf nur aus Bildern bestehen; so gibt ioBroker.assistant die Fotos aus Telegram weiter. Andere Dateien und größere Bilder werden mit einer Warnung verworfen, damit ein abgelehntes Bild das Gespräch nicht blockiert",
+				"ru": "Картинки в «ask»: до 4 картинок (JPEG, PNG, GIF, WebP, каждая примерно до 3,9 МБ) уходят модели вместе с текстом, запрос может состоять только из картинок; так ioBroker.assistant передаёт фото из Telegram. Другие файлы и картинки побольше отбрасываются с предупреждением, чтобы отклонённая картинка не блокировала беседу",
+				"pt": "Imagens em “ask”: até 4 imagens (JPEG, PNG, GIF, WebP, cada uma até cerca de 3,9 MB) vão para o modelo com o texto, um pedido pode ter só imagens; é assim que o ioBroker.assistant passa as fotos do Telegram. Outros ficheiros e imagens maiores são descartados com um aviso, para que uma imagem recusada não bloqueie a conversa",
+				"nl": "Afbeeldingen in “ask”: tot 4 afbeeldingen (JPEG, PNG, GIF, WebP, elk tot ongeveer 3,9 MB) gaan met de tekst naar het model, een verzoek mag alleen uit afbeeldingen bestaan; zo geeft ioBroker.assistant de foto’s uit Telegram door. Andere bestanden en grotere afbeeldingen worden met een waarschuwing weggelaten, zodat een geweigerde afbeelding het gesprek niet blokkeert",
+				"fr": "Images dans « ask » : jusqu’à 4 images (JPEG, PNG, GIF, WebP, chacune jusqu’à environ 3,9 Mo) vont au modèle avec le texte, une requête peut ne contenir que des images ; ioBroker.assistant transmet ainsi les photos de Telegram. Les autres fichiers et les images plus grandes sont écartés avec un avertissement, afin qu’une image refusée ne bloque pas la conversation",
+				"it": "Immagini in “ask”: fino a 4 immagini (JPEG, PNG, GIF, WebP, ciascuna fino a circa 3,9 MB) arrivano al modello con il testo, una richiesta può contenere solo immagini; così ioBroker.assistant inoltra le foto di Telegram. Altri file e immagini più grandi vengono scartati con un avviso, perché un’immagine rifiutata non blocchi la conversazione",
+				"es": "Imágenes en «ask»: hasta 4 imágenes (JPEG, PNG, GIF, WebP, cada una de hasta unos 3,9 MB) van al modelo con el texto, una solicitud puede tener solo imágenes; así ioBroker.assistant pasa las fotos de Telegram. Otros archivos e imágenes más grandes se descartan con un aviso, para que una imagen rechazada no bloquee la conversación",
+				"pl": "Obrazy w „ask”: do 4 obrazów (JPEG, PNG, GIF, WebP, każdy do ok. 3,9 MB) trafia do modelu razem z tekstem, zapytanie może składać się tylko z obrazów; tak ioBroker.assistant przekazuje zdjęcia z Telegrama. Inne pliki i większe obrazy są odrzucane z ostrzeżeniem, aby odrzucony obraz nie blokował rozmowy",
+				"uk": "Зображення в «ask»: до 4 зображень (JPEG, PNG, GIF, WebP, кожне приблизно до 3,9 МБ) надходять моделі разом із текстом, запит може складатися лише із зображень; так ioBroker.assistant передає фото з Telegram. Інші файли та більші зображення відкидаються з попередженням, щоб відхилене зображення не блокувало розмову",
+				"zh-cn": "“ask”中的图片：最多 4 张图片（JPEG、PNG、GIF、WebP，每张约 3.9 MB 以内）与文字一起交给模型，请求也可以只包含图片；ioBroker.assistant 以这种方式转发 Telegram 的照片。其他文件和更大的图片会被丢弃并给出警告，以免被拒绝的图片阻塞对话"
+			},
 			"0.9.2": {
 				"en": "Telegram: a warning in the log when the telegram instance also hands messages to an assistant instance (since telegram 6.1.0 also voice messages) or to text2command, because then every message gets two answers",
 				"de": "Telegram: eine Warnung im Log, wenn die Telegram-Instanz Nachrichten auch an eine Assistant-Instanz (seit telegram 6.1.0 auch Sprachnachrichten) oder an text2command weitergibt, denn dann bekommt jede Nachricht zwei Antworten",
@@ -80,19 +93,6 @@
 				"pl": "Aktualizacja środowiska agenta do pi-durable 1.5.0: schematy narzędzi są budowane przez pi-schema (ten sam JSON Schema), historia czatu jest czytana z aktywnego kontekstu rozmowy",
 				"uk": "Оновлення середовища агента до pi-durable 1.5.0: схеми інструментів будуються через pi-schema (ті самі JSON Schema), історія чату читається з активного контексту розмови",
 				"zh-cn": "代理运行时更新到 pi-durable 1.5.0：工具模式改用 pi-schema 构建（JSON Schema 相同），聊天记录从对话的活动上下文中读取"
-			},
-			"0.8.6": {
-				"en": "OpenRouter: a model that the catalog does not list yet (e.g. minimax/minimax-m3.1-flash) works with conservative limits; after a model change, requests of assistant cut off by a restart use the new model",
-				"de": "OpenRouter: ein Modell, das der Katalog noch nicht kennt (z. B. minimax/minimax-m3.1-flash), funktioniert mit vorsichtigen Grenzen; nach einem Modellwechsel nutzen durch einen Neustart unterbrochene Anfragen von assistant das neue Modell",
-				"ru": "OpenRouter: модель, которой ещё нет в каталоге (например, minimax/minimax-m3.1-flash), работает с осторожными лимитами; после смены модели прерванные перезапуском запросы assistant идут на новую модель",
-				"pt": "OpenRouter: um modelo que o catálogo ainda não lista (p. ex. minimax/minimax-m3.1-flash) funciona com limites prudentes; após mudar o modelo, os pedidos do assistant interrompidos por um reinício usam o novo modelo",
-				"nl": "OpenRouter: een model dat de catalogus nog niet kent (bijv. minimax/minimax-m3.1-flash) werkt met voorzichtige limieten; na een modelwissel gebruiken door een herstart onderbroken verzoeken van assistant het nieuwe model",
-				"fr": "OpenRouter : un modèle que le catalogue ne liste pas encore (p. ex. minimax/minimax-m3.1-flash) fonctionne avec des limites prudentes ; après un changement de modèle, les requêtes d'assistant interrompues par un redémarrage utilisent le nouveau modèle",
-				"it": "OpenRouter: un modello che il catalogo non elenca ancora (ad es. minimax/minimax-m3.1-flash) funziona con limiti prudenti; dopo un cambio di modello, le richieste di assistant interrotte da un riavvio usano il nuovo modello",
-				"es": "OpenRouter: un modelo que el catálogo aún no incluye (p. ej. minimax/minimax-m3.1-flash) funciona con límites prudentes; tras cambiar de modelo, las peticiones de assistant cortadas por un reinicio usan el nuevo modelo",
-				"pl": "OpenRouter: model, którego katalog jeszcze nie zna (np. minimax/minimax-m3.1-flash), działa z ostrożnymi limitami; po zmianie modelu żądania assistant przerwane restartem używają nowego modelu",
-				"uk": "OpenRouter: модель, якої ще немає в каталозі (наприклад, minimax/minimax-m3.1-flash), працює з обережними лімітами; після зміни моделі перервані перезапуском запити assistant ідуть на нову модель",
-				"zh-cn": "OpenRouter：目录中尚未列出的模型（例如 minimax/minimax-m3.1-flash）以保守的限制运行；更换模型后，因重启而中断的 assistant 请求会使用新模型"
 			}
 		},
 		"titleLang": {

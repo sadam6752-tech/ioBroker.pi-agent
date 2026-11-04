@@ -1,5 +1,12 @@
 # Older Changelog
 
+### 0.8.6 (2026-11-03)
+
+- OpenRouter: a model that the catalog of the installed version does not list yet (e.g. `minimax/minimax-m3.1-flash`)
+  works with conservative limits instead of failing with "Unknown model" / `no_model`
+- After a change of the model, requests from sendTo callers (e.g. assistant) that a restart cut off use the new model
+  instead of failing with `no_model`
+
 ### 0.8.5 (2026-11-02)
 
 - Backups: the lists of backups show the time in the time zone of the house (e.g. `2026-11-02 18:31:40

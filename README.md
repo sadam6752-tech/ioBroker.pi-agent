@@ -514,7 +514,7 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 0.9.3 (2026-11-04)
 
 - (@GermanBluefox) Pictures in `ask`: `images: [{ data: <base64>, mimeType }]` (JPEG, PNG, GIF, WebP, at most 4 of up
   to about 3.9 MB) go to the model with the text; a request may consist of pictures only. ioBroker.assistant passes
@@ -558,13 +558,6 @@ the last copy.
 - Update of the agent runtime to pi-durable 1.5.0 (`@earendil-works/*` 1.5.0): the tool schemas are built with
   `@earendil-works/pi-schema` instead of TypeBox (the same JSON Schema), the admin chat history and the answers are
   read from the active context of the conversation
-
-### 0.8.6 (2026-11-03)
-
-- OpenRouter: a model that the catalog of the installed version does not list yet (e.g. `minimax/minimax-m3.1-flash`)
-  works with conservative limits instead of failing with "Unknown model" / `no_model`
-- After a change of the model, requests from sendTo callers (e.g. assistant) that a restart cut off use the new model
-  instead of failing with `no_model`
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 
