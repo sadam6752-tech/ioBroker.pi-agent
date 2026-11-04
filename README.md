@@ -149,8 +149,11 @@ sendTo('pi-agent.0', 'ask', {
 - JPEG, PNG, GIF and WebP, at most 4 pictures of up to about 3.9 MB each. The type is taken from the content of the
   picture. Other files and larger pictures are dropped with a warning in the log.
 - A model without image input gets a note instead of the picture.
-- The picture stays in the history of the conversation: follow-up questions send it to the model again, which costs
-  tokens accordingly. `chat.pending` keeps only the text.
+- A picture goes to the model only once, with its own message. The model writes what it shows into notes after its
+  answer (`<picture-notes>`, the user does not see them); later questions get these notes instead of the picture. So
+  a picture costs its tokens once, and a picture the provider refuses cannot block the conversation.
+- The store keeps the newest 20 pictures; older ones are removed at the next start of the instance (their notes
+  stay). `chat.pending` keeps only the text.
 
 Such a conversation has no buttons, so by default a write with "Confirmation required", a restart and an update are
 blocked there. With **Confirmation by text in sendTo conversations** (tab "Write permissions", off by default) the
@@ -514,6 +517,11 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.9.4 (2026-11-04)
+
+- Pictures go to the model only once: the model keeps notes of what a picture shows, later questions get the notes
+  instead of the picture. The store keeps the newest 20 pictures, older ones are removed at the start
+
 ### 0.9.3 (2026-11-04)
 
 - (@GermanBluefox) Pictures in `ask`: `images: [{ data: <base64>, mimeType }]` (JPEG, PNG, GIF, WebP, at most 4 of up
@@ -552,12 +560,6 @@ the last copy.
   `usage.tokensToday` and `usage.limitReached`
 - OpenRouter: a model outside the catalog gets its prices, context window and answer length from the public model
   list of OpenRouter, so its cost is counted
-
-### 0.8.7 (2026-11-03)
-
-- Update of the agent runtime to pi-durable 1.5.0 (`@earendil-works/*` 1.5.0): the tool schemas are built with
-  `@earendil-works/pi-schema` instead of TypeBox (the same JSON Schema), the admin chat history and the answers are
-  read from the active context of the conversation
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

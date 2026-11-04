@@ -75,6 +75,7 @@ const { isAllowedUser, stripPrefix, telegramRequestId } = require('./lib/telegra
 const { TextConfirmations, isYes, spokenAnswer, languageOf, confirmationQuestion } = require('./lib/text-confirmation');
 const { createScriptHistory, scriptName } = require('./lib/scripts');
 const { speechSettings, transcribe, listSpeechModels, silenceWav } = require('./lib/speech');
+const { MAX_STORED_PICTURES, trimStoredPictures, withoutPictureNotes } = require('./lib/pictures');
 
 /**
  * Text blocks of the model messages of one transcript entry.
@@ -724,6 +725,7 @@ class PiAgent extends utils.Adapter {
             // an unreadable list is dropped later by resumePending
         }
         await this.purgeConversations();
+        this.trimPictures();
         const { storage, migrated } = await openStore(utils.getAbsoluteInstanceDataDir(this), this.context, {
             pendingCount,
             log: this.log,
@@ -1784,6 +1786,25 @@ class PiAgent extends utils.Adapter {
     }
 
     /**
+     * At the start, before the store is opened: keep only the newest pictures in the store (lib/pictures.js).
+     * A failure leaves the store as it was; the agent starts in any case.
+     */
+    trimPictures() {
+        try {
+            const { removed, skipped } = trimStoredPictures(utils.getAbsoluteInstanceDataDir(this));
+            if (skipped) {
+                this.log.warn(`Old pictures are not removed from the store: ${skipped}`);
+            } else if (removed > 0) {
+                this.log.info(
+                    `${removed} old picture(s) removed from the store, the newest ${MAX_STORED_PICTURES} are kept`,
+                );
+            }
+        } catch (e) {
+            this.log.warn(`Old pictures could not be removed from the store: ${e.message}`);
+        }
+    }
+
+    /**
      * At the start, before the store is opened: put a backup chosen for restore in place, with its chat map.
      * Requests that were waiting belong to the replaced conversations and are dropped.
      */
@@ -2286,7 +2307,7 @@ class PiAgent extends utils.Adapter {
             if (entries[i].kind !== 'pi.assistant') {
                 continue;
             }
-            const answer = answerText(entries[i].model || []);
+            const answer = withoutPictureNotes(answerText(entries[i].model || []));
             if (answer) {
                 return answer;
             }

@@ -1584,6 +1584,19 @@ const DESC = [
 ];
 /** common.news per version, newest first; the repository builder keeps at most seven. */
 const NEWS = {};
+NEWS['0.9.4'] = [
+    'Pictures go to the model only once: the model keeps notes of what a picture shows, later questions get the notes instead of the picture, which saves tokens. The store keeps the newest 20 pictures, older ones are removed at the start',
+    'Bilder gehen nur einmal an das Modell: es hält in Notizen fest, was ein Bild zeigt, spätere Fragen bekommen die Notizen statt des Bildes, das spart Tokens. Der Speicher behält die neuesten 20 Bilder, ältere werden beim Start entfernt',
+    'Картинки уходят модели только один раз: модель записывает в заметки, что на картинке, следующие вопросы получают заметки вместо картинки, это экономит токены. В хранилище остаются 20 последних картинок, более старые удаляются при старте',
+    'As imagens vão para o modelo só uma vez: o modelo anota o que uma imagem mostra, as perguntas seguintes recebem as notas em vez da imagem, o que poupa tokens. O armazenamento guarda as 20 imagens mais recentes, as mais antigas são removidas no arranque',
+    'Afbeeldingen gaan maar één keer naar het model: het model noteert wat een afbeelding toont, latere vragen krijgen de notities in plaats van de afbeelding, dat spaart tokens. De opslag bewaart de nieuwste 20 afbeeldingen, oudere worden bij het starten verwijderd',
+    'Les images ne vont qu’une fois au modèle : il note ce que montre une image, les questions suivantes reçoivent les notes au lieu de l’image, ce qui économise des tokens. Le stockage garde les 20 images les plus récentes, les plus anciennes sont supprimées au démarrage',
+    'Le immagini vanno al modello una sola volta: il modello annota cosa mostra un’immagine, le domande successive ricevono le note invece dell’immagine, il che fa risparmiare token. L’archivio conserva le 20 immagini più recenti, quelle più vecchie vengono rimosse all’avvio',
+    'Las imágenes van al modelo solo una vez: el modelo anota lo que muestra una imagen, las preguntas siguientes reciben las notas en lugar de la imagen, lo que ahorra tokens. El almacén guarda las 20 imágenes más recientes, las más antiguas se eliminan al iniciar',
+    'Obrazy trafiają do modelu tylko raz: model zapisuje w notatkach, co pokazuje obraz, kolejne pytania dostają notatki zamiast obrazu, co oszczędza tokeny. Magazyn trzyma 20 najnowszych obrazów, starsze są usuwane przy starcie',
+    'Зображення надходять моделі лише один раз: модель записує в нотатки, що на зображенні, наступні запитання отримують нотатки замість зображення, це заощаджує токени. У сховищі лишаються 20 останніх зображень, старіші видаляються під час запуску',
+    '图片只发送给模型一次：模型会记下图片的内容，之后的问题得到这些笔记而不是图片，从而节省 token。存储中保留最新的 20 张图片，更早的图片在启动时删除',
+];
 NEWS['0.9.3'] = [
     'Pictures in "ask": up to 4 pictures (JPEG, PNG, GIF, WebP, up to about 3.9 MB each) go to the model with the text, a request may consist of pictures only; ioBroker.assistant passes on the photos of Telegram this way. Other files and larger pictures are dropped with a warning, so a refused picture cannot block the conversation',
     'Bilder in „ask“: bis zu 4 Bilder (JPEG, PNG, GIF, WebP, je bis etwa 3,9 MB) gehen mit dem Text an das Modell, eine Anfrage darf nur aus Bildern bestehen; so gibt ioBroker.assistant die Fotos aus Telegram weiter. Andere Dateien und größere Bilder werden mit einer Warnung verworfen, damit ein abgelehntes Bild das Gespräch nicht blockiert',

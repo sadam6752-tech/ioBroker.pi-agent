@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.9.3",
+		"version": "0.9.4",
 		"news": {
+			"0.9.4": {
+				"en": "Pictures go to the model only once: the model keeps notes of what a picture shows, later questions get the notes instead of the picture, which saves tokens. The store keeps the newest 20 pictures, older ones are removed at the start",
+				"de": "Bilder gehen nur einmal an das Modell: es hält in Notizen fest, was ein Bild zeigt, spätere Fragen bekommen die Notizen statt des Bildes, das spart Tokens. Der Speicher behält die neuesten 20 Bilder, ältere werden beim Start entfernt",
+				"ru": "Картинки уходят модели только один раз: модель записывает в заметки, что на картинке, следующие вопросы получают заметки вместо картинки, это экономит токены. В хранилище остаются 20 последних картинок, более старые удаляются при старте",
+				"pt": "As imagens vão para o modelo só uma vez: o modelo anota o que uma imagem mostra, as perguntas seguintes recebem as notas em vez da imagem, o que poupa tokens. O armazenamento guarda as 20 imagens mais recentes, as mais antigas são removidas no arranque",
+				"nl": "Afbeeldingen gaan maar één keer naar het model: het model noteert wat een afbeelding toont, latere vragen krijgen de notities in plaats van de afbeelding, dat spaart tokens. De opslag bewaart de nieuwste 20 afbeeldingen, oudere worden bij het starten verwijderd",
+				"fr": "Les images ne vont qu’une fois au modèle : il note ce que montre une image, les questions suivantes reçoivent les notes au lieu de l’image, ce qui économise des tokens. Le stockage garde les 20 images les plus récentes, les plus anciennes sont supprimées au démarrage",
+				"it": "Le immagini vanno al modello una sola volta: il modello annota cosa mostra un’immagine, le domande successive ricevono le note invece dell’immagine, il che fa risparmiare token. L’archivio conserva le 20 immagini più recenti, quelle più vecchie vengono rimosse all’avvio",
+				"es": "Las imágenes van al modelo solo una vez: el modelo anota lo que muestra una imagen, las preguntas siguientes reciben las notas en lugar de la imagen, lo que ahorra tokens. El almacén guarda las 20 imágenes más recientes, las más antiguas se eliminan al iniciar",
+				"pl": "Obrazy trafiają do modelu tylko raz: model zapisuje w notatkach, co pokazuje obraz, kolejne pytania dostają notatki zamiast obrazu, co oszczędza tokeny. Magazyn trzyma 20 najnowszych obrazów, starsze są usuwane przy starcie",
+				"uk": "Зображення надходять моделі лише один раз: модель записує в нотатки, що на зображенні, наступні запитання отримують нотатки замість зображення, це заощаджує токени. У сховищі лишаються 20 останніх зображень, старіші видаляються під час запуску",
+				"zh-cn": "图片只发送给模型一次：模型会记下图片的内容，之后的问题得到这些笔记而不是图片，从而节省 token。存储中保留最新的 20 张图片，更早的图片在启动时删除"
+			},
 			"0.9.3": {
 				"en": "Pictures in \"ask\": up to 4 pictures (JPEG, PNG, GIF, WebP, up to about 3.9 MB each) go to the model with the text, a request may consist of pictures only; ioBroker.assistant passes on the photos of Telegram this way. Other files and larger pictures are dropped with a warning, so a refused picture cannot block the conversation",
 				"de": "Bilder in „ask“: bis zu 4 Bilder (JPEG, PNG, GIF, WebP, je bis etwa 3,9 MB) gehen mit dem Text an das Modell, eine Anfrage darf nur aus Bildern bestehen; so gibt ioBroker.assistant die Fotos aus Telegram weiter. Andere Dateien und größere Bilder werden mit einer Warnung verworfen, damit ein abgelehntes Bild das Gespräch nicht blockiert",
@@ -80,19 +93,6 @@
 				"pl": "Limity: najwyżej 10 żądań na minutę na rozmowę (ustawienie) zatrzymuje pętlę, zanim model zostanie zapytany; opcjonalny limit tokenów dziennie; modele OpenRouter spoza katalogu dostają ceny z OpenRouter",
 				"uk": "Ліміти: не більше 10 запитів за хвилину на розмову (налаштування) зупиняють петлю до звернення до моделі; необовʼязковий ліміт токенів на день; моделі OpenRouter поза каталогом отримують ціни від OpenRouter",
 				"zh-cn": "限制：每个对话每分钟最多 10 个请求（设置），在询问模型之前阻止循环；可选的每日令牌限制；目录外的 OpenRouter 模型从 OpenRouter 获取价格"
-			},
-			"0.8.7": {
-				"en": "Update of the agent runtime to pi-durable 1.5.0: the tool schemas are built with pi-schema (the same JSON Schema), the chat history is read from the active context of the conversation",
-				"de": "Aktualisierung der Agenten-Laufzeit auf pi-durable 1.5.0: die Schemas der Werkzeuge entstehen mit pi-schema (dasselbe JSON Schema), der Chatverlauf wird aus dem aktiven Kontext des Gesprächs gelesen",
-				"ru": "Обновление среды агента до pi-durable 1.5.0: схемы инструментов строятся через pi-schema (те же JSON Schema), история чата читается из активного контекста разговора",
-				"pt": "Atualização do runtime do agente para pi-durable 1.5.0: os esquemas das ferramentas são criados com pi-schema (o mesmo JSON Schema), o histórico do chat é lido do contexto ativo da conversa",
-				"nl": "Update van de agent-runtime naar pi-durable 1.5.0: de schema’s van de tools worden met pi-schema gebouwd (hetzelfde JSON Schema), de chatgeschiedenis wordt uit de actieve context van het gesprek gelezen",
-				"fr": "Mise à jour du moteur de l'agent vers pi-durable 1.5.0 : les schémas des outils sont construits avec pi-schema (le même JSON Schema), l'historique du chat est lu dans le contexte actif de la conversation",
-				"it": "Aggiornamento del runtime dell'agente a pi-durable 1.5.0: gli schemi degli strumenti sono creati con pi-schema (lo stesso JSON Schema), la cronologia della chat viene letta dal contesto attivo della conversazione",
-				"es": "Actualización del entorno del agente a pi-durable 1.5.0: los esquemas de las herramientas se crean con pi-schema (el mismo JSON Schema), el historial del chat se lee del contexto activo de la conversación",
-				"pl": "Aktualizacja środowiska agenta do pi-durable 1.5.0: schematy narzędzi są budowane przez pi-schema (ten sam JSON Schema), historia czatu jest czytana z aktywnego kontekstu rozmowy",
-				"uk": "Оновлення середовища агента до pi-durable 1.5.0: схеми інструментів будуються через pi-schema (ті самі JSON Schema), історія чату читається з активного контексту розмови",
-				"zh-cn": "代理运行时更新到 pi-durable 1.5.0：工具模式改用 pi-schema 构建（JSON Schema 相同），聊天记录从对话的活动上下文中读取"
 			}
 		},
 		"titleLang": {

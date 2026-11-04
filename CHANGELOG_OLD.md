@@ -1,5 +1,11 @@
 # Older Changelog
 
+### 0.8.7 (2026-11-03)
+
+- Update of the agent runtime to pi-durable 1.5.0 (`@earendil-works/*` 1.5.0): the tool schemas are built with
+  `@earendil-works/pi-schema` instead of TypeBox (the same JSON Schema), the admin chat history and the answers are
+  read from the active context of the conversation
+
 ### 0.8.6 (2026-11-03)
 
 - OpenRouter: a model that the catalog of the installed version does not list yet (e.g. `minimax/minimax-m3.1-flash`)
