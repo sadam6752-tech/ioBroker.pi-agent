@@ -1584,6 +1584,19 @@ const DESC = [
 ];
 /** common.news per version, newest first; the repository builder keeps at most seven. */
 const NEWS = {};
+NEWS['0.9.2'] = [
+    'Telegram: a warning in the log when the telegram instance also hands messages to an assistant instance (since telegram 6.1.0 also voice messages) or to text2command, because then every message gets two answers',
+    'Telegram: eine Warnung im Log, wenn die Telegram-Instanz Nachrichten auch an eine Assistant-Instanz (seit telegram 6.1.0 auch Sprachnachrichten) oder an text2command weitergibt, denn dann bekommt jede Nachricht zwei Antworten',
+    'Telegram: предупреждение в логе, если экземпляр telegram передаёт сообщения также экземпляру assistant (с telegram 6.1.0 и голосовые) или text2command, потому что тогда на каждое сообщение приходят два ответа',
+    'Telegram: um aviso no registo quando a instância do telegram também passa as mensagens a uma instância do assistant (desde o telegram 6.1.0 também as mensagens de voz) ou ao text2command, porque então cada mensagem recebe duas respostas',
+    'Telegram: een waarschuwing in het logboek wanneer de telegram-instantie berichten ook doorgeeft aan een assistant-instantie (sinds telegram 6.1.0 ook spraakberichten) of aan text2command, want dan krijgt elk bericht twee antwoorden',
+    'Telegram : un avertissement dans le journal lorsque l’instance telegram transmet aussi les messages à une instance assistant (depuis telegram 6.1.0 aussi les messages vocaux) ou à text2command, car chaque message reçoit alors deux réponses',
+    'Telegram: un avviso nel log quando l’istanza telegram passa i messaggi anche a un’istanza assistant (da telegram 6.1.0 anche i messaggi vocali) o a text2command, perché allora ogni messaggio riceve due risposte',
+    'Telegram: un aviso en el registro cuando la instancia de telegram también pasa los mensajes a una instancia de assistant (desde telegram 6.1.0 también los mensajes de voz) o a text2command, porque entonces cada mensaje recibe dos respuestas',
+    'Telegram: ostrzeżenie w logu, gdy instancja telegram przekazuje wiadomości także do instancji assistant (od telegram 6.1.0 również głosowe) lub do text2command, bo wtedy każda wiadomość dostaje dwie odpowiedzi',
+    'Telegram: попередження в журналі, якщо екземпляр telegram передає повідомлення також екземпляру assistant (з telegram 6.1.0 і голосові) або text2command, бо тоді на кожне повідомлення приходять дві відповіді',
+    'Telegram：当 telegram 实例同时把消息交给 assistant 实例（自 telegram 6.1.0 起也包括语音消息）或 text2command 时，日志中会给出警告，因为此时每条消息都会得到两个回答',
+];
 NEWS['0.9.1'] = [
     'Confirmation by voice: besides the plain yes word, "okay", "klar", "конечно" and the like count as yes, also with "bitte" or "please", and so do "Ya" and "Yup", which Whisper made of a short spoken "Ja"; the model no longer tells a voice user to press a button',
     'Bestätigung per Sprache: neben dem reinen Ja-Wort zählen auch „okay“, „klar“, „конечно“ und ähnliche als Ja, auch mit „bitte“ oder „please“, ebenso „Ya“ und „Yup“, die Whisper aus einem kurz gesprochenen „Ja“ machte; das Modell fordert Sprachnutzer nicht mehr auf, eine Schaltfläche zu drücken',

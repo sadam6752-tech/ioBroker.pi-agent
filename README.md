@@ -498,6 +498,11 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.9.2 (2026-11-04)
+
+- Telegram: a warning in the log when the telegram instance also hands messages to an assistant instance (since
+  telegram 6.1.0 also voice messages) or to text2command, because then every message gets two answers
+
 ### 0.9.1 (2026-11-03)
 
 - Confirmation by voice: besides the plain yes word, "okay", "klar", "конечно" and the like count as yes, also with
@@ -536,12 +541,6 @@ the last copy.
   works with conservative limits instead of failing with "Unknown model" / `no_model`
 - After a change of the model, requests from sendTo callers (e.g. assistant) that a restart cut off use the new model
   instead of failing with `no_model`
-
-### 0.8.5 (2026-11-02)
-
-- Backups: the lists of backups show the time in the time zone of the house (e.g. `2026-11-02 18:31:40
-  (Europe/Berlin) · by hand`) instead of UTC; a backup made at 18:31 read "17:31 UTC", and the wrong one was easily
-  restored
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

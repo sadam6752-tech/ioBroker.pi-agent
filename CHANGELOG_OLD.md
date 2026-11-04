@@ -1,5 +1,11 @@
 # Older Changelog
 
+### 0.8.5 (2026-11-02)
+
+- Backups: the lists of backups show the time in the time zone of the house (e.g. `2026-11-02 18:31:40
+  (Europe/Berlin) · by hand`) instead of UTC; a backup made at 18:31 read "17:31 UTC", and the wrong one was easily
+  restored
+
 ### 0.8.4 (2026-11-02)
 
 - Code mode (setting, off by default): for a question with several steps the agent writes a short script that calls
