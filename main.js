@@ -752,11 +752,37 @@ class PiAgent extends utils.Adapter {
             this.log.info(
                 `${driver.label}: listening on ${instance} for ${allowed.size} allowed user(s)${prefix ? `, prefix "${prefix}"` : ''}`,
             );
+            await this.warnOfSecondAnswer(instance, driver.label);
             // the telegram adapter saves every voice message and writes its path to communicate.pathFile
             if (voice && speech.service && driver.voiceMessages) {
                 await this.subscribeForeignStatesAsync(`${instance}.communicate.pathFile`);
                 this.log.info(
                     `${driver.label}: voice messages on ${instance} are recognized by ${speech.service === 'openrouter' ? 'OpenRouter' : speech.baseUrl} (${speech.model || 'no model'})`,
+                );
+            }
+        }
+    }
+
+    /**
+     * The telegram adapter can hand messages to text2command or, since 6.1.0, to an assistant instance, voice
+     * messages included. That instance then answers in the chat too: every message gets two answers.
+     *
+     * @param {string} instance messenger instance
+     * @param {string} label name of the messenger
+     */
+    async warnOfSecondAnswer(instance, label) {
+        let native;
+        try {
+            native = (await this.getForeignObjectAsync(`system.adapter.${instance}`))?.native;
+        } catch {
+            return; // only a hint, the chat works without it
+        }
+        const fields = { assistantInstance: 'assistant instance', text2command: 'text2command' };
+        for (const [key, name] of Object.entries(fields)) {
+            const target = native?.[key];
+            if (typeof target === 'string' && target.trim()) {
+                this.log.warn(
+                    `${label} ${instance} also hands messages to ${target.trim()} ("${name}" in its settings): both answer, every message gets two answers. Clear that field if the agent alone should answer.`,
                 );
             }
         }

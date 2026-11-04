@@ -150,6 +150,30 @@ test('Telegram is off when no instance is configured', async () => {
     await stopAgent(agent);
 });
 
+test('a telegram instance that also hands messages to assistant or text2command gets a warning', async () => {
+    const instance = native => ({ type: 'instance', common: { name: 'telegram' }, native });
+    const { agent } = await startAgent({
+        dataDir: tmp(),
+        config: {
+            messengers: [
+                { enabled: true, instance: TG, users: '1' },
+                { enabled: true, instance: 'telegram.1', users: '1' },
+            ],
+        },
+        seed: {
+            objects: {
+                [`system.adapter.${TG}`]: instance({ assistantInstance: 'assistant.0', text2command: '' }),
+                'system.adapter.telegram.1': instance({ assistantInstance: '', text2command: '' }),
+            },
+        },
+        responses: [],
+    });
+    const warnings = agent.logs.filter(([lvl, m]) => lvl === 'warn' && m.includes('two answers'));
+    assert.equal(warnings.length, 1);
+    assert.match(warnings[0][1], /telegram\.0 also hands messages to assistant\.0 \("assistant instance"/);
+    await stopAgent(agent);
+});
+
 test('Markdown in an answer is sent as Telegram HTML', async () => {
     const f = await faux();
     const { agent, db } = await startAgent({

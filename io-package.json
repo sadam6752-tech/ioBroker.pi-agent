@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.9.1",
+		"version": "0.9.2",
 		"news": {
+			"0.9.2": {
+				"en": "Telegram: a warning in the log when the telegram instance also hands messages to an assistant instance (since telegram 6.1.0 also voice messages) or to text2command, because then every message gets two answers",
+				"de": "Telegram: eine Warnung im Log, wenn die Telegram-Instanz Nachrichten auch an eine Assistant-Instanz (seit telegram 6.1.0 auch Sprachnachrichten) oder an text2command weitergibt, denn dann bekommt jede Nachricht zwei Antworten",
+				"ru": "Telegram: предупреждение в логе, если экземпляр telegram передаёт сообщения также экземпляру assistant (с telegram 6.1.0 и голосовые) или text2command, потому что тогда на каждое сообщение приходят два ответа",
+				"pt": "Telegram: um aviso no registo quando a instância do telegram também passa as mensagens a uma instância do assistant (desde o telegram 6.1.0 também as mensagens de voz) ou ao text2command, porque então cada mensagem recebe duas respostas",
+				"nl": "Telegram: een waarschuwing in het logboek wanneer de telegram-instantie berichten ook doorgeeft aan een assistant-instantie (sinds telegram 6.1.0 ook spraakberichten) of aan text2command, want dan krijgt elk bericht twee antwoorden",
+				"fr": "Telegram : un avertissement dans le journal lorsque l’instance telegram transmet aussi les messages à une instance assistant (depuis telegram 6.1.0 aussi les messages vocaux) ou à text2command, car chaque message reçoit alors deux réponses",
+				"it": "Telegram: un avviso nel log quando l’istanza telegram passa i messaggi anche a un’istanza assistant (da telegram 6.1.0 anche i messaggi vocali) o a text2command, perché allora ogni messaggio riceve due risposte",
+				"es": "Telegram: un aviso en el registro cuando la instancia de telegram también pasa los mensajes a una instancia de assistant (desde telegram 6.1.0 también los mensajes de voz) o a text2command, porque entonces cada mensaje recibe dos respuestas",
+				"pl": "Telegram: ostrzeżenie w logu, gdy instancja telegram przekazuje wiadomości także do instancji assistant (od telegram 6.1.0 również głosowe) lub do text2command, bo wtedy każda wiadomość dostaje dwie odpowiedzi",
+				"uk": "Telegram: попередження в журналі, якщо екземпляр telegram передає повідомлення також екземпляру assistant (з telegram 6.1.0 і голосові) або text2command, бо тоді на кожне повідомлення приходять дві відповіді",
+				"zh-cn": "Telegram：当 telegram 实例同时把消息交给 assistant 实例（自 telegram 6.1.0 起也包括语音消息）或 text2command 时，日志中会给出警告，因为此时每条消息都会得到两个回答"
+			},
 			"0.9.1": {
 				"en": "Confirmation by voice: besides the plain yes word, \"okay\", \"klar\", \"конечно\" and the like count as yes, also with \"bitte\" or \"please\", and so do \"Ya\" and \"Yup\", which Whisper made of a short spoken \"Ja\"; the model no longer tells a voice user to press a button",
 				"de": "Bestätigung per Sprache: neben dem reinen Ja-Wort zählen auch „okay“, „klar“, „конечно“ und ähnliche als Ja, auch mit „bitte“ oder „please“, ebenso „Ya“ und „Yup“, die Whisper aus einem kurz gesprochenen „Ja“ machte; das Modell fordert Sprachnutzer nicht mehr auf, eine Schaltfläche zu drücken",
@@ -80,19 +93,6 @@
 				"pl": "OpenRouter: model, którego katalog jeszcze nie zna (np. minimax/minimax-m3.1-flash), działa z ostrożnymi limitami; po zmianie modelu żądania assistant przerwane restartem używają nowego modelu",
 				"uk": "OpenRouter: модель, якої ще немає в каталозі (наприклад, minimax/minimax-m3.1-flash), працює з обережними лімітами; після зміни моделі перервані перезапуском запити assistant ідуть на нову модель",
 				"zh-cn": "OpenRouter：目录中尚未列出的模型（例如 minimax/minimax-m3.1-flash）以保守的限制运行；更换模型后，因重启而中断的 assistant 请求会使用新模型"
-			},
-			"0.8.5": {
-				"en": "Backups: the lists of backups show the time in the time zone of the house instead of UTC, so the right backup is restored",
-				"de": "Backups: die Listen der Backups zeigen die Zeit in der Zeitzone des Hauses statt in UTC, damit das richtige Backup wiederhergestellt wird",
-				"ru": "Бэкапы: в списках бэкапов время показано в часовом поясе дома, а не в UTC, чтобы восстанавливался нужный бэкап",
-				"pt": "Backups: as listas de backups mostram a hora no fuso horário da casa em vez de UTC, para que seja reposto o backup certo",
-				"nl": "Back-ups: de lijsten met back-ups tonen de tijd in de tijdzone van het huis in plaats van UTC, zodat de juiste back-up wordt hersteld",
-				"fr": "Sauvegardes : les listes de sauvegardes affichent l'heure dans le fuseau horaire de la maison au lieu de l'UTC, pour restaurer la bonne sauvegarde",
-				"it": "Backup: gli elenchi dei backup mostrano l'ora nel fuso orario della casa invece che in UTC, così si ripristina il backup giusto",
-				"es": "Copias de seguridad: las listas muestran la hora en la zona horaria de la casa en lugar de UTC, para restaurar la copia correcta",
-				"pl": "Kopie zapasowe: listy kopii pokazują czas w strefie czasowej domu zamiast UTC, aby przywrócić właściwą kopię",
-				"uk": "Бекапи: у списках бекапів час показано в часовому поясі дому, а не в UTC, щоб відновлювався потрібний бекап",
-				"zh-cn": "备份：备份列表按家中的时区显示时间，而不是 UTC，以便恢复正确的备份"
 			}
 		},
 		"titleLang": {
