@@ -498,6 +498,12 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### **WORK IN PROGRESS**
+
+- Pictures in `ask`: `images: [{ data: <base64>, mimeType }]` (JPEG, PNG, GIF, WebP, at most 4) go to the model with
+  the text; a request may consist of pictures only. ioBroker.assistant passes on the photos of Telegram this way. A
+  model without image input gets a note instead; `chat.pending` keeps only the text
+
 ### 0.9.1 (2026-11-03)
 
 - Confirmation by voice: besides the plain yes word, "okay", "klar", "конечно" and the like count as yes, also with

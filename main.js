@@ -170,6 +170,48 @@ function sendToTarget(from, message) {
     };
 }
 
+/** At most this many pictures per "ask" (ioBroker.assistant sends up to 4) */
+const MAX_ASK_IMAGES = 4;
+
+/**
+ * Pictures of an "ask" as image blocks of pi-ai: ioBroker.assistant passes on the photos of a Telegram message as
+ * `[{ data: base64, mimeType }]`. Anything that is not a JPEG, PNG, GIF or WebP is dropped. A model without image
+ * input gets a note from pi-ai instead.
+ *
+ * @param {unknown} raw the `images` field of the message
+ * @returns {Array<{ type: 'image', data: string, mimeType: string }>} image blocks
+ */
+function askImages(raw) {
+    if (!Array.isArray(raw)) {
+        return [];
+    }
+    return raw
+        .filter(
+            i => i && typeof i.data === 'string' && i.data && /^image\/(jpeg|png|gif|webp)$/.test(String(i.mimeType)),
+        )
+        .slice(0, MAX_ASK_IMAGES)
+        .map(i => ({ type: 'image', data: i.data, mimeType: String(i.mimeType) }));
+}
+
+/**
+ * What of a request is kept in the pending list (`chat.pending`): the text, a mark for pictures. The pictures
+ * themselves are part of the submission in the store; a restart finds it by the request id.
+ *
+ * @param {string | Array<{ type: string, text?: string }>} content user content
+ * @returns {string} text
+ */
+function contentText(content) {
+    if (typeof content === 'string') {
+        return content;
+    }
+    const images = content.filter(b => b.type === 'image').length;
+    const text = content
+        .filter(b => b.type === 'text')
+        .map(b => b.text)
+        .join('\n');
+    return [images ? `[${images > 1 ? `${images} pictures` : 'picture'}]` : '', text].filter(Boolean).join(' ');
+}
+
 class PiAgent extends utils.Adapter {
     /** @param {Partial<utils.AdapterOptions>} [options] adapter options */
     constructor(options = {}) {
@@ -2115,7 +2157,7 @@ class PiAgent extends utils.Adapter {
     /**
      * Submit a request exactly once and return the answer text.
      *
-     * @param {string} content user text
+     * @param {string | Array<object>} content user text, or text and image blocks
      * @param {string} requestId stable id, so a retry finds the original submission
      * @param {{ kind: string, instance?: string, chatId?: string }} [target] where the answer goes (kept for a restart)
      * @param {{ resumed?: boolean }} [options] resumed: a request accepted before a restart, which no limit refuses
@@ -2137,7 +2179,10 @@ class PiAgent extends utils.Adapter {
             if (!this.root) {
                 throw new Error('Agent is not running');
             }
-            this.pending = this.pending.filter(p => p.requestId !== requestId).concat({ requestId, content, target });
+            // only the text: base64 pictures do not belong in a state
+            this.pending = this.pending
+                .filter(p => p.requestId !== requestId)
+                .concat({ requestId, content: contentText(content), target });
             await this.savePending();
         })();
         const previous = this.queues.get(key) || Promise.resolve();
@@ -2743,10 +2788,13 @@ class PiAgent extends utils.Adapter {
         let result;
         try {
             const message = typeof obj.message === 'string' ? { text: obj.message } : obj.message || {};
-            if (!message.text) {
+            const images = askImages(message.images);
+            const text = String(message.text || '');
+            if (!text && !images.length) {
                 throw new Error('Missing "text"');
             }
-            const requestId = message.requestId || requestIdFor(crypto, Date.now(), message.text);
+            const requestId =
+                message.requestId || requestIdFor(crypto, Date.now(), text || `${images.length} image(s)`);
             const target = sendToTarget(obj.from, message);
             const key = this.chatKeyOf(target);
             const language = String(message.language ?? '')
@@ -2759,14 +2807,15 @@ class PiAgent extends utils.Adapter {
             let run;
             if (key && this.textConfirmations.has(key)) {
                 // the answer to a question of the agent: decided here, not by the model
-                const yes = isYes(message.text);
+                const yes = isYes(text);
                 // what was heard, so a "no" the user did not say can be traced (speech recognition: "Ja" → "Я")
                 this.log.info(
-                    `Answer by text in ${key}: "${spokenAnswer(message.text).slice(0, 100)}" → ${yes ? 'yes' : 'no'}`,
+                    `Answer by text in ${key}: "${spokenAnswer(text).slice(0, 100)}" → ${yes ? 'yes' : 'no'}`,
                 );
                 run = this.textConfirmations.decide(key, yes);
             } else {
-                run = this.ask(String(message.text), String(requestId), target);
+                const content = images.length ? [...(text ? [{ type: 'text', text }] : []), ...images] : text;
+                run = this.ask(content, String(requestId), target);
             }
             // a conversation of its own may get a question to confirm before the answer
             result = { answer: key ? await this.textConfirmations.answerOf(key, run) : await run };
