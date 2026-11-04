@@ -86,6 +86,43 @@ test('pictures without text are a request; without both it is refused', async ()
     await stopAgent(agent);
 });
 
+test('the type comes from the content; too large, unknown and a fifth picture are dropped with a warning', async () => {
+    const f = await faux();
+    let seen;
+    const { agent } = await startAgent({
+        dataDir: tmp(),
+        responses: [
+            context => {
+                seen = context.messages.at(-1).content;
+                return f.fauxAssistantMessage('Gesehen.');
+            },
+        ],
+    });
+    const PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0]).toString('base64');
+    const huge = JPEG + 'A'.repeat(5 * 1024 * 1024);
+    const answer = await ask(agent, {
+        text: 'Was ist das?',
+        images: [
+            { data: `data:image/png;base64,${PNG}`, mimeType: 'image/jpeg' }, // wrong type named, data URL
+            { data: huge, mimeType: 'image/jpeg' },
+            { data: 'JVBERi0=', mimeType: 'image/jpeg' }, // a PDF named a JPEG
+            { data: JPEG, mimeType: 'image/jpeg' },
+            { data: JPEG, mimeType: 'image/jpeg' },
+            { data: JPEG, mimeType: 'image/jpeg' },
+            { data: JPEG, mimeType: 'image/jpeg' },
+        ],
+    });
+    assert.deepEqual(answer, { answer: 'Gesehen.' });
+    assert.deepEqual(
+        seen.slice(1).map(b => b.mimeType),
+        ['image/png', 'image/jpeg', 'image/jpeg', 'image/jpeg'],
+    );
+    assert.equal(seen[1].data, PNG);
+    const warning = agent.logs.find(([lvl, m]) => lvl === 'warn' && m.includes('not sent to the model'));
+    assert.match(warning[1], /picture 2: larger than 3\.9 MB; picture 3: no JPEG.*; picture 7: more than 4 pictures/);
+    await stopAgent(agent);
+});
+
 test('the admin page shows a mark for the pictures', () => {
     const messages = historyOf([
         {

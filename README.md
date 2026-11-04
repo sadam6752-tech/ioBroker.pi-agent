@@ -136,6 +136,22 @@ sendTo('pi-agent.0', 'ask', {
 The conversations are kept per sending instance (`pi-agent.0.telegram.chats` lists them as
 `sendTo:<instance>/<conversation>`). Changed instructions apply from the next request of the conversation on.
 
+A request can carry pictures; ioBroker.assistant passes on the photos that users send to the Telegram bot this way:
+
+```js
+sendTo('pi-agent.0', 'ask', {
+    text: 'What is this?', // optional when there are pictures
+    images: [{ data: '<base64>', mimeType: 'image/jpeg' }], // a data URL works too
+    conversation: 'telegram:Max',
+}, result => log(result.answer));
+```
+
+- JPEG, PNG, GIF and WebP, at most 4 pictures of up to about 3.9 MB each. The type is taken from the content of the
+  picture. Other files and larger pictures are dropped with a warning in the log.
+- A model without image input gets a note instead of the picture.
+- The picture stays in the history of the conversation: follow-up questions send it to the model again, which costs
+  tokens accordingly. `chat.pending` keeps only the text.
+
 Such a conversation has no buttons, so by default a write with "Confirmation required", a restart and an update are
 blocked there. With **Confirmation by text in sendTo conversations** (tab "Write permissions", off by default) the
 agent asks by text instead:
@@ -500,9 +516,11 @@ the last copy.
 
 ### **WORK IN PROGRESS**
 
-- Pictures in `ask`: `images: [{ data: <base64>, mimeType }]` (JPEG, PNG, GIF, WebP, at most 4) go to the model with
-  the text; a request may consist of pictures only. ioBroker.assistant passes on the photos of Telegram this way. A
-  model without image input gets a note instead; `chat.pending` keeps only the text
+- (@GermanBluefox) Pictures in `ask`: `images: [{ data: <base64>, mimeType }]` (JPEG, PNG, GIF, WebP, at most 4 of up
+  to about 3.9 MB) go to the model with the text; a request may consist of pictures only. ioBroker.assistant passes
+  on the photos of Telegram this way. The type is taken from the content; other files and larger pictures are dropped
+  with a warning, so a picture the model refuses cannot block the conversation. A model without image input gets a
+  note instead; `chat.pending` keeps only the text
 
 ### 0.9.2 (2026-11-04)
 

@@ -70,7 +70,7 @@ const BACKUP_COMMANDS = [
 const { resolveTimeZone, timeZoneOptions, formatLocal } = require('./lib/time');
 const { channelsFromConfig, legacyRows, chatKey, parseChatKey, migrateChats } = require('./lib/channels');
 const { createDrivers, messengerType, MESSENGER_ADAPTERS } = require('./lib/messengers');
-const { ADMIN, ADMIN_INSTRUCTIONS, historyOf, withNotices, createAdminChat } = require('./lib/admin-chat');
+const { ADMIN, ADMIN_INSTRUCTIONS, historyOf, userText, withNotices, createAdminChat } = require('./lib/admin-chat');
 const { isAllowedUser, stripPrefix, telegramRequestId } = require('./lib/telegram');
 const { TextConfirmations, isYes, spokenAnswer, languageOf, confirmationQuestion } = require('./lib/text-confirmation');
 const { createScriptHistory, scriptName } = require('./lib/scripts');
@@ -174,23 +174,60 @@ function sendToTarget(from, message) {
 const MAX_ASK_IMAGES = 4;
 
 /**
+ * Largest picture, as base64 text (about 3.9 MB of image). Anthropic refuses more than 5 MB; a refused picture stays
+ * in the conversation and would make every later question of it fail too.
+ */
+const MAX_ASK_IMAGE_BASE64 = 5 * 1024 * 1024;
+
+/**
+ * The type of a picture by its first bytes, or '' when it is no JPEG, PNG, GIF or WebP.
+ *
+ * @param {Buffer} head first bytes of the picture
+ * @returns {string} media type
+ */
+function imageTypeOf(head) {
+    if (head[0] === 0xff && head[1] === 0xd8 && head[2] === 0xff) {
+        return 'image/jpeg';
+    }
+    if (head.subarray(0, 4).toString('latin1') === '\x89PNG') {
+        return 'image/png';
+    }
+    if (head.subarray(0, 4).toString('latin1') === 'GIF8') {
+        return 'image/gif';
+    }
+    if (head.subarray(0, 4).toString('latin1') === 'RIFF' && head.subarray(8, 12).toString('latin1') === 'WEBP') {
+        return 'image/webp';
+    }
+    return '';
+}
+
+/**
  * Pictures of an "ask" as image blocks of pi-ai: ioBroker.assistant passes on the photos of a Telegram message as
- * `[{ data: base64, mimeType }]`. Anything that is not a JPEG, PNG, GIF or WebP is dropped. A model without image
- * input gets a note from pi-ai instead.
+ * `[{ data: base64, mimeType }]`. The type comes from the content, not from `mimeType`; anything that is not a JPEG,
+ * PNG, GIF or WebP, and any picture above the size limit, is dropped. A model without image input gets a note from
+ * pi-ai instead.
  *
  * @param {unknown} raw the `images` field of the message
- * @returns {Array<{ type: 'image', data: string, mimeType: string }>} image blocks
+ * @returns {{ images: Array<{ type: 'image', data: string, mimeType: string }>, dropped: string[] }} image blocks and why others were dropped
  */
 function askImages(raw) {
-    if (!Array.isArray(raw)) {
-        return [];
+    const images = [];
+    const dropped = [];
+    for (const [n, item] of (Array.isArray(raw) ? raw : []).entries()) {
+        // a data URL works too
+        const data = typeof item?.data === 'string' ? item.data.replace(/^data:[^,]*;base64,/, '').trim() : '';
+        const mimeType = data ? imageTypeOf(Buffer.from(data.slice(0, 24), 'base64')) : '';
+        if (!mimeType) {
+            dropped.push(`picture ${n + 1}: no JPEG, PNG, GIF or WebP`);
+        } else if (data.length > MAX_ASK_IMAGE_BASE64) {
+            dropped.push(`picture ${n + 1}: larger than ${Math.round((MAX_ASK_IMAGE_BASE64 * 3) / 4 / 1e5) / 10} MB`);
+        } else if (images.length >= MAX_ASK_IMAGES) {
+            dropped.push(`picture ${n + 1}: more than ${MAX_ASK_IMAGES} pictures`);
+        } else {
+            images.push({ data, mimeType });
+        }
     }
-    return raw
-        .filter(
-            i => i && typeof i.data === 'string' && i.data && /^image\/(jpeg|png|gif|webp)$/.test(String(i.mimeType)),
-        )
-        .slice(0, MAX_ASK_IMAGES)
-        .map(i => ({ type: 'image', data: i.data, mimeType: String(i.mimeType) }));
+    return { images: images.map(i => ({ type: 'image', ...i })), dropped };
 }
 
 /**
@@ -201,15 +238,7 @@ function askImages(raw) {
  * @returns {string} text
  */
 function contentText(content) {
-    if (typeof content === 'string') {
-        return content;
-    }
-    const images = content.filter(b => b.type === 'image').length;
-    const text = content
-        .filter(b => b.type === 'text')
-        .map(b => b.text)
-        .join('\n');
-    return [images ? `[${images > 1 ? `${images} pictures` : 'picture'}]` : '', text].filter(Boolean).join(' ');
+    return typeof content === 'string' ? content : userText(content);
 }
 
 class PiAgent extends utils.Adapter {
@@ -2814,7 +2843,10 @@ class PiAgent extends utils.Adapter {
         let result;
         try {
             const message = typeof obj.message === 'string' ? { text: obj.message } : obj.message || {};
-            const images = askImages(message.images);
+            const { images, dropped } = askImages(message.images);
+            if (dropped.length) {
+                this.log.warn(`ask from ${obj.from}: ${dropped.join('; ')}, not sent to the model`);
+            }
             const text = String(message.text || '');
             if (!text && !images.length) {
                 throw new Error('Missing "text"');
