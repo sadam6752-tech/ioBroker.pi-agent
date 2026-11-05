@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.9.4",
+		"version": "0.9.5",
 		"news": {
+			"0.9.5": {
+				"en": "Reminders asked on a voice satellite of ioBroker.assistant (1.4.9+) come back there: within 24 hours as a timer on the satellite (countdown, ring, the text spoken), else spoken on the satellite when due. Scheduled writes, watches and background jobs of such a conversation are told on that satellite",
+				"de": "Erinnerungen, die an einem Sprach-Satelliten von ioBroker.assistant (1.4.9+) gestellt werden, kommen dort an: innerhalb von 24 Stunden als Timer auf dem Satelliten (Countdown, Klingeln, der Text wird gesprochen), sonst zur Fälligkeit auf dem Satelliten gesprochen. Geplante Schreibvorgänge, Überwachungen und Hintergrund-Jobs eines solchen Gesprächs melden sich auf diesem Satelliten",
+				"ru": "Напоминания, заданные на голосовом сателлите ioBroker.assistant (1.4.9+), приходят туда же: в пределах 24 часов как таймер на сателлите (отсчёт, звонок, текст произносится), иначе произносятся на сателлите в нужное время. Отложенные записи, наблюдения и фоновые задачи такой беседы сообщают на этом сателлите",
+				"pt": "Os lembretes pedidos num satélite de voz do ioBroker.assistant (1.4.9+) voltam lá: dentro de 24 horas como temporizador no satélite (contagem, toque, o texto falado), senão falados no satélite na hora. Escritas agendadas, vigilâncias e tarefas em segundo plano dessa conversa avisam nesse satélite",
+				"nl": "Herinneringen die op een spraaksatelliet van ioBroker.assistant (1.4.9+) worden gevraagd, komen daar terug: binnen 24 uur als timer op de satelliet (aftellen, bellen, de tekst uitgesproken), anders op het tijdstip op de satelliet uitgesproken. Geplande schrijfacties, bewakingen en achtergrondtaken van zo een gesprek melden zich op die satelliet",
+				"fr": "Les rappels demandés sur un satellite vocal d’ioBroker.assistant (1.4.9+) y reviennent : sous 24 heures comme minuteur sur le satellite (décompte, sonnerie, le texte est dit), sinon dits sur le satellite à l’échéance. Les écritures planifiées, les surveillances et les tâches de fond d’une telle conversation s’annoncent sur ce satellite",
+				"it": "I promemoria chiesti su un satellite vocale di ioBroker.assistant (1.4.9+) tornano lì: entro 24 ore come timer sul satellite (conto alla rovescia, squillo, il testo pronunciato), altrimenti pronunciati sul satellite alla scadenza. Scritture pianificate, sorveglianze e attività in background di tale conversazione avvisano su quel satellite",
+				"es": "Los recordatorios pedidos en un satélite de voz de ioBroker.assistant (1.4.9+) vuelven allí: dentro de 24 horas como temporizador en el satélite (cuenta atrás, timbre, el texto hablado), si no, se dicen en el satélite a su hora. Las escrituras programadas, vigilancias y tareas en segundo plano de esa conversación avisan en ese satélite",
+				"pl": "Przypomnienia zadane na satelicie głosowym ioBroker.assistant (1.4.9+) wracają tam: w ciągu 24 godzin jako minutnik na satelicie (odliczanie, dzwonek, tekst wypowiedziany), w przeciwnym razie wypowiadane na satelicie w terminie. Zaplanowane zapisy, obserwacje i zadania w tle takiej rozmowy zgłaszają się na tym satelicie",
+				"uk": "Нагадування, задані на голосовому сателіті ioBroker.assistant (1.4.9+), приходять туди ж: протягом 24 годин як таймер на сателіті (відлік, дзвінок, текст вимовляється), інакше вимовляються на сателіті у потрібний час. Відкладені записи, спостереження та фонові завдання такої розмови повідомляють на цьому сателіті",
+				"zh-cn": "在 ioBroker.assistant（1.4.9+）语音卫星上设置的提醒会回到该卫星：24 小时内作为卫星上的计时器（倒计时、响铃、朗读文本），否则在到期时在该卫星上朗读。此类对话的计划写入、监视和后台任务也在该卫星上通知"
+			},
 			"0.9.4": {
 				"en": "Pictures go to the model only once: the model keeps notes of what a picture shows, later questions get the notes instead of the picture, which saves tokens. The store keeps the newest 20 pictures, older ones are removed at the start",
 				"de": "Bilder gehen nur einmal an das Modell: es hält in Notizen fest, was ein Bild zeigt, spätere Fragen bekommen die Notizen statt des Bildes, das spart Tokens. Der Speicher behält die neuesten 20 Bilder, ältere werden beim Start entfernt",
@@ -80,19 +93,6 @@
 				"pl": "Aktualizacje: list_updates jednym wywołaniem porównuje wszystkie zainstalowane adaptery z npm, łącznie z pi-agent; adapter jest znajdowany także po tytule; poproszony o ponowne sprawdzenie agent czyta wersje od nowa zamiast odpowiadać wcześniejszymi wynikami",
 				"uk": "Оновлення: list_updates одним викликом порівнює всі встановлені адаптери з npm, включно з pi-agent; адаптер знаходиться й за заголовком; коли просять перевірити знову, агент читає версії заново, а не відповідає за попередніми результатами",
 				"zh-cn": "更新：list_updates 一次调用即可将所有已安装的适配器与 npm 比较，包括 pi-agent；也可以按标题找到适配器；被要求再次检查时，代理会重新读取版本，而不是用之前的结果回答"
-			},
-			"0.8.8": {
-				"en": "Limits: at most 10 requests per minute per conversation (setting) stop a loop before the model is asked; an optional limit of tokens per day; OpenRouter models outside the catalog get their prices from OpenRouter",
-				"de": "Grenzen: höchstens 10 Anfragen pro Minute und Gespräch (Einstellung) stoppen eine Schleife, bevor das Modell gefragt wird; optionale Grenze an Tokens pro Tag; OpenRouter-Modelle außerhalb des Katalogs bekommen ihre Preise von OpenRouter",
-				"ru": "Лимиты: не больше 10 запросов в минуту на разговор (настройка) останавливают петлю до обращения к модели; необязательный лимит токенов в день; модели OpenRouter вне каталога получают цены от OpenRouter",
-				"pt": "Limites: no máximo 10 pedidos por minuto e conversa (definição) param um ciclo antes de perguntar ao modelo; limite opcional de tokens por dia; modelos do OpenRouter fora do catálogo recebem os preços do OpenRouter",
-				"nl": "Limieten: hoogstens 10 verzoeken per minuut per gesprek (instelling) stoppen een lus voordat het model wordt gevraagd; optionele limiet van tokens per dag; OpenRouter-modellen buiten de catalogus krijgen hun prijzen van OpenRouter",
-				"fr": "Limites : au plus 10 requêtes par minute et conversation (paramètre) arrêtent une boucle avant d'interroger le modèle ; limite optionnelle de jetons par jour ; les modèles OpenRouter hors catalogue reçoivent leurs prix d'OpenRouter",
-				"it": "Limiti: al massimo 10 richieste al minuto per conversazione (impostazione) fermano un ciclo prima di interpellare il modello; limite opzionale di token al giorno; i modelli OpenRouter fuori catalogo ricevono i prezzi da OpenRouter",
-				"es": "Límites: como máximo 10 peticiones por minuto y conversación (ajuste) detienen un bucle antes de preguntar al modelo; límite opcional de tokens por día; los modelos de OpenRouter fuera del catálogo reciben sus precios de OpenRouter",
-				"pl": "Limity: najwyżej 10 żądań na minutę na rozmowę (ustawienie) zatrzymuje pętlę, zanim model zostanie zapytany; opcjonalny limit tokenów dziennie; modele OpenRouter spoza katalogu dostają ceny z OpenRouter",
-				"uk": "Ліміти: не більше 10 запитів за хвилину на розмову (налаштування) зупиняють петлю до звернення до моделі; необовʼязковий ліміт токенів на день; моделі OpenRouter поза каталогом отримують ціни від OpenRouter",
-				"zh-cn": "限制：每个对话每分钟最多 10 个请求（设置），在询问模型之前阻止循环；可选的每日令牌限制；目录外的 OpenRouter 模型从 OpenRouter 获取价格"
 			}
 		},
 		"titleLang": {

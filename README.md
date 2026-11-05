@@ -188,6 +188,12 @@ middle, they continue on the next start. The answer of a request from `chat.inpu
   written, so nothing is asked.
 - **Reminders:** `remind_me` sends a message later (at most 7 days ahead) to the chat of the conversation, or to
   `chat.answer`. The reminder waits in the conversation store and survives restarts.
+- **Reminders on a voice satellite:** ioBroker.assistant 1.4.9 and newer names the satellite a request comes from
+  (`satellite`, `tts` in "ask"). A reminder asked there within the next 24 hours becomes a **timer on that satellite**
+  (sendTo `setTimer`): it counts down on the device, rings, and the text is spoken ("Erinnerung: …"). A later
+  reminder, or one an older assistant cannot set as a timer, is spoken on that satellite when it is due (its `tts`
+  state). Scheduled writes and watches of such a conversation are told there, too. In simulation mode nothing is
+  spoken. Only a `tts` state of the asking instance itself is used.
 - **History:** `get_history` reads past values (up to 31 days, averaged to at most 200 values) from the history
   instance.
 - **Usage:** `pi-agent.0.usage.*` shows input, output and total tokens and the cost in USD over all conversations
@@ -313,7 +319,8 @@ Select **OpenAI-compatible (own URL)** for any server with the OpenAI chat compl
   one of them.
 - `get_logs` reads the newest lines of the ioBroker log file (filtered by instance, level and a word, at most 50);
   `list_notifications` shows the notifications of ioBroker (the bell in admin). Both only read.
-- A message from a conversation of a `sendTo` caller (e.g. ioBroker.assistant) goes to `chat.answer`.
+- A message from a conversation of a `sendTo` caller (e.g. ioBroker.assistant) goes to `chat.answer`; from a voice
+  satellite of ioBroker.assistant 1.4.9+ it is spoken on that satellite.
 
 ## Background jobs
 
@@ -330,7 +337,8 @@ at 7, tell me the weather and the low batteries".
   conversation is woken up with the task, reads what it needs and tells the user, or stays quiet (a false alarm).
   A job that never fires costs nothing.
 - **Where it reports:** the chat the job was set up in (default), the admin chat, a messenger chat, or **by voice**:
-  the satellite of ioBroker.assistant the job was set up from (`assistant.0.satellites.<id>.tts`), else all of them
+  the satellite of ioBroker.assistant the job was set up from (`assistant.0.satellites.<id>.tts`, named by the
+  assistant since 1.4.9), else all of them
   (`assistant.0.tts.text`). Speaking needs **Write allowed** for that state in "Write permissions"; in simulation mode
   nothing is spoken. Set up by voice, the agent asks where to report.
 - **Actions only with ✅/❌:** every write, restart, command, update or script change of a job is asked in the
@@ -517,6 +525,12 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.9.5 (2026-11-05)
+
+- Reminders asked on a voice satellite of ioBroker.assistant (1.4.9+) come back there: within 24 hours as a timer on
+  the satellite (countdown, ring, the text spoken), else spoken on the satellite when due. Before, they went to
+  `chat.answer` only. Scheduled writes, watches and background jobs of such a conversation are told on that satellite
+
 ### 0.9.4 (2026-11-04)
 
 - Pictures go to the model only once: the model keeps notes of what a picture shows, later questions get the notes
@@ -552,14 +566,6 @@ the last copy.
 - Updates: `list_updates` with `npm: true` compares every installed adapter with npm in one call, pi-agent included;
   `check_npm` and `update_adapter` also find an adapter by its title. The agent is told to call the tools again when
   asked to check, instead of answering from earlier results of the conversation
-
-### 0.8.8 (2026-11-03)
-
-- Limits: at most 10 requests per minute per conversation (setting) stop a loop of a script or another adapter
-  before the model is asked; an optional limit of tokens per day stops all requests until midnight. New states
-  `usage.tokensToday` and `usage.limitReached`
-- OpenRouter: a model outside the catalog gets its prices, context window and answer length from the public model
-  list of OpenRouter, so its cost is counted
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

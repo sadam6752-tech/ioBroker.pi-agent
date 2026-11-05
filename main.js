@@ -171,6 +171,41 @@ function sendToTarget(from, message) {
     };
 }
 
+/**
+ * The voice satellite an "ask" came from (ioBroker.assistant 1.4.9+: `satellite` and `tts`), to speak on it later.
+ * The tts state must belong to the caller, so an "ask" cannot make pi-agent write any other state.
+ *
+ * @param {string} from sender of the message, e.g. "system.adapter.assistant.0"
+ * @param {{ satellite?: unknown, tts?: unknown }} message the message
+ * @returns {{ instance: string, satellite: string, tts: string } | undefined} the satellite
+ */
+function callerVoice(from, message) {
+    const instance = String(from || '').replace(/^system\.adapter\./, '');
+    const tts = String(message.tts ?? '').trim();
+    if (!instance || !tts.startsWith(`${instance}.`) || /[\s*?]/.test(tts) || tts.length > 200) {
+        return undefined;
+    }
+    const satellite = String(message.satellite ?? '')
+        .trim()
+        .slice(0, 100);
+    return { instance, satellite, tts };
+}
+
+/** "Reminder" in the language of a satellite, before the text it speaks. */
+const REMINDER_WORD = {
+    de: 'Erinnerung',
+    en: 'Reminder',
+    ru: 'Напоминание',
+    uk: 'Нагадування',
+    fr: 'Rappel',
+    nl: 'Herinnering',
+    it: 'Promemoria',
+    es: 'Recordatorio',
+    pl: 'Przypomnienie',
+    pt: 'Lembrete',
+    'zh-cn': '提醒',
+};
+
 /** At most this many pictures per "ask" (ioBroker.assistant sends up to 4) */
 const MAX_ASK_IMAGES = 4;
 
@@ -281,6 +316,11 @@ class PiAgent extends utils.Adapter {
          * confirm. A voice satellite listens in it; a question in another language gets an answer it cannot hear.
          */
         this.callerLanguages = new Map();
+        /**
+         * Per sendTo conversation: the voice satellite of its last "ask" (ioBroker.assistant 1.4.9+), so reminders,
+         * scheduled writes and watches are told on the satellite they were asked on: instance, satellite, tts.
+         */
+        this.callerVoices = new Map();
         /** Questions, errors and reminders of the chat in the admin tab, per ioBroker user. */
         this.adminChat = createAdminChat(this);
         /** Long-term memory shared by all conversations (lib/memory.js). */
@@ -681,7 +721,9 @@ class PiAgent extends utils.Adapter {
                 codeMode: this.config.codeMode === true,
                 instructions: String(this.config.instructions || ''),
                 requestConfirmation: request => this.requestConfirmation(request),
-                deliverReminder: (conversationId, text) => this.deliverReminder(conversationId, text),
+                deliverReminder: (conversationId, text, voice) => this.deliverReminder(conversationId, text, voice),
+                voiceOf: conversationId => this.voiceOf(conversationId),
+                satelliteTimer: (voice, seconds, text) => this.satelliteTimer(voice, seconds, text),
                 historyInstance: () => this.historyInstance(),
                 restartList: this.restartList,
                 restartInstance: instance => this.restartInstance(instance),
@@ -1138,12 +1180,67 @@ class PiAgent extends utils.Adapter {
     }
 
     /**
-     * A reminder is due: send it to the messenger chat of its conversation, or to chat.answer.
+     * The voice satellite a conversation was last asked on, with its language.
+     *
+     * @param {unknown} conversationId conversation id
+     * @returns {{ instance: string, satellite: string, tts: string, language?: string } | undefined} satellite
+     */
+    voiceOf(conversationId) {
+        const key = this.keyOfConversation(conversationId);
+        const voice = key ? this.callerVoices.get(key) : undefined;
+        if (!voice) {
+            return undefined;
+        }
+        const language = this.callerLanguages.get(key);
+        return language ? { ...voice, language } : { ...voice };
+    }
+
+    /**
+     * Set a timer with a text on a voice satellite (ioBroker.assistant 1.4.9+, sendTo "setTimer"): it counts down on
+     * the device, rings, and the text is spoken.
+     *
+     * @param {{ instance: string, satellite: string, language?: string }} voice the satellite
+     * @param {number} seconds from now
+     * @param {string} text what to remind of
+     * @returns {Promise<{ id?: unknown, fireAt?: unknown } | undefined>} the timer, undefined when the assistant
+     *     cannot set one (older version, unknown satellite, no answer)
+     */
+    async satelliteTimer(voice, seconds, text) {
+        if (!voice.satellite) {
+            return undefined;
+        }
+        const word = REMINDER_WORD[languageOf(voice.language || (await this.systemLanguage()))] || REMINDER_WORD.en;
+        try {
+            const result = await this.sendToAsync(
+                voice.instance,
+                'setTimer',
+                { satellite: voice.satellite, seconds: Math.round(seconds), name: text, announce: `${word}: ${text}` },
+                { timeout: 5000 },
+            );
+            const answer = Object(result);
+            if (answer.ok) {
+                return { id: answer.id, fireAt: answer.fireAt };
+            }
+            this.log.info(
+                `${voice.instance} set no timer on ${voice.satellite} (${JSON.stringify(result)?.slice(0, 200)}): the reminder is spoken when due`,
+            );
+        } catch (e) {
+            this.log.info(
+                `${voice.instance} set no timer on ${voice.satellite} (${e.message}): the reminder is spoken when due`,
+            );
+        }
+        return undefined;
+    }
+
+    /**
+     * A reminder is due: send it to the messenger chat of its conversation, speak it on the voice satellite it was
+     * asked on, or write it to chat.answer.
      *
      * @param {unknown} conversationId conversation that set the reminder
      * @param {string} text reminder text
+     * @param {{ tts: string, language?: string }} [voice] the satellite it was asked on (kept with the reminder)
      */
-    async deliverReminder(conversationId, text) {
+    async deliverReminder(conversationId, text, voice) {
         const job = this.jobs.byConversation(conversationId);
         if (job) {
             this.log.info(`Reminder due for job ${job.id}`);
@@ -1154,6 +1251,19 @@ class PiAgent extends utils.Adapter {
         if (user) {
             this.log.info(`Reminder due for the admin chat of ${user}`);
             this.adminChat.addNotice(user, `⏰ ${text}`);
+            return;
+        }
+        const satellite = voice?.tts ? voice : this.voiceOf(conversationId);
+        if (satellite?.tts) {
+            const word =
+                REMINDER_WORD[languageOf(satellite.language || (await this.systemLanguage()))] || REMINDER_WORD.en;
+            const spoken = `${word}: ${String(text).replace(/^⏰\s*/, '')}`;
+            if (this.config.dryRun) {
+                this.log.info(`Reminder due: simulation mode, not spoken on ${satellite.tts}: ${spoken}`);
+            } else {
+                this.log.info(`Reminder due, spoken on ${satellite.tts}`);
+                await this.setForeignStateAsync(satellite.tts, { val: spoken, ack: false });
+            }
             return;
         }
         const chat = this.chatOf(conversationId);
@@ -1200,6 +1310,11 @@ class PiAgent extends utils.Adapter {
      */
     async voiceState(ownerKey) {
         const exists = async id => Boolean(await this.getForeignObjectAsync(id).catch(() => null));
+        // the satellite the job was asked on (ioBroker.assistant 1.4.9+ names it in "ask")
+        const asked = ownerKey ? this.callerVoices.get(ownerKey)?.tts : undefined;
+        if (asked && (await exists(asked))) {
+            return asked;
+        }
         if (ownerKey?.startsWith('sendTo:')) {
             const { instance, chatId } = parseChatKey(ownerKey.slice('sendTo:'.length), '');
             for (const id of [`${instance}.satellites.${chatId}.tts`, `${instance}.tts.text`]) {
@@ -2882,6 +2997,10 @@ class PiAgent extends utils.Adapter {
                 .slice(0, 10);
             if (key && language) {
                 this.callerLanguages.set(key, language);
+            }
+            const voice = key ? callerVoice(obj.from, message) : undefined;
+            if (voice) {
+                this.callerVoices.set(key, voice);
             }
             let run;
             if (key && this.textConfirmations.has(key)) {

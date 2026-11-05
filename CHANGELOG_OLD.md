@@ -1,5 +1,13 @@
 # Older Changelog
 
+### 0.8.8 (2026-11-03)
+
+- Limits: at most 10 requests per minute per conversation (setting) stop a loop of a script or another adapter
+  before the model is asked; an optional limit of tokens per day stops all requests until midnight. New states
+  `usage.tokensToday` and `usage.limitReached`
+- OpenRouter: a model outside the catalog gets its prices, context window and answer length from the public model
+  list of OpenRouter, so its cost is counted
+
 ### 0.8.7 (2026-11-03)
 
 - Update of the agent runtime to pi-durable 1.5.0 (`@earendil-works/*` 1.5.0): the tool schemas are built with
