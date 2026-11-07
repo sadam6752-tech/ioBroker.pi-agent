@@ -22,7 +22,14 @@ declare global {
             requestsPerMinute: number;
             dailyTokens: number;
             /** Messenger instances (telegram, max) since 0.1.0: one row per instance. */
-            messengers: Array<{ enabled?: boolean; instance: string; users: string; prefix: string; voice?: boolean }>;
+            messengers: Array<{
+                enabled?: boolean;
+                instance: string;
+                users: string;
+                prefix: string;
+                voice?: boolean;
+                photos?: boolean;
+            }>;
             /** Speech recognition of voice messages since 0.9.0: "" off, "server" (OpenAI-compatible URL) or "openrouter". */
             speechService: '' | 'server' | 'openrouter';
             speechBaseUrl: string;

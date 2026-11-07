@@ -117,5 +117,7 @@
 	"API key for speech (optional)": "API-sleutel voor spraakherkenning (optioneel)",
 	"Two letters, for example de or ru. Empty: detected for every message (a local server then needs longer)": "Twee letters, bijvoorbeeld de of ru. Leeg: per bericht herkend (een lokale server heeft dan meer tijd nodig)",
 	"Test speech recognition": "Spraakherkenning testen",
-	"Language": "Taal"
+	"Language": "Taal",
+	"Photos": "Foto's",
+	"Photos: photos sent to the bot go to the model with their caption, the photos of an album as one question (at most 4). A text sent right after photos without caption is their question. The model sees a photo only once and keeps notes of it for later questions. Telegram saves photos only with \"Save files\" in its settings; set \"Delete received files after (days)\" there (telegram 6.3.0+) so old ones are removed. MAX saves them always.": "Foto's: foto's die naar de bot worden gestuurd gaan met hun bijschrift naar het model, de foto's van een album als één vraag (maximaal 4). Een tekst direct na foto's zonder bijschrift is hun vraag. Het model ziet een foto maar één keer en bewaart notities ervan voor latere vragen. Telegram slaat foto's alleen op met 'Bestanden opslaan' in zijn instellingen; stel daar 'Ontvangen bestanden verwijderen na (dagen)' in (telegram 6.3.0+) zodat oude worden verwijderd. MAX slaat ze altijd op."
 }

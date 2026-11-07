@@ -117,5 +117,7 @@
 	"API key for speech (optional)": "语音识别 API 密钥（可选）",
 	"Two letters, for example de or ru. Empty: detected for every message (a local server then needs longer)": "两个字母，例如 de 或 ru。留空：每条消息自动检测（本地服务器会更慢）",
 	"Test speech recognition": "测试语音识别",
-	"Language": "语言"
+	"Language": "语言",
+	"Photos": "照片",
+	"Photos: photos sent to the bot go to the model with their caption, the photos of an album as one question (at most 4). A text sent right after photos without caption is their question. The model sees a photo only once and keeps notes of it for later questions. Telegram saves photos only with \"Save files\" in its settings; set \"Delete received files after (days)\" there (telegram 6.3.0+) so old ones are removed. MAX saves them always.": "照片：发送给机器人的照片连同说明一起交给模型，一个相册的照片作为一个问题（最多 4 张）。紧跟在无说明照片之后的文字就是对它们的提问。模型只看一次照片，并为后续问题保留关于它的笔记。Telegram 只有在其设置中开启“保存文件”时才会保存照片；请在那里设置“在（天）后删除收到的文件”（telegram 6.3.0+），以便删除旧照片。MAX 总是保存照片。"
 }

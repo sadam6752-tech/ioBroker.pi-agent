@@ -76,6 +76,7 @@ const { TextConfirmations, isYes, spokenAnswer, languageOf, confirmationQuestion
 const { createScriptHistory, scriptName } = require('./lib/scripts');
 const { speechSettings, transcribe, listSpeechModels, silenceWav } = require('./lib/speech');
 const { MAX_STORED_PICTURES, trimStoredPictures, withoutPictureNotes } = require('./lib/pictures');
+const { isPhotoPath, largestPhotos, PhotoCollector } = require('./lib/photos');
 
 /**
  * Text blocks of the model messages of one transcript entry.
@@ -311,6 +312,12 @@ class PiAgent extends utils.Adapter {
         this.drivers = createDrivers(this);
         /** Confirmations by text in the conversations of sendTo callers (setting "textConfirmation"). */
         this.textConfirmations = new TextConfirmations(this);
+        /** Photos sent to the bots, gathered with their caption (lib/photos.js). */
+        this.photos = new PhotoCollector(message => void this.onPhotoMessage(message), {
+            setTimeout: (fn, ms) => this.setTimeout(fn, ms),
+            /** @param {ioBroker.Timeout | undefined} timer handle of setTimeout */
+            clearTimeout: timer => timer && this.clearTimeout(timer),
+        });
         /**
          * Per sendTo conversation: the language the caller named in its last "ask" (e.g. "ru"), for the questions to
          * confirm. A voice satellite listens in it; a question in another language gets an answer it cannot hear.
@@ -789,10 +796,16 @@ class PiAgent extends utils.Adapter {
     /** Listen to the configured messenger instances, if any. */
     async startMessengers() {
         this.channels = new Map();
+        const speech = speechSettings(this.config);
         for (const channel of channelsFromConfig(this.config)) {
             const driver = this.drivers[messengerType(channel.instance)];
             if (driver) {
-                this.channels.set(channel.instance, { ...channel, driver });
+                this.channels.set(channel.instance, {
+                    ...channel,
+                    driver,
+                    voiceOn: Boolean(channel.voice && speech.service && driver.voiceMessages),
+                    photosOn: Boolean(channel.photos && driver.photoMessages),
+                });
             } else {
                 this.log.warn(
                     `Messenger ${channel.instance} ignored: only ${MESSENGER_ADAPTERS.join(' and ')} are supported`,
@@ -816,8 +829,7 @@ class PiAgent extends utils.Adapter {
                 this.context,
             );
         }
-        const speech = speechSettings(this.config);
-        for (const { instance, allowed, prefix, voice, driver } of this.channels.values()) {
+        for (const { instance, allowed, prefix, voiceOn, photosOn, driver } of this.channels.values()) {
             if (allowed.size === 0) {
                 this.log.warn(`${driver.label} ${instance}: no user is allowed, every message is ignored.`);
             }
@@ -826,13 +838,55 @@ class PiAgent extends utils.Adapter {
                 `${driver.label}: listening on ${instance} for ${allowed.size} allowed user(s)${prefix ? `, prefix "${prefix}"` : ''}`,
             );
             await this.warnOfSecondAnswer(instance, driver.label);
-            // the telegram adapter saves every voice message and writes its path to communicate.pathFile
-            if (voice && speech.service && driver.voiceMessages) {
+            // the messenger adapter saves voice messages and photos and writes their path to communicate.pathFile
+            if (voiceOn || photosOn) {
                 await this.subscribeForeignStatesAsync(`${instance}.communicate.pathFile`);
+            }
+            if (voiceOn) {
                 this.log.info(
                     `${driver.label}: voice messages on ${instance} are recognized by ${speech.service === 'openrouter' ? 'OpenRouter' : speech.baseUrl} (${speech.model || 'no model'})`,
                 );
             }
+            if (photosOn) {
+                this.log.info(`${driver.label}: photos on ${instance} go to the model`);
+                await this.checkPhotoSettings(instance, driver);
+            }
+        }
+    }
+
+    /**
+     * Hints for photos: the telegram adapter saves photos only with "Save files", tells a caption of a photo (sent
+     * before the photo) only with "Remember raw request data", and keeps photos until "Delete received files after (days)"
+     * (6.3.0) is set. The max adapter always saves them and removes old ones itself.
+     *
+     * @param {string} instance messenger instance
+     * @param {{ label: string, photoSettings?: boolean }} driver messenger driver
+     */
+    async checkPhotoSettings(instance, driver) {
+        if (!driver.photoSettings) {
+            return;
+        }
+        let native;
+        try {
+            native = (await this.getForeignObjectAsync(`system.adapter.${instance}`))?.native;
+        } catch {
+            return; // only a hint
+        }
+        if (!native) {
+            return;
+        }
+        if (!native.saveFiles) {
+            this.log.warn(
+                `${driver.label} ${instance} does not save received files ("Save files" in its settings is off): photos do not reach the agent`,
+            );
+        } else if (!native.storeRawRequest) {
+            this.log.warn(
+                `${driver.label} ${instance} does not store raw requests ("Remember raw request data" on the tab Messages of its settings is off): a photo and its caption get two separate answers`,
+            );
+        } else if (!(Number(native.deleteFilesAfterDays) > 0)) {
+            this.log.info(
+                `${driver.label} ${instance} keeps received photos for ever; "Delete received files after (days)" (telegram 6.3.0+) removes old ones`,
+            );
         }
     }
 
@@ -898,8 +952,8 @@ class PiAgent extends utils.Adapter {
      */
     async onVoiceMessage(instance, state) {
         const filePath = String(state?.val || '');
-        // pathFile also names photos and documents when the telegram adapter saves those
-        if (!/[\\/]voice[\\/][^\\/]+$/.test(filePath)) {
+        // pathFile also names documents, videos and audio files when the telegram adapter saves those
+        if (!this.channels.get(instance)?.voiceOn || !/[\\/]voice[\\/][^\\/]+$/.test(filePath)) {
             return;
         }
         const { allowed, driver } = this.channels.get(instance);
@@ -910,7 +964,7 @@ class PiAgent extends utils.Adapter {
         }
         let text;
         try {
-            const audio = await this.readVoiceFile(instance, filePath);
+            const audio = await this.readReceivedFile(instance, filePath, 'voice');
             const started = Date.now();
             text = await transcribe(
                 await this.speechSettingsOf(this.config),
@@ -939,14 +993,82 @@ class PiAgent extends utils.Adapter {
     }
 
     /**
-     * The file of a voice message. The telegram adapter names a path in its data folder; with "save files to
-     * ioBroker" the file is in its file storage instead, under the same name below "voice".
+     * A photo was saved: check the sender and gather it with the other photos and the caption of the message.
+     *
+     * @param {string} instance messenger instance
+     * @param {ioBroker.State | null | undefined} state value of <instance>.communicate.pathFile
+     */
+    async onPhoto(instance, state) {
+        const channel = this.channels.get(instance);
+        if (!channel?.photosOn) {
+            return;
+        }
+        const { allowed, driver } = channel;
+        const request = await driver.readRequest(instance, '');
+        if (!request.chatId || !this.senderAllowed(instance, driver, allowed, request)) {
+            return;
+        }
+        this.photos.addPhoto(instance, request.chatId, request.messageId, String(state?.val || ''));
+    }
+
+    /**
+     * The photos of a message (or album) are complete: one question with the largest size of each photo and the
+     * caption. A picture goes to the model only with this question (lib/pictures.js).
+     *
+     * @param {{ instance: string, chatId: string, messageId: unknown, files: string[], text: string, waited: boolean }} message gathered photos
+     */
+    async onPhotoMessage(message) {
+        const { instance, chatId, messageId, files, text, waited } = message;
+        const driver = this.channels.get(instance)?.driver;
+        if (!driver) {
+            return;
+        }
+        if (waited) {
+            this.log.warn(
+                `${driver.label} ${instance}: the photos of a message did not arrive, only its caption is answered (is "Save files" on?)`,
+            );
+        }
+        const raw = [];
+        for (const file of largestPhotos(files)) {
+            try {
+                raw.push({ data: (await this.readReceivedFile(instance, file, 'photo')).toString('base64') });
+            } catch (e) {
+                this.log.warn(`${driver.label} ${instance}: photo ${file} cannot be read: ${e.message}`);
+            }
+        }
+        const { images, dropped } = askImages(raw);
+        if (dropped.length) {
+            this.log.warn(`${driver.label} ${instance}: ${dropped.join('; ')}, not sent to the model`);
+        }
+        if (!images.length && !text) {
+            if (files.length) {
+                driver.send(instance, chatId, '📷 The photo could not be read.');
+            }
+            return;
+        }
+        if (images.length) {
+            this.log.info(
+                `${driver.label} ${instance}: ${images.length} photo(s)${text ? ' with a question' : ''} go to the model`,
+            );
+        }
+        const content = images.length ? [...(text ? [{ type: 'text', text }] : []), ...images] : text;
+        const requestId =
+            messageId !== null && messageId !== undefined
+                ? telegramRequestId(instance, chatId, messageId)
+                : requestIdFor(crypto, Date.now(), files[0] || text);
+        await this.process({ requestId, content, target: { kind: 'chat', instance, chatId } });
+    }
+
+    /**
+     * A file the messenger adapter received. It names a path in its data folder; with "save files to ioBroker" the
+     * telegram adapter keeps the file in its file storage instead, under the same name below the folder.
      *
      * @param {string} instance messenger instance
      * @param {string} filePath value of communicate.pathFile
+     * @param {string} folder "voice" or "photo"
      * @returns {Promise<Buffer>} the file
      */
-    async readVoiceFile(instance, filePath) {
+    async readReceivedFile(instance, filePath, folder) {
         try {
             return await fs.promises.readFile(filePath);
         } catch (e) {
@@ -955,7 +1077,7 @@ class PiAgent extends utils.Adapter {
             }
         }
         const name = filePath.split(/[\\/]/).pop();
-        const { file } = await this.readFileAsync(instance, `voice/${name}`);
+        const { file } = await this.readFileAsync(instance, `${folder}/${name}`);
         return Buffer.isBuffer(file) ? file : Buffer.from(file);
     }
 
@@ -2433,7 +2555,7 @@ class PiAgent extends utils.Adapter {
     /**
      * Run a request and deliver the answer (or the error) to its target.
      *
-     * @param {{ requestId: string, content: string, target: { kind: string, instance?: string, chatId?: string } }} entry request
+     * @param {{ requestId: string, content: string | Array<object>, target: { kind: string, instance?: string, chatId?: string } }} entry request
      * @param {{ resumed?: boolean }} [options] resumed: continued after a restart
      */
     async process(entry, options = {}) {
@@ -2526,9 +2648,11 @@ class PiAgent extends utils.Adapter {
         if (this.channels.has(instance)) {
             return this.onChatMessage(instance, state);
         }
-        const voiceOf = id.endsWith('.communicate.pathFile') ? id.slice(0, -'.communicate.pathFile'.length) : '';
-        if (this.channels.get(voiceOf)?.voice) {
-            return this.onVoiceMessage(voiceOf, state);
+        const fileOf = id.endsWith('.communicate.pathFile') ? id.slice(0, -'.communicate.pathFile'.length) : '';
+        if (this.channels.has(fileOf)) {
+            return isPhotoPath(String(state?.val || ''))
+                ? this.onPhoto(fileOf, state)
+                : this.onVoiceMessage(fileOf, state);
         }
         if (this.watches.handles(id)) {
             await this.watches.onState(id, state);
@@ -2562,7 +2686,7 @@ class PiAgent extends utils.Adapter {
         if (!state || !state.val) {
             return;
         }
-        const { allowed, prefix, driver } = this.channels.get(instance);
+        const { allowed, prefix, driver, photosOn } = this.channels.get(instance);
         const request = await driver.readRequest(instance, state.val);
         const { chatId, messageId, text } = request;
         if (!chatId) {
@@ -2574,6 +2698,17 @@ class PiAgent extends utils.Adapter {
         }
         if (driver.takeButton(instance, request)) {
             return; // a button of a confirmation, not a message for the model
+        }
+        if (photosOn) {
+            // the prefix does not apply to photos and their caption
+            const caption = stripPrefix(text, prefix) ?? text;
+            if (request.withPhotos) {
+                this.photos.holdCaption(instance, chatId, messageId, caption);
+                return; // telegram: the photos follow
+            }
+            if (this.photos.takeText(instance, chatId, caption)) {
+                return; // max: the caption after the photos, or a question right after photos without caption
+            }
         }
         const content = stripPrefix(text, prefix);
         if (content === null) {
@@ -3036,6 +3171,7 @@ class PiAgent extends utils.Adapter {
         this.watches.stop();
         this.jobs.stop();
         this.textConfirmations.stop();
+        this.photos.stop();
         const done = async () => {
             try {
                 await this.harness?.close(this.context);

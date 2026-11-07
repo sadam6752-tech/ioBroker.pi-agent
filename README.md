@@ -262,6 +262,26 @@ conversation, same confirmations, same limits.
 - **Test speech recognition** sends one second of silence with the values of the form: a wrong URL, key or model shows
   up at once.
 
+### Photos (Telegram and MAX)
+
+With the column **Photos** ticked, photos sent to the bot go to the model, together with their caption: "What is
+this?", "How much does the meter show?". The photos of an album are one question (at most 4 pictures). A text sent right
+after photos without caption is their question; photos without any text are a question of their own.
+
+- The telegram adapter saves photos only with **Save files** in its settings and keeps them until **Delete received
+  files after (days)** (telegram 6.3.0 or newer) is set. It sends the caption before the photo; pi-agent tells it is a
+  caption only with **Remember raw request data** (tab Messages) on, else the caption and the photo get two answers.
+  pi-agent warns at the start when one of the two is off. With a quality of the media files set, at least "high" reads
+  text on photos better. The max adapter always saves photos and removes old ones itself.
+- Telegram saves every photo in up to four sizes; only the largest one goes to the model. JPEG, PNG, GIF and WebP of
+  up to about 3.9 MB, as with pictures in `ask`.
+- A photo goes to the model only with its own question: the model writes notes of what it shows, which later questions
+  get instead of the picture (see pictures in `ask`). The user does not see the notes.
+- The prefix does not apply to photos and their caption. Only allowed users are heard.
+- Rows saved before 0.9.6 have **Photos** off, so an update does not start sending photos to the model.
+- Do not also set an assistant instance in the telegram settings: it gets the photos too, and every photo gets two
+  answers.
+
 ### DeepSeek
 
 Select **DeepSeek** as provider and enter a key from the DeepSeek platform. Available models: `deepseek-flash`
@@ -524,6 +544,15 @@ the last copy.
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+
+### 0.9.6 (2026-11-08)
+
+- Photos sent to the bots of Telegram and MAX go to the model with their caption, the photos of an album as one
+  question (at most 4); a text right after photos without caption is their question. Only the largest size of a
+  Telegram photo is used; the model sees it once and keeps notes of it. New column "Photos" on the tab "Messengers"
+  (off for rows saved before). Telegram saves photos only with "Save files"; "Delete received files after (days)" of
+  telegram 6.3.0 removes old ones
+- A picture whose answer has no picture notes is no longer taken for one that was never sent
 
 ### 0.9.5 (2026-11-05)
 

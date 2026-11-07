@@ -546,7 +546,7 @@
                             "type": "text",
                             "attr": "users",
                             "title": "Allowed users",
-                            "width": "40%",
+                            "width": "30%",
                             "default": ""
                         },
                         {
@@ -562,8 +562,25 @@
                             "title": "Voice",
                             "width": "10%",
                             "default": true
+                        },
+                        {
+                            "type": "checkbox",
+                            "attr": "photos",
+                            "title": "Photos",
+                            "width": "10%",
+                            "default": true
                         }
                     ]
+                },
+                "photosHelp": {
+                    "type": "staticText",
+                    "text": "Photos: photos sent to the bot go to the model with their caption, the photos of an album as one question (at most 4). A text sent right after photos without caption is their question. The model sees a photo only once and keeps notes of it for later questions. Telegram saves photos only with \"Save files\" in its settings; set \"Delete received files after (days)\" there (telegram 6.3.0+) so old ones are removed. MAX saves them always.",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
                 },
                 "_speechHeader": {
                     "type": "header",

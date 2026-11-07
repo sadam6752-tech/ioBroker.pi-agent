@@ -117,5 +117,7 @@
 	"API key for speech (optional)": "API-ключ для распознавания (необязательно)",
 	"Two letters, for example de or ru. Empty: detected for every message (a local server then needs longer)": "Две буквы, например de или ru. Пусто: определяется для каждого сообщения (локальному серверу тогда нужно больше времени)",
 	"Test speech recognition": "Проверить распознавание",
-	"Language": "Язык"
+	"Language": "Язык",
+	"Photos": "Фото",
+	"Photos: photos sent to the bot go to the model with their caption, the photos of an album as one question (at most 4). A text sent right after photos without caption is their question. The model sees a photo only once and keeps notes of it for later questions. Telegram saves photos only with \"Save files\" in its settings; set \"Delete received files after (days)\" there (telegram 6.3.0+) so old ones are removed. MAX saves them always.": "Фото: фотографии, отправленные боту, уходят модели вместе с подписью, фото одного альбома — одним вопросом (не больше 4). Текст сразу после фото без подписи считается вопросом к ним. Модель видит фото только один раз и сохраняет заметки о нём для следующих вопросов. Telegram сохраняет фото только при включённом «Сохранять файлы» в своих настройках; задайте там «Удалять полученные файлы через (дней)» (telegram 6.3.0+), чтобы старые удалялись. MAX сохраняет их всегда."
 }
