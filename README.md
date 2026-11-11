@@ -545,6 +545,11 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.9.7 (2026-11-11)
+
+- send_to: the model asks an adapter for its commands with "help" first, when it does not know them —
+  e.g. satellite-display 0.2.0, which adds, moves and removes tiles of the displays by chat
+
 ### 0.9.6 (2026-11-08)
 
 - Photos sent to the bots of Telegram and MAX go to the model with their caption, the photos of an album as one
@@ -589,12 +594,6 @@ the last copy.
 - Voice messages: voice messages of Telegram and MAX (max 0.1.13 or newer) are turned into text by a local server with the transcription API of OpenAI
   (e.g. speaches with faster-whisper) or by OpenRouter, shown in the chat and answered like a written message. New
   block "Speech recognition" and column "Voice" on the tab "Messengers"
-
-### 0.8.9 (2026-11-03)
-
-- Updates: `list_updates` with `npm: true` compares every installed adapter with npm in one call, pi-agent included;
-  `check_npm` and `update_adapter` also find an adapter by its title. The agent is told to call the tools again when
-  asked to check, instead of answering from earlier results of the conversation
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

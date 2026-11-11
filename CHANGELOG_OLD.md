@@ -1,5 +1,11 @@
 # Older Changelog
 
+### 0.8.9 (2026-11-03)
+
+- Updates: `list_updates` with `npm: true` compares every installed adapter with npm in one call, pi-agent included;
+  `check_npm` and `update_adapter` also find an adapter by its title. The agent is told to call the tools again when
+  asked to check, instead of answering from earlier results of the conversation
+
 ### 0.8.8 (2026-11-03)
 
 - Limits: at most 10 requests per minute per conversation (setting) stop a loop of a script or another adapter

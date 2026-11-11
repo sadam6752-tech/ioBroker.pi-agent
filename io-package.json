@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.9.6",
+		"version": "0.9.7",
 		"news": {
+			"0.9.7": {
+				"en": "send_to: the model asks an adapter for its commands with \"help\" first (e.g. satellite-display 0.2.0: add tiles to the displays by chat)",
+				"de": "send_to: das Modell fragt einen Adapter zuerst mit \"help\" nach seinen Befehlen (z. B. satellite-display 0.2.0: Kacheln per Chat auf die Displays setzen)",
+				"ru": "send_to: модель сначала запрашивает у адаптера его команды через \"help\" (например, satellite-display 0.2.0: плитки на дисплеи через чат)",
+				"pt": "send_to: o modelo pede primeiro a um adaptador os seus comandos com \"help\" (p. ex. satellite-display 0.2.0: adicionar mosaicos aos ecrãs pelo chat)",
+				"nl": "send_to: het model vraagt een adapter eerst met \"help\" naar zijn opdrachten (bijv. satellite-display 0.2.0: tegels via de chat op de displays zetten)",
+				"fr": "send_to : le modèle demande d'abord ses commandes à un adaptateur avec « help » (p. ex. satellite-display 0.2.0 : ajouter des tuiles aux écrans par le chat)",
+				"it": "send_to: il modello chiede prima a un adattatore i suoi comandi con \"help\" (ad es. satellite-display 0.2.0: aggiungere riquadri ai display tramite chat)",
+				"es": "send_to: el modelo pide primero a un adaptador sus comandos con \"help\" (p. ej. satellite-display 0.2.0: añadir mosaicos a las pantallas por chat)",
+				"pl": "send_to: model najpierw pyta adapter o jego polecenia przez \"help\" (np. satellite-display 0.2.0: dodawanie kafelków na wyświetlacze przez czat)",
+				"uk": "send_to: модель спершу запитує в адаптера його команди через \"help\" (наприклад, satellite-display 0.2.0: плитки на дисплеї через чат)",
+				"zh-cn": "send_to：模型先用 \"help\" 询问适配器的命令（例如 satellite-display 0.2.0：通过聊天向显示屏添加磁贴）"
+			},
 			"0.9.6": {
 				"en": "Photos sent to the bots go to the model with their caption, the photos of an album as one question (at most 4); a text right after photos without caption is their question. Only the largest size of a photo is used, the model sees it once and keeps notes of it. New column \"Photos\" on the tab \"Messengers\" (off for existing rows); Telegram needs \"Save files\", \"Delete received files after (days)\" of telegram 6.3.0 removes old ones",
 				"de": "An die Bots gesendete Fotos gehen mit ihrer Beschriftung an das Modell, die Fotos eines Albums als eine Frage (höchstens 4); ein Text direkt nach Fotos ohne Beschriftung ist ihre Frage. Nur die größte Auflösung eines Fotos wird verwendet, das Modell sieht es einmal und behält Notizen dazu. Neue Spalte „Fotos“ im Reiter „Messenger“ (bei bestehenden Zeilen aus); Telegram braucht „Dateien speichern“, „Empfangene Dateien löschen nach (Tagen)“ von telegram 6.3.0 entfernt alte",
@@ -80,19 +93,6 @@
 				"pl": "Potwierdzanie głosem: oprócz samego słowa tak jako tak liczą się też „okay”, „klar”, „конечно” i podobne, również z „bitte” lub „please”, a także „Ya” i „Yup”, które Whisper zrobił z krótkiego „Ja”; model nie prosi już użytkownika głosowego o naciśnięcie przycisku",
 				"uk": "Підтвердження голосом: крім самого слова «так», як «так» зараховуються «okay», «klar», «конечно» та подібні, також з «bitte» або «please», а ще «Ya» і «Yup», які Whisper зробив з короткого «Ja»; модель більше не просить голосового користувача натиснути кнопку",
 				"zh-cn": "语音确认：除了“是”本身，“okay”“klar”“конечно”等也算作是，也可带“bitte”或“please”，Whisper 把简短的“Ja”识别成的“Ya”和“Yup”同样算作是；模型不再要求语音用户按按钮"
-			},
-			"0.9.0": {
-				"en": "Voice messages: voice messages of Telegram and MAX are turned into text by a local server with the transcription API of OpenAI (e.g. speaches with faster-whisper) or by OpenRouter, shown in the chat and answered like a written message; new block \"Speech recognition\" and column \"Voice\" on the tab \"Messengers\"",
-				"de": "Sprachnachrichten: Sprachnachrichten von Telegram und MAX werden von einem lokalen Server mit der Transkriptions-API von OpenAI (z. B. speaches mit faster-whisper) oder von OpenRouter in Text umgewandelt, im Chat angezeigt und wie eine geschriebene Nachricht beantwortet; neuer Block „Spracherkennung“ und Spalte „Sprachnachrichten“ im Reiter „Messenger“",
-				"ru": "Голосовые сообщения: голосовые сообщения Telegram и MAX превращаются в текст локальным сервером с API распознавания OpenAI (например, speaches с faster-whisper) или через OpenRouter, показываются в чате и обрабатываются как написанное сообщение; новый блок «Распознавание речи» и колонка «Голос» на вкладке «Мессенджеры»",
-				"pt": "Mensagens de voz: as mensagens de voz do Telegram e do MAX são convertidas em texto por um servidor local com a API de transcrição da OpenAI (p. ex. speaches com faster-whisper) ou pelo OpenRouter, mostradas no chat e respondidas como uma mensagem escrita; novo bloco “Reconhecimento de voz” e coluna “Voz” no separador “Mensageiros”",
-				"nl": "Spraakberichten: spraakberichten van Telegram en MAX worden door een lokale server met de transcriptie-API van OpenAI (bijv. speaches met faster-whisper) of door OpenRouter omgezet in tekst, in de chat getoond en beantwoord als een geschreven bericht; nieuw blok “Spraakherkenning” en kolom “Spraak” op het tabblad “Messengers”",
-				"fr": "Messages vocaux : les messages vocaux de Telegram et de MAX sont transcrits par un serveur local offrant l’API de transcription d’OpenAI (p. ex. speaches avec faster-whisper) ou par OpenRouter, affichés dans le chat et traités comme un message écrit ; nouveau bloc « Reconnaissance vocale » et colonne « Voix » dans l’onglet « Messageries »",
-				"it": "Messaggi vocali: i messaggi vocali di Telegram e MAX vengono trasformati in testo da un server locale con l’API di trascrizione di OpenAI (ad es. speaches con faster-whisper) o da OpenRouter, mostrati nella chat e trattati come un messaggio scritto; nuovo blocco “Riconoscimento vocale” e colonna “Voce” nella scheda “Messenger”",
-				"es": "Mensajes de voz: los mensajes de voz de Telegram y MAX se convierten en texto con un servidor local con la API de transcripción de OpenAI (p. ej. speaches con faster-whisper) o con OpenRouter, se muestran en el chat y se responden como un mensaje escrito; nuevo bloque «Reconocimiento de voz» y columna «Voz» en la pestaña «Mensajería»",
-				"pl": "Wiadomości głosowe: wiadomości głosowe z Telegrama i MAX są zamieniane na tekst przez lokalny serwer z API transkrypcji OpenAI (np. speaches z faster-whisper) lub przez OpenRouter, pokazywane w czacie i obsługiwane jak wiadomość pisana; nowy blok „Rozpoznawanie mowy” i kolumna „Głos” na karcie „Komunikatory”",
-				"uk": "Голосові повідомлення: голосові повідомлення Telegram і MAX перетворюються на текст локальним сервером з API розпізнавання OpenAI (наприклад, speaches з faster-whisper) або через OpenRouter, показуються в чаті та обробляються як написане повідомлення; новий блок «Розпізнавання мовлення» і колонка «Голос» на вкладці «Месенджери»",
-				"zh-cn": "语音消息：Telegram 和 MAX 的语音消息由提供 OpenAI 转录 API 的本地服务器（例如带 faster-whisper 的 speaches）或 OpenRouter 转换为文字，显示在聊天中，并像文字消息一样得到回答；“消息应用”选项卡中新增“语音识别”区块和“语音”列"
 			}
 		},
 		"titleLang": {
