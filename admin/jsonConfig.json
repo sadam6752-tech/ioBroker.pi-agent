@@ -220,6 +220,65 @@
                     "lg": 4,
                     "xl": 4
                 },
+                "_docsHeader": {
+                    "type": "header",
+                    "text": "Documentation search (RAG)",
+                    "size": 4,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "_docsInfo": {
+                    "type": "staticText",
+                    "text": "The agent can search the ioBroker documentation (the official docs, the source code of the core and the READMEs of the adapters) on a server of the project ioBrokerRAG (REST API v1), before it writes a script or answers how an adapter works. The question of the model is sent to this server. Only passages of permissively licensed sources go to the model. Empty URL: off.",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "docsUrl": {
+                    "type": "text",
+                    "label": "RAG server URL",
+                    "help": "For example http://192.168.1.10:8000 (without /query)",
+                    "default": "",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "docsToken": {
+                    "type": "password",
+                    "label": "Token of the RAG server (optional)",
+                    "help": "Only when the server sets IOB_RAG_TOKEN",
+                    "default": "",
+                    "hidden": "!data.docsUrl",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "testDocs": {
+                    "type": "sendTo",
+                    "command": "testDocs",
+                    "label": "Test documentation search",
+                    "jsonData": "{\"docsUrl\": ${JSON.stringify(data.docsUrl || '')}, \"docsToken\": ${JSON.stringify(data.docsToken || '')}}",
+                    "variant": "outlined",
+                    "showProcess": true,
+                    "hidden": "!data.docsUrl",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
+                },
                 "_limitsHeader": {
                     "type": "header",
                     "text": "Limits",

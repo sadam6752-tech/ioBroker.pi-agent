@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.9.7",
+		"version": "0.10.0",
 		"news": {
+			"0.10.0": {
+				"en": "Documentation search: with the URL of an ioBrokerRAG server the agent looks up the ioBroker documentation before it writes a script or explains an adapter; the daily token limit no longer counts cache reads and warns at 80, 90 and 99 %; the admin chat shows a refused request instead of thinking for ever",
+				"de": "Dokumentationssuche: mit der URL eines ioBrokerRAG-Servers schlägt der Agent in der ioBroker-Dokumentation nach, bevor er ein Skript schreibt oder einen Adapter erklärt; das Tageslimit für Tokens zählt keine Cache-Lesezugriffe mehr und warnt bei 80, 90 und 99 %; der Admin-Chat zeigt eine abgelehnte Anfrage, statt endlos nachzudenken",
+				"ru": "Поиск по документации: с URL сервера ioBrokerRAG агент сверяется с документацией ioBroker, прежде чем писать скрипт или объяснять адаптер; дневной лимит токенов больше не учитывает чтение из кэша и предупреждает на 80, 90 и 99 %; чат в admin показывает отклонённый запрос, а не думает бесконечно",
+				"pt": "Pesquisa na documentação: com o URL de um servidor ioBrokerRAG, o agente consulta a documentação do ioBroker antes de escrever um script ou explicar um adaptador; o limite diário de tokens já não conta leituras da cache e avisa a 80, 90 e 99 %; o chat do admin mostra um pedido recusado em vez de pensar sem fim",
+				"nl": "Zoeken in de documentatie: met de URL van een ioBrokerRAG-server zoekt de agent in de ioBroker-documentatie voordat hij een script schrijft of een adapter uitlegt; de daglimiet voor tokens telt geen cache-leesacties meer en waarschuwt bij 80, 90 en 99 %; de admin-chat toont een geweigerd verzoek in plaats van eindeloos na te denken",
+				"fr": "Recherche dans la documentation : avec l'URL d'un serveur ioBrokerRAG, l'agent consulte la documentation d'ioBroker avant d'écrire un script ou d'expliquer un adaptateur ; la limite quotidienne de jetons ne compte plus les lectures du cache et avertit à 80, 90 et 99 % ; le chat de l'admin affiche une requête refusée au lieu de réfléchir sans fin",
+				"it": "Ricerca nella documentazione: con l'URL di un server ioBrokerRAG l'agente consulta la documentazione di ioBroker prima di scrivere uno script o spiegare un adattatore; il limite giornaliero di token non conta più le letture dalla cache e avvisa all'80, 90 e 99 %; la chat dell'admin mostra una richiesta rifiutata invece di pensare all'infinito",
+				"es": "Búsqueda en la documentación: con la URL de un servidor ioBrokerRAG, el agente consulta la documentación de ioBroker antes de escribir un script o explicar un adaptador; el límite diario de tokens ya no cuenta las lecturas de la caché y avisa al 80, 90 y 99 %; el chat del admin muestra una petición rechazada en lugar de pensar sin fin",
+				"pl": "Wyszukiwanie w dokumentacji: z adresem URL serwera ioBrokerRAG agent sprawdza dokumentację ioBrokera, zanim napisze skrypt lub wyjaśni adapter; dzienny limit tokenów nie liczy już odczytów z pamięci podręcznej i ostrzega przy 80, 90 i 99 %; czat w adminie pokazuje odrzucone żądanie zamiast myśleć bez końca",
+				"uk": "Пошук у документації: з URL сервера ioBrokerRAG агент звіряється з документацією ioBroker, перш ніж писати скрипт або пояснювати адаптер; денний ліміт токенів більше не враховує читання з кешу й попереджає на 80, 90 і 99 %; чат в admin показує відхилений запит замість нескінченного очікування",
+				"zh-cn": "文档搜索：配置 ioBrokerRAG 服务器的 URL 后，代理在编写脚本或解释适配器之前会查阅 ioBroker 文档；每日令牌限额不再计入缓存读取，并在 80%、90% 和 99% 时发出警告；管理界面聊天会显示被拒绝的请求，而不再无限思考"
+			},
 			"0.9.7": {
 				"en": "send_to: the model asks an adapter for its commands with \"help\" first (e.g. satellite-display 0.2.0: add tiles to the displays by chat)",
 				"de": "send_to: das Modell fragt einen Adapter zuerst mit \"help\" nach seinen Befehlen (z. B. satellite-display 0.2.0: Kacheln per Chat auf die Displays setzen)",
@@ -80,19 +93,6 @@
 				"pl": "Telegram: ostrzeżenie w logu, gdy instancja telegram przekazuje wiadomości także do instancji assistant (od telegram 6.1.0 również głosowe) lub do text2command, bo wtedy każda wiadomość dostaje dwie odpowiedzi",
 				"uk": "Telegram: попередження в журналі, якщо екземпляр telegram передає повідомлення також екземпляру assistant (з telegram 6.1.0 і голосові) або text2command, бо тоді на кожне повідомлення приходять дві відповіді",
 				"zh-cn": "Telegram：当 telegram 实例同时把消息交给 assistant 实例（自 telegram 6.1.0 起也包括语音消息）或 text2command 时，日志中会给出警告，因为此时每条消息都会得到两个回答"
-			},
-			"0.9.1": {
-				"en": "Confirmation by voice: besides the plain yes word, \"okay\", \"klar\", \"конечно\" and the like count as yes, also with \"bitte\" or \"please\", and so do \"Ya\" and \"Yup\", which Whisper made of a short spoken \"Ja\"; the model no longer tells a voice user to press a button",
-				"de": "Bestätigung per Sprache: neben dem reinen Ja-Wort zählen auch „okay“, „klar“, „конечно“ und ähnliche als Ja, auch mit „bitte“ oder „please“, ebenso „Ya“ und „Yup“, die Whisper aus einem kurz gesprochenen „Ja“ machte; das Modell fordert Sprachnutzer nicht mehr auf, eine Schaltfläche zu drücken",
-				"ru": "Подтверждение голосом: кроме самого слова «да», как «да» засчитываются «okay», «klar», «конечно» и подобные, также с «bitte» или «please», а ещё «Ya» и «Yup», которые Whisper сделал из короткого «Ja»; модель больше не просит голосового пользователя нажать кнопку",
-				"pt": "Confirmação por voz: além da palavra sim, “okay”, “klar”, “конечно” e semelhantes contam como sim, também com “bitte” ou “please”, assim como “Ya” e “Yup”, que o Whisper fez de um “Ja” curto; o modelo já não pede a um utilizador de voz que prima um botão",
-				"nl": "Bevestiging met spraak: naast het woord ja tellen ook “okay”, “klar”, “конечно” en dergelijke als ja, ook met “bitte” of “please”, en ook “Ya” en “Yup”, die Whisper van een kort gesproken “Ja” maakte; het model vraagt een spraakgebruiker niet meer op een knop te drukken",
-				"fr": "Confirmation vocale : outre le simple mot oui, « okay », « klar », « конечно » et similaires comptent comme oui, aussi avec « bitte » ou « please », ainsi que « Ya » et « Yup », que Whisper a tirés d’un « Ja » bref ; le modèle ne demande plus à un utilisateur vocal d’appuyer sur un bouton",
-				"it": "Conferma vocale: oltre alla parola sì, contano come sì anche “okay”, “klar”, “конечно” e simili, anche con “bitte” o “please”, e così “Ya” e “Yup”, che Whisper ha ricavato da un breve “Ja”; il modello non chiede più a un utente vocale di premere un pulsante",
-				"es": "Confirmación por voz: además de la palabra sí, cuentan como sí «okay», «klar», «конечно» y similares, también con «bitte» o «please», así como «Ya» y «Yup», que Whisper sacó de un «Ja» corto; el modelo ya no pide a un usuario de voz que pulse un botón",
-				"pl": "Potwierdzanie głosem: oprócz samego słowa tak jako tak liczą się też „okay”, „klar”, „конечно” i podobne, również z „bitte” lub „please”, a także „Ya” i „Yup”, które Whisper zrobił z krótkiego „Ja”; model nie prosi już użytkownika głosowego o naciśnięcie przycisku",
-				"uk": "Підтвердження голосом: крім самого слова «так», як «так» зараховуються «okay», «klar», «конечно» та подібні, також з «bitte» або «please», а ще «Ya» і «Yup», які Whisper зробив з короткого «Ja»; модель більше не просить голосового користувача натиснути кнопку",
-				"zh-cn": "语音确认：除了“是”本身，“okay”“klar”“конечно”等也算作是，也可带“bitte”或“please”，Whisper 把简短的“Ja”识别成的“Ya”和“Yup”同样算作是；模型不再要求语音用户按按钮"
 			}
 		},
 		"titleLang": {
@@ -199,12 +199,14 @@
 	"encryptedNative": [
 		"apiKey",
 		"remotePassword",
-		"speechApiKey"
+		"speechApiKey",
+		"docsToken"
 	],
 	"protectedNative": [
 		"apiKey",
 		"remotePassword",
-		"speechApiKey"
+		"speechApiKey",
+		"docsToken"
 	],
 	"native": {
 		"provider": "anthropic",
@@ -233,6 +235,8 @@
 		"speechModel": "",
 		"speechApiKey": "",
 		"speechLanguage": "",
+		"docsUrl": "",
+		"docsToken": "",
 		"confirmRequired": "",
 		"historyInstance": "",
 		"timeZone": "",

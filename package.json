@@ -1,6 +1,6 @@
 {
 	"name": "iobroker.pi-agent",
-	"version": "0.9.7",
+	"version": "0.10.0",
 	"description": "Durable LLM agent for ioBroker: crash-safe tool calls, write allowlist, idempotent triggers.",
 	"author": {
 		"name": "Alex",
@@ -51,7 +51,7 @@
 		"main.js"
 	],
 	"scripts": {
-		"test:js": "node --test test/unit.test.js test/harness.test.js test/providers.test.js test/deepseek.test.js test/main.test.js test/telegram.test.js test/telegram-flow.test.js test/max-flow.test.js test/admin-chat.test.js test/credentials.test.js test/backup.test.js test/store.test.js test/features.test.js test/time.test.js test/system-ai.test.js test/purge.test.js test/restart-memory.test.js test/send-to.test.js test/rooms.test.js test/planned.test.js test/scheduler.test.js test/updates.test.js test/text-confirmation.test.js test/scripts.test.js test/jobs.test.js test/codemode.test.js test/limits.test.js test/speech.test.js test/images.test.js test/photos.test.js test/satellite.test.js",
+		"test:js": "node --test test/unit.test.js test/harness.test.js test/providers.test.js test/deepseek.test.js test/main.test.js test/telegram.test.js test/telegram-flow.test.js test/max-flow.test.js test/admin-chat.test.js test/credentials.test.js test/backup.test.js test/store.test.js test/features.test.js test/time.test.js test/system-ai.test.js test/purge.test.js test/restart-memory.test.js test/send-to.test.js test/rooms.test.js test/planned.test.js test/scheduler.test.js test/updates.test.js test/text-confirmation.test.js test/scripts.test.js test/jobs.test.js test/codemode.test.js test/limits.test.js test/speech.test.js test/images.test.js test/photos.test.js test/satellite.test.js test/docs.test.js",
 		"test:unit": "npm run test:js",
 		"test:package": "mocha test/package.js --exit",
 		"test:integration": "mocha test/integration.js --exit --config test/mocharc.custom.json",

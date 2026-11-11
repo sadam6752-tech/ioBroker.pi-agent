@@ -44,11 +44,11 @@ test('nameText: handles translated names', () => {
 	assert.equal(nameText(undefined), '');
 });
 
-test('io-package: the API keys and the SFTP password are declared encrypted and protected at the top level', () => {
+test('io-package: the API keys, the SFTP password and the RAG token are declared encrypted and protected at the top level', () => {
 	const io = require('../io-package.json');
 	// js-controller reads these two lists from the top level only; inside "common" they are ignored.
-	assert.deepEqual(io.encryptedNative, ['apiKey', 'remotePassword', 'speechApiKey']);
-	assert.deepEqual(io.protectedNative, ['apiKey', 'remotePassword', 'speechApiKey']);
+	assert.deepEqual(io.encryptedNative, ['apiKey', 'remotePassword', 'speechApiKey', 'docsToken']);
+	assert.deepEqual(io.protectedNative, ['apiKey', 'remotePassword', 'speechApiKey', 'docsToken']);
 	assert.equal('encryptedNative' in io.common, false);
 	assert.equal('protectedNative' in io.common, false);
 });

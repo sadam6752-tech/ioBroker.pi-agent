@@ -198,7 +198,8 @@ middle, they continue on the next start. The answer of a request from `chat.inpu
   instance.
 - **Usage:** `pi-agent.0.usage.*` shows input, output and total tokens and the cost in USD over all conversations
   (the cost needs prices in the model catalog; it can stay 0 for a provider without them), `usage.json` per model,
-  `usage.tokensToday` the tokens since midnight in the time zone of the house.
+  `usage.tokensToday` the tokens since midnight in the time zone of the house that count for the daily limit (new
+  input, output and cache writes; not the cache reads, see below).
 
 ### Limits
 
@@ -215,6 +216,13 @@ Two limits stop a request before the model is asked, so a runaway costs no token
   midnight, the log gets one warning, and `usage.limitReached` is `true` until the first request after midnight.
   A request that started before the limit is finished, so the day can end a little above it. Answers to ✅/❌
   questions keep working, they need no model.
+  At 80 %, 90 % and 99 % of the limit the user who asked gets a warning once a day under the answer (in the admin chat
+  as a note, in a messenger, a job or `chat.answer` at the end of the answer), and the log a warning; a `sendTo`
+  caller gets it in the field `warning` of its answer, not in the answer text (a satellite would speak it).
+  Cache reads do not count: every request sends the whole conversation again (instructions, tool descriptions, the
+  messages and tool results so far), and the provider reads the part it has seen from its cache for about a tenth of
+  the price. Counted in full they were over 90 % of the tokens of a day. A new conversation after a change of topic
+  keeps the requests small.
 
 ### Messengers: Telegram and MAX
 
@@ -451,6 +459,20 @@ documents.
 - The agent waits up to 30 seconds for the answer; many adapters do not answer, then the command may still have worked.
   A command is never sent a second time after an interruption. In simulation mode nothing is sent.
 
+## Documentation search (RAG)
+
+Models, local ones above all, invent functions of the script API or settings of adapters. With a server of the
+project [ioBrokerRAG](https://github.com/bloop-herbert-bot/ioBrokerRAG) (REST API v1) the agent searches the ioBroker
+documentation first: the official docs, the source code of the core and the READMEs of the adapters.
+
+- Tab "General", block "Documentation search (RAG)": the URL of the server (e.g. `http://192.168.1.10:8000`) and,
+  only when the server sets `IOB_RAG_TOKEN`, its token (stored encrypted). "Test documentation search" checks both.
+  Empty URL: off, and the model does not get the tool.
+- The tool `search_docs` sends the question of the model to that server and returns up to 10 passages with their
+  source. Only passages of permissively licensed sources (`license_status: allow`) go to the model.
+- The agent searches before it writes a script and when it is asked how an adapter or ioBroker works. The state IDs of
+  the house still come from the objects, not from the documentation.
+
 ## Updates of adapters
 
 With **Allow adapter updates** (tab "Write permissions", off by default) the agent can update adapters, e.g. "are
@@ -545,6 +567,17 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.10.0 (2026-11-11)
+
+- Documentation search: with the URL of an ioBrokerRAG server (tab "General") the agent searches the ioBroker
+  documentation, the source code of the core and the READMEs of the adapters before it writes a script or explains an
+  adapter (tool `search_docs`); only permissively licensed passages go to the model
+- Daily token limit: cache reads no longer count (they were over 90 % of the tokens of a day); the count of the
+  day starts anew once after the update
+- Daily token limit: at 80 %, 90 % and 99 % the user gets a warning under the answer, once a day each; the log too
+- Admin chat: a request refused by the daily limit (or failed otherwise) showed "thinking …" for ever; the chat now
+  shows the error
+
 ### 0.9.7 (2026-11-11)
 
 - send_to: the model asks an adapter for its commands with "help" first, when it does not know them —
@@ -588,12 +621,6 @@ the last copy.
 - Confirmation by voice: besides the plain yes word, "okay", "klar", "конечно" and the like count as yes, also with
   "bitte" or "please", and so do "Ya" and "Yup", which Whisper made of a short spoken "Ja". The model no longer tells
   a voice user to press a button
-
-### 0.9.0 (2026-11-03)
-
-- Voice messages: voice messages of Telegram and MAX (max 0.1.13 or newer) are turned into text by a local server with the transcription API of OpenAI
-  (e.g. speaches with faster-whisper) or by OpenRouter, shown in the chat and answered like a written message. New
-  block "Speech recognition" and column "Voice" on the tab "Messengers"
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

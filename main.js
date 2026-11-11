@@ -75,6 +75,7 @@ const { isAllowedUser, stripPrefix, telegramRequestId } = require('./lib/telegra
 const { TextConfirmations, isYes, spokenAnswer, languageOf, confirmationQuestion } = require('./lib/text-confirmation');
 const { createScriptHistory, scriptName } = require('./lib/scripts');
 const { speechSettings, transcribe, listSpeechModels, silenceWav } = require('./lib/speech');
+const { docsSettings, searchDocs, testDocs } = require('./lib/docs');
 const { MAX_STORED_PICTURES, trimStoredPictures, withoutPictureNotes } = require('./lib/pictures');
 const { isPhotoPath, largestPhotos, PhotoCollector } = require('./lib/photos');
 
@@ -278,6 +279,26 @@ function contentText(content) {
     return typeof content === 'string' ? content : userText(content);
 }
 
+/**
+ * Tokens that count for the daily limit: new input, output and cache writes of all models and tools. Cache reads do
+ * not count: every request sends the whole conversation again, and the provider reads its start from the cache for
+ * about a tenth of the price; counted in full they made up over 90 % of the day.
+ *
+ * @param {{ models?: Record<string, Record<string, unknown>>, tools?: Record<string, Record<string, unknown>> }} usage usage of the harness
+ * @returns {number} tokens
+ */
+function countedTokens(usage) {
+    const all = [...Object.values(usage?.models || {}), ...Object.values(usage?.tools || {})];
+    return all.reduce(
+        (total, u) =>
+            total +
+            (Number(u?.input) || 0) +
+            (Number(u?.output) || 0) +
+            (Number(u?.cacheWrite) || 0) +
+            (Number(u?.cacheWrite1h) || 0),
+        0,
+    );
+}
 class PiAgent extends utils.Adapter {
     /** @param {Partial<utils.AdapterOptions>} [options] adapter options */
     constructor(options = {}) {
@@ -735,6 +756,10 @@ class PiAgent extends utils.Adapter {
                 restartList: this.restartList,
                 restartInstance: instance => this.restartInstance(instance),
                 memory: this.memory,
+                docs: {
+                    enabled: () => Boolean(docsSettings(this.config).url),
+                    search: (question, topK) => searchDocs(docsSettings(this.config), question, { topK }, this.fetch),
+                },
                 scripts: {
                     allowed: () => this.config.allowScripts === true,
                     foreign: () => this.config.allowScripts === true && this.config.allowForeignScripts === true,
@@ -2423,11 +2448,22 @@ class PiAgent extends utils.Adapter {
             timeZone: this.timeZone,
             log: this.log,
         });
-        const [today, total] = await Promise.all([
+        const [today, stored] = await Promise.all([
             this.getStateAsync('usage.tokensToday'),
-            this.getStateAsync('usage.tokensTotal'),
+            this.getStateAsync('usage.json'),
         ]);
-        this.limits.restore(Number(today?.val) || 0, today?.ts || 0, total ? Number(total.val) || 0 : null);
+        let usage = null;
+        try {
+            usage = stored?.val ? JSON.parse(String(stored.val)) : null;
+        } catch {
+            // no usage yet
+        }
+        if (usage && Number.isFinite(usage.limitBase)) {
+            this.limits.restore(Number(today?.val) || 0, today?.ts || 0, usage.limitBase);
+        } else {
+            // up to 0.9.7 the day counted the cache reads too; that count is not comparable, so the day starts anew
+            this.limits.restore(0, today?.ts || 0, usage ? countedTokens(usage) : null);
+        }
         await this.setStateAsync('usage.limitReached', { val: this.limits.reached(), ack: true });
     }
 
@@ -2440,13 +2476,14 @@ class PiAgent extends utils.Adapter {
             await this.setStateAsync('usage.tokensInput', { val: sum(u => u.input), ack: true });
             await this.setStateAsync('usage.tokensOutput', { val: sum(u => u.output), ack: true });
             await this.setStateAsync('usage.tokensTotal', { val: sum(u => u.totalTokens), ack: true });
+            const limitBase = countedTokens(state);
             if (this.limits) {
-                const today = this.limits.count(sum(u => u.totalTokens));
+                const today = this.limits.count(limitBase);
                 await this.setStateAsync('usage.tokensToday', { val: today.tokens, ack: true });
                 await this.setStateAsync('usage.limitReached', { val: today.reached, ack: true });
             }
             await this.setStateAsync('usage.cost', { val: Math.round(sum(u => u.cost?.total) * 1e6) / 1e6, ack: true });
-            await this.setStateAsync('usage.json', { val: JSON.stringify(state), ack: true });
+            await this.setStateAsync('usage.json', { val: JSON.stringify({ ...state, limitBase }), ack: true });
         } catch (e) {
             this.log.warn(`Usage could not be published: ${e.message}`);
         }
@@ -2509,7 +2546,8 @@ class PiAgent extends utils.Adapter {
                 }
                 const answer = await this.lastAnswer(conversation);
                 await this.removePending(requestId);
-                void this.updateUsage();
+                // counted before the answer goes out, so a warning about the daily limit can go with it
+                await this.updateUsage();
                 return answer;
             } catch (e) {
                 if (!this.stopping) {
@@ -2561,7 +2599,14 @@ class PiAgent extends utils.Adapter {
     async process(entry, options = {}) {
         try {
             const answer = await this.ask(entry.content, entry.requestId, entry.target, options);
-            await this.deliver(entry.target, answer);
+            const warning = this.limitWarning();
+            if (warning && entry.target.kind === 'admin') {
+                this.adminChat.addNotice(String(entry.target.chatId), warning);
+            }
+            await this.deliver(
+                entry.target,
+                warning && entry.target.kind !== 'admin' ? `${answer}\n\n${warning}` : answer,
+            );
         } catch (e) {
             if (this.stopping) {
                 // The request stays pending, so the next start continues it.
@@ -2575,6 +2620,19 @@ class PiAgent extends utils.Adapter {
             }
             await this.deliver(entry.target, `Error: ${e.message}`);
         }
+    }
+
+    /**
+     * The warning about the share of the daily token limit used, once a day at 80, 90 and 99 %; also in the log.
+     *
+     * @returns {string} text for the user, "" when there is nothing new
+     */
+    limitWarning() {
+        const warning = this.limits?.takeWarning() || '';
+        if (warning) {
+            this.log.warn(warning.replace(/^⚠️ /, 'Daily token limit: '));
+        }
+        return warning;
     }
 
     /**
@@ -3066,6 +3124,22 @@ class PiAgent extends utils.Adapter {
             }
             return;
         }
+        if (obj?.command === 'testDocs') {
+            // block "Documentation search" of the tab "General", with the unsaved values of the form
+            let answer;
+            try {
+                answer = {
+                    result: await testDocs(docsSettings({ ...this.config, ...Object(obj.message) }), this.fetch),
+                };
+            } catch (e) {
+                this.log.debug(`testDocs: ${e.message}`);
+                answer = { error: e.message };
+            }
+            if (obj.callback) {
+                this.sendTo(obj.from, obj.command, answer, obj.callback);
+            }
+            return;
+        }
         if (obj?.command === 'listSpeechModels' || obj?.command === 'testSpeech') {
             // block "Speech recognition" of the tab "Messengers", with the unsaved values of the form
             let answer;
@@ -3151,7 +3225,10 @@ class PiAgent extends utils.Adapter {
                 run = this.ask(content, String(requestId), target);
             }
             // a conversation of its own may get a question to confirm before the answer
-            result = { answer: key ? await this.textConfirmations.answerOf(key, run) : await run };
+            const answer = key ? await this.textConfirmations.answerOf(key, run) : await run;
+            // not into the answer: a satellite would speak it; the caller may show it
+            const warning = this.limitWarning();
+            result = warning ? { answer, warning } : { answer };
         } catch (e) {
             result = {
                 error: this.stopping

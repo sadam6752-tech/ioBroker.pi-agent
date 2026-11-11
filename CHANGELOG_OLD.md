@@ -1,5 +1,11 @@
 # Older Changelog
 
+### 0.9.0 (2026-11-03)
+
+- Voice messages: voice messages of Telegram and MAX (max 0.1.13 or newer) are turned into text by a local server with the transcription API of OpenAI
+  (e.g. speaches with faster-whisper) or by OpenRouter, shown in the chat and answered like a written message. New
+  block "Speech recognition" and column "Voice" on the tab "Messengers"
+
 ### 0.8.9 (2026-11-03)
 
 - Updates: `list_updates` with `npm: true` compares every installed adapter with npm in one call, pi-agent included;

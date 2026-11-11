@@ -738,7 +738,9 @@
                     selectConversation('');
                     return;
                 }
-                offline = Boolean(answer.error);
+                // an answer with entries is the chat: its "error" is the error of the last request (e.g. the daily
+                // limit), shown under the messages; without entries the adapter did not answer
+                offline = Boolean(answer.error) && !Array.isArray(answer.entries);
                 if (!offline) {
                     state = answer;
                     pending = false;

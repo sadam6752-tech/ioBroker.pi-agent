@@ -37,6 +37,9 @@ declare global {
             speechApiKey: string;
             /** Two letters; empty: detected for every message. */
             speechLanguage: string;
+            /** Documentation search (ioBrokerRAG, REST API v1) since 0.10.0: URL of the server, "" off; token optional. */
+            docsUrl: string;
+            docsToken: string;
             /** Single fields of 0.0.5 and earlier, moved into messengers at the first start. */
             telegramInstance: string;
             telegramUsers: string;

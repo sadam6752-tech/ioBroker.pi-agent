@@ -14,6 +14,14 @@ export interface Voice {
 
 /** What the tools read from the adapter at every use, and the adapter functions they call back into. */
 export interface Policy {
+    /** Documentation search on a RAG server (0.10.0); missing or enabled() false: no search_docs tool. */
+    docs?: {
+        enabled: () => boolean;
+        search: (
+            question: string,
+            topK?: number,
+        ) => Promise<{ results: Array<Record<string, unknown>>; left: number; unmatched?: number; ms: number }>;
+    };
     /** States the agent may write. */
     allowlist: RegExp[];
     /** States whose write the user must confirm first (missing: none). */
