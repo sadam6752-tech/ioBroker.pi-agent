@@ -130,8 +130,13 @@ sendTo('pi-agent.0', 'ask', {
     instructions: 'Answer in one or two short sentences without Markdown; the answer is spoken.', // optional
     requestId: 'kitchen-1730123456789', // optional: a repeated request with the same id is answered once
     language: 'ru', // optional: language of the user, for the questions to confirm (see below)
-}, result => log(result.answer));
+}, result => log(result.answer, result.language));
 ```
+
+A caller that sends `language` speaks the answers (ioBroker.assistant). Its conversation also gets the rule to mark
+the language of each answer; pi-agent takes the mark out and returns the code as `result.language` (`'ru'`, `'de'`
+…), so the caller can speak a Russian answer with a Russian voice, also when the satellite listens in German. When the
+model leaves the mark out, `language` is missing and the caller decides itself.
 
 The conversations are kept per sending instance (`pi-agent.0.telegram.chats` lists them as
 `sendTo:<instance>/<conversation>`). Changed instructions apply from the next request of the conversation on.
@@ -567,6 +572,13 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.10.1 (2026-11-12)
+
+- (sadam6752-tech) `ask` with `language` (ioBroker.assistant): the answer comes with the language it is written in
+  (`result.language`), so a voice satellite can speak a Russian answer with a Russian voice instead of spelling it.
+  The model marks the language (a reminder goes with each question); without a mark Cyrillic and Chinese letters
+  still tell it. A different language than the caller listens in is logged
+
 ### 0.10.0 (2026-11-11)
 
 - Documentation search: with the URL of an ioBrokerRAG server (tab "General") the agent searches the ioBroker
@@ -615,12 +627,6 @@ the last copy.
 
 - Telegram: a warning in the log when the telegram instance also hands messages to an assistant instance (since
   telegram 6.1.0 also voice messages) or to text2command, because then every message gets two answers
-
-### 0.9.1 (2026-11-03)
-
-- Confirmation by voice: besides the plain yes word, "okay", "klar", "конечно" and the like count as yes, also with
-  "bitte" or "please", and so do "Ya" and "Yup", which Whisper made of a short spoken "Ja". The model no longer tells
-  a voice user to press a button
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

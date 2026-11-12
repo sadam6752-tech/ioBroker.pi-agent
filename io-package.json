@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.10.0",
+		"version": "0.10.1",
 		"news": {
+			"0.10.1": {
+				"en": "Voice answers in the right language: when ioBroker.assistant sends its language, the answer comes back with the language it is written in (language), so a satellite can speak a Russian answer with a Russian voice instead of spelling it",
+				"de": "Sprachantworten in der richtigen Sprache: sendet ioBroker.assistant seine Sprache, kommt die Antwort mit der Sprache zurück, in der sie geschrieben ist (language), damit ein Satellit eine russische Antwort mit einer russischen Stimme spricht, statt sie zu buchstabieren",
+				"ru": "Голосовые ответы на нужном языке: если ioBroker.assistant передаёт свой язык, ответ возвращается с языком, на котором он написан (language), и сателлит может озвучить русский ответ русским голосом, а не по буквам",
+				"pt": "Respostas de voz no idioma certo: quando o ioBroker.assistant envia o seu idioma, a resposta volta com o idioma em que está escrita (language), para que um satélite fale uma resposta em russo com uma voz russa em vez de a soletrar",
+				"nl": "Spraakantwoorden in de juiste taal: als ioBroker.assistant zijn taal meestuurt, komt het antwoord terug met de taal waarin het geschreven is (language), zodat een satelliet een Russisch antwoord met een Russische stem uitspreekt in plaats van het te spellen",
+				"fr": "Réponses vocales dans la bonne langue : quand ioBroker.assistant envoie sa langue, la réponse revient avec la langue dans laquelle elle est écrite (language), pour qu'un satellite prononce une réponse en russe avec une voix russe au lieu de l'épeler",
+				"it": "Risposte vocali nella lingua giusta: quando ioBroker.assistant invia la sua lingua, la risposta torna con la lingua in cui è scritta (language), così un satellite pronuncia una risposta in russo con una voce russa invece di sillabarla",
+				"es": "Respuestas de voz en el idioma correcto: cuando ioBroker.assistant envía su idioma, la respuesta vuelve con el idioma en que está escrita (language), para que un satélite diga una respuesta en ruso con una voz rusa en lugar de deletrearla",
+				"pl": "Odpowiedzi głosowe we właściwym języku: gdy ioBroker.assistant przesyła swój język, odpowiedź wraca z językiem, w którym jest napisana (language), więc satelita wypowie rosyjską odpowiedź rosyjskim głosem zamiast ją literować",
+				"uk": "Голосові відповіді потрібною мовою: якщо ioBroker.assistant передає свою мову, відповідь повертається з мовою, якою вона написана (language), і сателіт може озвучити російську відповідь російським голосом, а не по літерах",
+				"zh-cn": "语音回答使用正确的语言：当 ioBroker.assistant 发送其语言时，回答会附带其书写语言（language），这样卫星设备可以用俄语语音朗读俄语回答，而不是逐个字母拼读"
+			},
 			"0.10.0": {
 				"en": "Documentation search: with the URL of an ioBrokerRAG server the agent looks up the ioBroker documentation before it writes a script or explains an adapter; the daily token limit no longer counts cache reads and warns at 80, 90 and 99 %; the admin chat shows a refused request instead of thinking for ever",
 				"de": "Dokumentationssuche: mit der URL eines ioBrokerRAG-Servers schlägt der Agent in der ioBroker-Dokumentation nach, bevor er ein Skript schreibt oder einen Adapter erklärt; das Tageslimit für Tokens zählt keine Cache-Lesezugriffe mehr und warnt bei 80, 90 und 99 %; der Admin-Chat zeigt eine abgelehnte Anfrage, statt endlos nachzudenken",
@@ -80,19 +93,6 @@
 				"pl": "Obrazy w „ask”: do 4 obrazów (JPEG, PNG, GIF, WebP, każdy do ok. 3,9 MB) trafia do modelu razem z tekstem, zapytanie może składać się tylko z obrazów; tak ioBroker.assistant przekazuje zdjęcia z Telegrama. Inne pliki i większe obrazy są odrzucane z ostrzeżeniem, aby odrzucony obraz nie blokował rozmowy",
 				"uk": "Зображення в «ask»: до 4 зображень (JPEG, PNG, GIF, WebP, кожне приблизно до 3,9 МБ) надходять моделі разом із текстом, запит може складатися лише із зображень; так ioBroker.assistant передає фото з Telegram. Інші файли та більші зображення відкидаються з попередженням, щоб відхилене зображення не блокувало розмову",
 				"zh-cn": "“ask”中的图片：最多 4 张图片（JPEG、PNG、GIF、WebP，每张约 3.9 MB 以内）与文字一起交给模型，请求也可以只包含图片；ioBroker.assistant 以这种方式转发 Telegram 的照片。其他文件和更大的图片会被丢弃并给出警告，以免被拒绝的图片阻塞对话"
-			},
-			"0.9.2": {
-				"en": "Telegram: a warning in the log when the telegram instance also hands messages to an assistant instance (since telegram 6.1.0 also voice messages) or to text2command, because then every message gets two answers",
-				"de": "Telegram: eine Warnung im Log, wenn die Telegram-Instanz Nachrichten auch an eine Assistant-Instanz (seit telegram 6.1.0 auch Sprachnachrichten) oder an text2command weitergibt, denn dann bekommt jede Nachricht zwei Antworten",
-				"ru": "Telegram: предупреждение в логе, если экземпляр telegram передаёт сообщения также экземпляру assistant (с telegram 6.1.0 и голосовые) или text2command, потому что тогда на каждое сообщение приходят два ответа",
-				"pt": "Telegram: um aviso no registo quando a instância do telegram também passa as mensagens a uma instância do assistant (desde o telegram 6.1.0 também as mensagens de voz) ou ao text2command, porque então cada mensagem recebe duas respostas",
-				"nl": "Telegram: een waarschuwing in het logboek wanneer de telegram-instantie berichten ook doorgeeft aan een assistant-instantie (sinds telegram 6.1.0 ook spraakberichten) of aan text2command, want dan krijgt elk bericht twee antwoorden",
-				"fr": "Telegram : un avertissement dans le journal lorsque l’instance telegram transmet aussi les messages à une instance assistant (depuis telegram 6.1.0 aussi les messages vocaux) ou à text2command, car chaque message reçoit alors deux réponses",
-				"it": "Telegram: un avviso nel log quando l’istanza telegram passa i messaggi anche a un’istanza assistant (da telegram 6.1.0 anche i messaggi vocali) o a text2command, perché allora ogni messaggio riceve due risposte",
-				"es": "Telegram: un aviso en el registro cuando la instancia de telegram también pasa los mensajes a una instancia de assistant (desde telegram 6.1.0 también los mensajes de voz) o a text2command, porque entonces cada mensaje recibe dos respuestas",
-				"pl": "Telegram: ostrzeżenie w logu, gdy instancja telegram przekazuje wiadomości także do instancji assistant (od telegram 6.1.0 również głosowe) lub do text2command, bo wtedy każda wiadomość dostaje dwie odpowiedzi",
-				"uk": "Telegram: попередження в журналі, якщо екземпляр telegram передає повідомлення також екземпляру assistant (з telegram 6.1.0 і голосові) або text2command, бо тоді на кожне повідомлення приходять дві відповіді",
-				"zh-cn": "Telegram：当 telegram 实例同时把消息交给 assistant 实例（自 telegram 6.1.0 起也包括语音消息）或 text2command 时，日志中会给出警告，因为此时每条消息都会得到两个回答"
 			}
 		},
 		"titleLang": {

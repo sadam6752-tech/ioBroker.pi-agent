@@ -77,6 +77,7 @@ const { createScriptHistory, scriptName } = require('./lib/scripts');
 const { speechSettings, transcribe, listSpeechModels, silenceWav } = require('./lib/speech');
 const { docsSettings, searchDocs, testDocs } = require('./lib/docs');
 const { MAX_STORED_PICTURES, trimStoredPictures, withoutPictureNotes } = require('./lib/pictures');
+const { withLanguageRule, withLanguageReminder, takeLanguage, scriptLanguage } = require('./lib/answer-language');
 const { isPhotoPath, largestPhotos, PhotoCollector } = require('./lib/photos');
 
 /**
@@ -146,8 +147,11 @@ const MAX_CALLER_INSTRUCTIONS = 20000;
  * ("conversation"), e.g. one per room of a voice assistant. Such a conversation keeps its own history and
  * takes the instructions the caller sends with it.
  *
+ * A caller that sends `language` (ioBroker.assistant) speaks the answers: its conversation also gets the rule to mark
+ * the language of each answer, which comes back as `language` of the result.
+ *
  * @param {unknown} from sender of the message, e.g. "system.adapter.assistant.0"
- * @param {{ conversation?: unknown, instructions?: unknown }} message message of the caller
+ * @param {{ conversation?: unknown, instructions?: unknown, language?: unknown }} message message of the caller
  * @returns {{ kind: 'sendTo', instance?: string, chatId?: string, instructions?: string }} target
  */
 function sendToTarget(from, message) {
@@ -162,9 +166,10 @@ function sendToTarget(from, message) {
     const caller = String(from || '')
         .replace(/^system\.adapter\./, '')
         .replace(/\//g, '_');
-    const instructions = String(message.instructions ?? '')
+    const own = String(message.instructions ?? '')
         .trim()
         .slice(0, MAX_CALLER_INSTRUCTIONS);
+    const instructions = String(message.language ?? '').trim() ? withLanguageRule(own) : own;
     return {
         kind: 'sendTo',
         instance: `sendTo:${caller || '?'}`,
@@ -3221,14 +3226,38 @@ class PiAgent extends utils.Adapter {
                 );
                 run = this.textConfirmations.decide(key, yes);
             } else {
-                const content = images.length ? [...(text ? [{ type: 'text', text }] : []), ...images] : text;
+                const question = images.length ? [...(text ? [{ type: 'text', text }] : []), ...images] : text;
+                // a caller that speaks the answer needs its language (lib/answer-language.js)
+                const content = message.language ? withLanguageReminder(question) : question;
                 run = this.ask(content, String(requestId), target);
             }
             // a conversation of its own may get a question to confirm before the answer
             const answer = key ? await this.textConfirmations.answerOf(key, run) : await run;
             // not into the answer: a satellite would speak it; the caller may show it
             const warning = this.limitWarning();
-            result = warning ? { answer, warning } : { answer };
+            // the mark of the language rule (lib/answer-language.js) becomes a field; without one the field is missing
+            const spoken = takeLanguage(answer);
+            // without a mark the letters still tell Russian, Ukrainian and Chinese
+            const byLetters = message.language && !spoken.language ? scriptLanguage(spoken.text) : '';
+            if (byLetters) {
+                spoken.language = byLetters;
+            }
+            if (message.language) {
+                // a different language than the caller listens in is worth a line: its voice must change
+                const asked = String(message.language).toLowerCase();
+                const how = byLetters ? ' (by its letters, no mark)' : '';
+                const line = `Answer to ${String(obj.from).replace(/^system\.adapter\./, '')} in ${spoken.language ? `${spoken.language}${how}` : 'an unknown language (no mark)'}${spoken.language && !asked.startsWith(spoken.language) ? `, it listens in ${asked}` : ''}`;
+                if (spoken.language && spoken.language !== asked.split('-')[0]) {
+                    this.log.info(line);
+                } else {
+                    this.log.debug(line);
+                }
+            }
+            result = {
+                answer: spoken.text,
+                ...(spoken.language ? { language: spoken.language } : {}),
+                ...(warning ? { warning } : {}),
+            };
         } catch (e) {
             result = {
                 error: this.stopping

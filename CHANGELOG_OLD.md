@@ -1,5 +1,11 @@
 # Older Changelog
 
+### 0.9.1 (2026-11-03)
+
+- Confirmation by voice: besides the plain yes word, "okay", "klar", "конечно" and the like count as yes, also with
+  "bitte" or "please", and so do "Ya" and "Yup", which Whisper made of a short spoken "Ja". The model no longer tells
+  a voice user to press a button
+
 ### 0.9.0 (2026-11-03)
 
 - Voice messages: voice messages of Telegram and MAX (max 0.1.13 or newer) are turned into text by a local server with the transcription API of OpenAI
