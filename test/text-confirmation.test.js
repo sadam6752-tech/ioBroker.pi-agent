@@ -9,7 +9,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { startAgent, stopAgent, waitFor } = require('./helpers/agent-harness');
-const { isYes, confirmationQuestion } = require('../lib/text-confirmation');
+const { isYes, isBareAnswer, confirmationQuestion } = require('../lib/text-confirmation');
 
 const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'pi-agent-textconfirm-'));
 const faux = () => import('@earendil-works/pi-ai/providers/faux');
@@ -251,5 +251,53 @@ test('a Russian question on a satellite that listens in German is confirmed in R
     assert.equal(question.language, 'ru');
     assert.deepEqual(await ask(agent, 'Da.', { language: 'de' }), { answer: 'Лампа включена.', language: 'ru' });
     assert.deepEqual(db.writes, [[LAMP, true]]);
+    await stopAgent(agent);
+});
+
+test('isBareAnswer: only yes or no words, at most three', () => {
+    for (const text of ['Yeah.', 'Да', 'Да, пожалуйста.', 'Nein', 'ja ja', 'Uhrzeit: 17:30\n\nNo.']) {
+        assert.ok(isBareAnswer(text), text);
+    }
+    for (const text of ['', 'Yes, but first the lamp', 'Wie spät ist es?', 'ja ja ja ja']) {
+        assert.ok(!isBareAnswer(text), text);
+    }
+});
+
+test('a bare yes in Latin letters keeps the language of the conversation: "Да" heard as "Yeah."', async () => {
+    const f = await faux();
+    const { agent, db } = await startAgent({
+        dataDir: tmp(),
+        seed: SEED(),
+        config: CONFIG(),
+        responses: [
+            // the model asks itself first (2026-11-13), the "yes" to it goes to the model
+            f.fauxAssistantMessage('Включить лампу на кухне?'),
+            f.fauxAssistantMessage(f.fauxToolCall('set_state', { id: LAMP, val: true }), { stopReason: 'toolUse' }),
+            f.fauxAssistantMessage('Лампа включена.'),
+        ],
+    });
+    await ask(agent, 'Включи лампу на кухне', { language: 'de' });
+    const question = await ask(agent, 'Yeah.', { language: 'de' });
+    assert.ok(question.answer.startsWith('Установить Лампа на кухне в true?'), question.answer);
+    assert.equal(question.language, 'ru');
+    assert.deepEqual(await ask(agent, 'Yeah.', { language: 'de' }), { answer: 'Лампа включена.', language: 'ru' });
+    assert.deepEqual(db.writes, [[LAMP, true]]);
+    await stopAgent(agent);
+});
+
+test('a new German question after a Russian one is asked in German again', async () => {
+    const f = await faux();
+    const { agent } = await startAgent({
+        dataDir: tmp(),
+        seed: SEED(),
+        config: CONFIG(),
+        responses: [
+            f.fauxAssistantMessage('Готово.'),
+            f.fauxAssistantMessage(f.fauxToolCall('set_state', { id: LAMP, val: true }), { stopReason: 'toolUse' }),
+        ],
+    });
+    await ask(agent, 'Который час?', { language: 'de' });
+    const question = await ask(agent, 'Schalte die Küchenlampe ein', { language: 'de' });
+    assert.ok(question.answer.startsWith('Kitchen lamp auf true setzen?'), question.answer);
     await stopAgent(agent);
 });

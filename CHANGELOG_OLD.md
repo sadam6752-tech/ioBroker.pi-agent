@@ -1,5 +1,10 @@
 # Older Changelog
 
+### 0.9.4 (2026-11-04)
+
+- Pictures go to the model only once: the model keeps notes of what a picture shows, later questions get the notes
+  instead of the picture. The store keeps the newest 20 pictures, older ones are removed at the start
+
 ### 0.9.3 (2026-11-04)
 
 - (@GermanBluefox) Pictures in `ask`: `images: [{ data: <base64>, mimeType }]` (JPEG, PNG, GIF, WebP, at most 4 of up

@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.10.3",
+		"version": "0.10.4",
 		"news": {
+			"0.10.4": {
+				"en": "Confirmation by voice: a bare yes or no keeps the language of the conversation; a spoken \"Да\" came back from speech recognition as \"Yeah.\", and the confirmation that followed was asked in German instead of Russian",
+				"de": "Bestätigung per Sprache: ein bloßes Ja oder Nein behält die Sprache des Gesprächs; ein gesprochenes „Да“ kam von der Spracherkennung als „Yeah.“ zurück, und die folgende Bestätigung wurde auf Deutsch statt auf Russisch gefragt",
+				"ru": "Подтверждение голосом: простое «да» или «нет» сохраняет язык разговора; сказанное «Да» распознавание речи вернуло как «Yeah.», и следующее подтверждение спрашивалось по-немецки вместо русского",
+				"pt": "Confirmação por voz: um simples sim ou não mantém o idioma da conversa; um \"Да\" falado voltou do reconhecimento de fala como \"Yeah.\", e a confirmação seguinte foi perguntada em alemão em vez de russo",
+				"nl": "Bevestiging per spraak: een kaal ja of nee behoudt de taal van het gesprek; een gesproken \"Да\" kwam van de spraakherkenning terug als \"Yeah.\", en de bevestiging daarna werd in het Duits gevraagd in plaats van in het Russisch",
+				"fr": "Confirmation vocale : un simple oui ou non garde la langue de la conversation ; un « Да » prononcé revenait de la reconnaissance vocale sous la forme « Yeah. », et la confirmation suivante était demandée en allemand au lieu du russe",
+				"it": "Conferma vocale: un semplice sì o no mantiene la lingua della conversazione; un \"Да\" pronunciato tornava dal riconoscimento vocale come \"Yeah.\", e la conferma successiva veniva chiesta in tedesco invece che in russo",
+				"es": "Confirmación por voz: un simple sí o no mantiene el idioma de la conversación; un \"Да\" hablado volvía del reconocimiento de voz como \"Yeah.\", y la confirmación siguiente se preguntaba en alemán en lugar de ruso",
+				"pl": "Potwierdzenie głosowe: samo tak lub nie zachowuje język rozmowy; wypowiedziane „Да” wracało z rozpoznawania mowy jako „Yeah.”, a następne potwierdzenie było zadawane po niemiecku zamiast po rosyjsku",
+				"uk": "Підтвердження голосом: просте «так» або «ні» зберігає мову розмови; сказане «Да» розпізнавання мовлення повертало як «Yeah.», і наступне підтвердження питалося німецькою замість російської",
+				"zh-cn": "语音确认：单纯的“是”或“否”会保留对话的语言；说出的“Да”被语音识别识别为“Yeah.”，随后的确认用德语而不是俄语提问"
+			},
 			"0.10.3": {
 				"en": "New checkbox \"Round values for spoken answers\" (on by default): a caller that speaks the answers (ioBroker.assistant) reads temperatures, percentages and wind speeds as whole numbers, so the satellite no longer says \"0,6 bis 8 Grad\"",
 				"de": "Neues Kontrollkästchen „Werte für gesprochene Antworten runden“ (standardmäßig an): ein Aufrufer, der die Antworten spricht (ioBroker.assistant), liest Temperaturen, Prozente und Windgeschwindigkeiten als ganze Zahlen, der Satellit sagt also nicht mehr „0,6 bis 8 Grad“",
@@ -80,19 +93,6 @@
 				"pl": "Zdjęcia wysłane do botów trafiają do modelu z podpisem, zdjęcia albumu jako jedno pytanie (najwyżej 4); tekst zaraz po zdjęciach bez podpisu jest pytaniem do nich. Używany jest tylko największy rozmiar zdjęcia, model widzi je raz i zachowuje notatki. Nowa kolumna „Zdjęcia” w zakładce „Messengers” (wyłączona dla istniejących wierszy); Telegram potrzebuje „Zapisuj pliki”, „Usuwaj odebrane pliki po (dniach)” z telegram 6.3.0 usuwa stare",
 				"uk": "Фото, надіслані ботам, йдуть до моделі разом із підписом, фото альбому — одним питанням (не більше 4); текст одразу після фото без підпису вважається питанням до них. Береться лише найбільший розмір фото, модель бачить його один раз і зберігає нотатки. Нова колонка «Фото» на вкладці «Месенджери» (для наявних рядків вимкнена); Telegram потрібне «Зберігати файли», «Видаляти отримані файли через (днів)» з telegram 6.3.0 видаляє старі",
 				"zh-cn": "发送给机器人的照片连同说明一起交给模型，一个相册的照片作为一个问题（最多 4 张）；紧跟在无说明照片之后的文字就是对它们的提问。只使用照片的最大尺寸，模型只看一次并保留笔记。“消息”选项卡新增“照片”列（现有行默认关闭）；Telegram 需要开启“保存文件”，telegram 6.3.0 的“在（天）后删除收到的文件”会删除旧照片"
-			},
-			"0.9.5": {
-				"en": "Reminders asked on a voice satellite of ioBroker.assistant (1.4.9+) come back there: within 24 hours as a timer on the satellite (countdown, ring, the text spoken), else spoken on the satellite when due. Scheduled writes, watches and background jobs of such a conversation are told on that satellite",
-				"de": "Erinnerungen, die an einem Sprach-Satelliten von ioBroker.assistant (1.4.9+) gestellt werden, kommen dort an: innerhalb von 24 Stunden als Timer auf dem Satelliten (Countdown, Klingeln, der Text wird gesprochen), sonst zur Fälligkeit auf dem Satelliten gesprochen. Geplante Schreibvorgänge, Überwachungen und Hintergrund-Jobs eines solchen Gesprächs melden sich auf diesem Satelliten",
-				"ru": "Напоминания, заданные на голосовом сателлите ioBroker.assistant (1.4.9+), приходят туда же: в пределах 24 часов как таймер на сателлите (отсчёт, звонок, текст произносится), иначе произносятся на сателлите в нужное время. Отложенные записи, наблюдения и фоновые задачи такой беседы сообщают на этом сателлите",
-				"pt": "Os lembretes pedidos num satélite de voz do ioBroker.assistant (1.4.9+) voltam lá: dentro de 24 horas como temporizador no satélite (contagem, toque, o texto falado), senão falados no satélite na hora. Escritas agendadas, vigilâncias e tarefas em segundo plano dessa conversa avisam nesse satélite",
-				"nl": "Herinneringen die op een spraaksatelliet van ioBroker.assistant (1.4.9+) worden gevraagd, komen daar terug: binnen 24 uur als timer op de satelliet (aftellen, bellen, de tekst uitgesproken), anders op het tijdstip op de satelliet uitgesproken. Geplande schrijfacties, bewakingen en achtergrondtaken van zo een gesprek melden zich op die satelliet",
-				"fr": "Les rappels demandés sur un satellite vocal d’ioBroker.assistant (1.4.9+) y reviennent : sous 24 heures comme minuteur sur le satellite (décompte, sonnerie, le texte est dit), sinon dits sur le satellite à l’échéance. Les écritures planifiées, les surveillances et les tâches de fond d’une telle conversation s’annoncent sur ce satellite",
-				"it": "I promemoria chiesti su un satellite vocale di ioBroker.assistant (1.4.9+) tornano lì: entro 24 ore come timer sul satellite (conto alla rovescia, squillo, il testo pronunciato), altrimenti pronunciati sul satellite alla scadenza. Scritture pianificate, sorveglianze e attività in background di tale conversazione avvisano su quel satellite",
-				"es": "Los recordatorios pedidos en un satélite de voz de ioBroker.assistant (1.4.9+) vuelven allí: dentro de 24 horas como temporizador en el satélite (cuenta atrás, timbre, el texto hablado), si no, se dicen en el satélite a su hora. Las escrituras programadas, vigilancias y tareas en segundo plano de esa conversación avisan en ese satélite",
-				"pl": "Przypomnienia zadane na satelicie głosowym ioBroker.assistant (1.4.9+) wracają tam: w ciągu 24 godzin jako minutnik na satelicie (odliczanie, dzwonek, tekst wypowiedziany), w przeciwnym razie wypowiadane na satelicie w terminie. Zaplanowane zapisy, obserwacje i zadania w tle takiej rozmowy zgłaszają się na tym satelicie",
-				"uk": "Нагадування, задані на голосовому сателіті ioBroker.assistant (1.4.9+), приходять туди ж: протягом 24 годин як таймер на сателіті (відлік, дзвінок, текст вимовляється), інакше вимовляються на сателіті у потрібний час. Відкладені записи, спостереження та фонові завдання такої розмови повідомляють на цьому сателіті",
-				"zh-cn": "在 ioBroker.assistant（1.4.9+）语音卫星上设置的提醒会回到该卫星：24 小时内作为卫星上的计时器（倒计时、响铃、朗读文本），否则在到期时在该卫星上朗读。此类对话的计划写入、监视和后台任务也在该卫星上通知"
 			}
 		},
 		"titleLang": {

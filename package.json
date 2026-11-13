@@ -1,6 +1,6 @@
 {
 	"name": "iobroker.pi-agent",
-	"version": "0.10.3",
+	"version": "0.10.4",
 	"description": "Durable LLM agent for ioBroker: crash-safe tool calls, write allowlist, idempotent triggers.",
 	"author": {
 		"name": "Alex",

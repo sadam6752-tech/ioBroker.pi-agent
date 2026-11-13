@@ -72,7 +72,14 @@ const { channelsFromConfig, legacyRows, chatKey, parseChatKey, migrateChats } = 
 const { createDrivers, messengerType, MESSENGER_ADAPTERS } = require('./lib/messengers');
 const { ADMIN, ADMIN_INSTRUCTIONS, historyOf, userText, withNotices, createAdminChat } = require('./lib/admin-chat');
 const { isAllowedUser, stripPrefix, telegramRequestId } = require('./lib/telegram');
-const { TextConfirmations, isYes, spokenAnswer, languageOf, confirmationQuestion } = require('./lib/text-confirmation');
+const {
+    TextConfirmations,
+    isYes,
+    isBareAnswer,
+    spokenAnswer,
+    languageOf,
+    confirmationQuestion,
+} = require('./lib/text-confirmation');
 const { createScriptHistory, scriptName } = require('./lib/scripts');
 const { speechSettings, transcribe, listSpeechModels, silenceWav } = require('./lib/speech');
 const { docsSettings, searchDocs, testDocs } = require('./lib/docs');
@@ -3233,7 +3240,9 @@ class PiAgent extends utils.Adapter {
             // ioBroker.assistant names the language its satellites listen in, also for a Russian question: the
             // letters of the question (without the context the caller puts in front) tell better
             const heard = named ? scriptLanguage(spokenAnswer(text)) : '';
-            const language = heard && heard !== named.split('-')[0] ? heard : named;
+            // a bare yes or no tells no language ("Да" came back as "Yeah."): the conversation keeps the one it has
+            const earlier = key && !heard && isBareAnswer(text) ? this.callerLanguages.get(key) : '';
+            const language = earlier || (heard && heard !== named.split('-')[0] ? heard : named);
             if (key && language) {
                 this.callerLanguages.set(key, language);
             }

@@ -578,6 +578,11 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.10.4 (2026-11-13)
+
+- (sadam6752-tech) Confirmation by voice: a bare yes or no keeps the language of the conversation. A spoken "Да" came
+  back from speech recognition as "Yeah.", and the confirmation that followed was asked in German instead of Russian
+
 ### 0.10.3 (2026-11-13)
 
 - (sadam6752-tech) New checkbox "Round values for spoken answers" (on by default): a caller that speaks the answers
@@ -631,11 +636,6 @@ the last copy.
 - Reminders asked on a voice satellite of ioBroker.assistant (1.4.9+) come back there: within 24 hours as a timer on
   the satellite (countdown, ring, the text spoken), else spoken on the satellite when due. Before, they went to
   `chat.answer` only. Scheduled writes, watches and background jobs of such a conversation are told on that satellite
-
-### 0.9.4 (2026-11-04)
-
-- Pictures go to the model only once: the model keeps notes of what a picture shows, later questions get the notes
-  instead of the picture. The store keeps the newest 20 pictures, older ones are removed at the start
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 
