@@ -43,6 +43,8 @@ export interface Policy {
     deliverReminder?: (conversationId: unknown, text: string, voice?: Voice) => Promise<void>;
     /** The voice satellite a conversation was last asked on (ioBroker.assistant 1.4.9+). */
     voiceOf?: (conversationId: unknown) => Voice | undefined;
+    /** Read temperatures, percentages and wind as whole numbers in this conversation (spoken answers, checkbox). */
+    roundSpoken?: (conversationId: unknown) => boolean;
     /** Set a timer with a text on a voice satellite; undefined when the assistant cannot. */
     satelliteTimer?: (
         voice: Voice,

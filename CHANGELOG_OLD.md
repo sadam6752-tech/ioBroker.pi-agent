@@ -1,5 +1,13 @@
 # Older Changelog
 
+### 0.9.3 (2026-11-04)
+
+- (@GermanBluefox) Pictures in `ask`: `images: [{ data: <base64>, mimeType }]` (JPEG, PNG, GIF, WebP, at most 4 of up
+  to about 3.9 MB) go to the model with the text; a request may consist of pictures only. ioBroker.assistant passes
+  on the photos of Telegram this way. The type is taken from the content; other files and larger pictures are dropped
+  with a warning, so a picture the model refuses cannot block the conversation. A model without image input gets a
+  note instead; `chat.pending` keeps only the text
+
 ### 0.9.2 (2026-11-04)
 
 - Telegram: a warning in the log when the telegram instance also hands messages to an assistant instance (since

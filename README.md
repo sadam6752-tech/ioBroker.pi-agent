@@ -138,6 +138,12 @@ the language of each answer; pi-agent takes the mark out and returns the code as
 …), so the caller can speak a Russian answer with a Russian voice, also when the satellite listens in German. When the
 model leaves the mark out, `language` is missing and the caller decides itself.
 
+**Round values for spoken answers** (tab "Write permissions", on by default): in the conversation of such a caller
+`get_state` reads temperatures (°C, °F, K), percentages and wind speeds (km/h, m/s, mph, kn, Bft) as whole numbers,
+so a satellite says "1 to 8 degrees" instead of "0.6 to 8 degrees". A rule in the instructions alone was not enough:
+the model read out what the weather states held. Other values (mm, kWh …) and all other conversations keep the exact
+values.
+
 The conversations are kept per sending instance (`pi-agent.0.telegram.chats` lists them as
 `sendTo:<instance>/<conversation>`). Changed instructions apply from the next request of the conversation on.
 
@@ -572,6 +578,12 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.10.3 (2026-11-13)
+
+- (sadam6752-tech) New checkbox "Round values for spoken answers" (on by default): a caller that speaks the answers
+  (ioBroker.assistant) reads temperatures, percentages and wind speeds as whole numbers, so the satellite no longer
+  says "0,6 bis 8 Grad"
+
 ### 0.10.2 (2026-11-13)
 
 - (sadam6752-tech) Confirmation by voice: the model no longer asks "Shall I?" itself before an action that the tool
@@ -624,14 +636,6 @@ the last copy.
 
 - Pictures go to the model only once: the model keeps notes of what a picture shows, later questions get the notes
   instead of the picture. The store keeps the newest 20 pictures, older ones are removed at the start
-
-### 0.9.3 (2026-11-04)
-
-- (@GermanBluefox) Pictures in `ask`: `images: [{ data: <base64>, mimeType }]` (JPEG, PNG, GIF, WebP, at most 4 of up
-  to about 3.9 MB) go to the model with the text; a request may consist of pictures only. ioBroker.assistant passes
-  on the photos of Telegram this way. The type is taken from the content; other files and larger pictures are dropped
-  with a warning, so a picture the model refuses cannot block the conversation. A model without image input gets a
-  note instead; `chat.pending` keeps only the text
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

@@ -126,5 +126,7 @@
 	"For example http://192.168.1.10:8000 (without /query)": "例如 http://192.168.1.10:8000（不含 /query）",
 	"Token of the RAG server (optional)": "RAG 服务器令牌（可选）",
 	"Only when the server sets IOB_RAG_TOKEN": "仅当服务器设置了 IOB_RAG_TOKEN 时",
-	"Test documentation search": "测试文档搜索"
+	"Test documentation search": "测试文档搜索",
+	"Round values for spoken answers": "为语音回答取整数值",
+	"For callers that speak the answers, e.g. ioBroker.assistant: temperatures, percentages and wind speeds are read as whole numbers, so the answer says \"1 to 8 degrees\" instead of \"0.6 to 8 degrees\". Chats keep the exact values.": "对于朗读回答的调用方（例如 ioBroker.assistant）：温度、百分比和风速以整数读取，回答会说“1 到 8 度”而不是“0.6 到 8 度”。聊天保留精确值。"
 }

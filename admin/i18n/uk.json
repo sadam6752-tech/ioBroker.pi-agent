@@ -126,5 +126,7 @@
 	"For example http://192.168.1.10:8000 (without /query)": "Наприклад, http://192.168.1.10:8000 (без /query)",
 	"Token of the RAG server (optional)": "Токен сервера RAG (необов'язково)",
 	"Only when the server sets IOB_RAG_TOKEN": "Лише якщо на сервері задано IOB_RAG_TOKEN",
-	"Test documentation search": "Перевірити пошук у документації"
+	"Test documentation search": "Перевірити пошук у документації",
+	"Round values for spoken answers": "Округлювати значення для голосових відповідей",
+	"For callers that speak the answers, e.g. ioBroker.assistant: temperatures, percentages and wind speeds are read as whole numbers, so the answer says \"1 to 8 degrees\" instead of \"0.6 to 8 degrees\". Chats keep the exact values.": "Для викликачів, які озвучують відповіді, наприклад ioBroker.assistant: температури, відсотки й швидкість вітру читаються як цілі числа, і відповідь звучить «від 1 до 8 градусів», а не «від 0,6 до 8 градусів». Чати отримують точні значення."
 }

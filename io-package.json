@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.10.2",
+		"version": "0.10.3",
 		"news": {
+			"0.10.3": {
+				"en": "New checkbox \"Round values for spoken answers\" (on by default): a caller that speaks the answers (ioBroker.assistant) reads temperatures, percentages and wind speeds as whole numbers, so the satellite no longer says \"0,6 bis 8 Grad\"",
+				"de": "Neues Kontrollkästchen „Werte für gesprochene Antworten runden“ (standardmäßig an): ein Aufrufer, der die Antworten spricht (ioBroker.assistant), liest Temperaturen, Prozente und Windgeschwindigkeiten als ganze Zahlen, der Satellit sagt also nicht mehr „0,6 bis 8 Grad“",
+				"ru": "Новый флажок «Округлять значения для голосовых ответов» (включён по умолчанию): вызывающий, который озвучивает ответы (ioBroker.assistant), получает температуры, проценты и скорость ветра целыми числами, и сателлит больше не говорит «0,6 bis 8 Grad»",
+				"pt": "Nova caixa de seleção \"Arredondar valores para respostas faladas\" (ativa por predefinição): um chamador que fala as respostas (ioBroker.assistant) lê temperaturas, percentagens e velocidades do vento como números inteiros, por isso o satélite já não diz \"0,6 bis 8 Grad\"",
+				"nl": "Nieuw selectievakje \"Waarden afronden voor gesproken antwoorden\" (standaard aan): een aanroeper die de antwoorden uitspreekt (ioBroker.assistant) leest temperaturen, percentages en windsnelheden als hele getallen, zodat de satelliet niet meer \"0,6 bis 8 Grad\" zegt",
+				"fr": "Nouvelle case à cocher « Arrondir les valeurs des réponses parlées » (activée par défaut) : un appelant qui prononce les réponses (ioBroker.assistant) lit les températures, les pourcentages et les vitesses du vent en nombres entiers, le satellite ne dit donc plus « 0,6 bis 8 Grad »",
+				"it": "Nuova casella \"Arrotonda i valori per le risposte vocali\" (attiva per impostazione predefinita): un chiamante che pronuncia le risposte (ioBroker.assistant) legge temperature, percentuali e velocità del vento come numeri interi, quindi il satellite non dice più \"0,6 bis 8 Grad\"",
+				"es": "Nueva casilla \"Redondear valores para respuestas habladas\" (activada por defecto): un llamante que pronuncia las respuestas (ioBroker.assistant) lee temperaturas, porcentajes y velocidades del viento como números enteros, así que el satélite ya no dice \"0,6 bis 8 Grad\"",
+				"pl": "Nowe pole wyboru „Zaokrąglaj wartości w odpowiedziach głosowych” (domyślnie włączone): wywołujący, który wypowiada odpowiedzi (ioBroker.assistant), odczytuje temperatury, procenty i prędkości wiatru jako liczby całkowite, więc satelita nie mówi już „0,6 bis 8 Grad”",
+				"uk": "Новий прапорець «Округлювати значення для голосових відповідей» (увімкнений за замовчуванням): виклик, який озвучує відповіді (ioBroker.assistant), отримує температури, відсотки та швидкість вітру цілими числами, і сателіт більше не каже «0,6 bis 8 Grad»",
+				"zh-cn": "新复选框“为语音回答取整数值”（默认开启）：朗读回答的调用方（ioBroker.assistant）读取的温度、百分比和风速均为整数，因此卫星设备不再说“0,6 bis 8 Grad”"
+			},
 			"0.10.2": {
 				"en": "Voice confirmations: the model no longer asks \"Shall I?\" itself before an action the tool confirms, so the user answers once; a Russian request on a satellite that listens in German is confirmed in Russian, and \"Da\" counts as yes; a late reply of another adapter is no longer taken for a request (endless loop with ioBroker.assistant after its update)",
 				"de": "Bestätigungen per Sprache: das Modell fragt nicht mehr selbst „Soll ich?“ vor einer Aktion, die das Werkzeug bestätigen lässt, der Nutzer antwortet also nur einmal; eine russische Anfrage an einem Satelliten, der auf Deutsch hört, wird auf Russisch bestätigt, und „Da“ gilt als Ja; eine verspätete Antwort eines anderen Adapters gilt nicht mehr als Anfrage (Endlosschleife mit ioBroker.assistant nach dessen Update)",
@@ -80,19 +93,6 @@
 				"pl": "Przypomnienia zadane na satelicie głosowym ioBroker.assistant (1.4.9+) wracają tam: w ciągu 24 godzin jako minutnik na satelicie (odliczanie, dzwonek, tekst wypowiedziany), w przeciwnym razie wypowiadane na satelicie w terminie. Zaplanowane zapisy, obserwacje i zadania w tle takiej rozmowy zgłaszają się na tym satelicie",
 				"uk": "Нагадування, задані на голосовому сателіті ioBroker.assistant (1.4.9+), приходять туди ж: протягом 24 годин як таймер на сателіті (відлік, дзвінок, текст вимовляється), інакше вимовляються на сателіті у потрібний час. Відкладені записи, спостереження та фонові завдання такої розмови повідомляють на цьому сателіті",
 				"zh-cn": "在 ioBroker.assistant（1.4.9+）语音卫星上设置的提醒会回到该卫星：24 小时内作为卫星上的计时器（倒计时、响铃、朗读文本），否则在到期时在该卫星上朗读。此类对话的计划写入、监视和后台任务也在该卫星上通知"
-			},
-			"0.9.4": {
-				"en": "Pictures go to the model only once: the model keeps notes of what a picture shows, later questions get the notes instead of the picture, which saves tokens. The store keeps the newest 20 pictures, older ones are removed at the start",
-				"de": "Bilder gehen nur einmal an das Modell: es hält in Notizen fest, was ein Bild zeigt, spätere Fragen bekommen die Notizen statt des Bildes, das spart Tokens. Der Speicher behält die neuesten 20 Bilder, ältere werden beim Start entfernt",
-				"ru": "Картинки уходят модели только один раз: модель записывает в заметки, что на картинке, следующие вопросы получают заметки вместо картинки, это экономит токены. В хранилище остаются 20 последних картинок, более старые удаляются при старте",
-				"pt": "As imagens vão para o modelo só uma vez: o modelo anota o que uma imagem mostra, as perguntas seguintes recebem as notas em vez da imagem, o que poupa tokens. O armazenamento guarda as 20 imagens mais recentes, as mais antigas são removidas no arranque",
-				"nl": "Afbeeldingen gaan maar één keer naar het model: het model noteert wat een afbeelding toont, latere vragen krijgen de notities in plaats van de afbeelding, dat spaart tokens. De opslag bewaart de nieuwste 20 afbeeldingen, oudere worden bij het starten verwijderd",
-				"fr": "Les images ne vont qu’une fois au modèle : il note ce que montre une image, les questions suivantes reçoivent les notes au lieu de l’image, ce qui économise des tokens. Le stockage garde les 20 images les plus récentes, les plus anciennes sont supprimées au démarrage",
-				"it": "Le immagini vanno al modello una sola volta: il modello annota cosa mostra un’immagine, le domande successive ricevono le note invece dell’immagine, il che fa risparmiare token. L’archivio conserva le 20 immagini più recenti, quelle più vecchie vengono rimosse all’avvio",
-				"es": "Las imágenes van al modelo solo una vez: el modelo anota lo que muestra una imagen, las preguntas siguientes reciben las notas en lugar de la imagen, lo que ahorra tokens. El almacén guarda las 20 imágenes más recientes, las más antiguas se eliminan al iniciar",
-				"pl": "Obrazy trafiają do modelu tylko raz: model zapisuje w notatkach, co pokazuje obraz, kolejne pytania dostają notatki zamiast obrazu, co oszczędza tokeny. Magazyn trzyma 20 najnowszych obrazów, starsze są usuwane przy starcie",
-				"uk": "Зображення надходять моделі лише один раз: модель записує в нотатки, що на зображенні, наступні запитання отримують нотатки замість зображення, це заощаджує токени. У сховищі лишаються 20 останніх зображень, старіші видаляються під час запуску",
-				"zh-cn": "图片只发送给模型一次：模型会记下图片的内容，之后的问题得到这些笔记而不是图片，从而节省 token。存储中保留最新的 20 张图片，更早的图片在启动时删除"
 			}
 		},
 		"titleLang": {
@@ -218,6 +218,7 @@
 		"writeRules": [],
 		"allowUpdates": false,
 		"textConfirmation": false,
+		"roundSpokenValues": true,
 		"allowScripts": false,
 		"scriptInstance": "javascript.0",
 		"allowForeignScripts": false,

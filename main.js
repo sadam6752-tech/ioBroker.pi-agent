@@ -756,6 +756,9 @@ class PiAgent extends utils.Adapter {
                 requestConfirmation: request => this.requestConfirmation(request),
                 deliverReminder: (conversationId, text, voice) => this.deliverReminder(conversationId, text, voice),
                 voiceOf: conversationId => this.voiceOf(conversationId),
+                // checkbox "Round values for spoken answers" (on by default)
+                roundSpoken: conversationId =>
+                    this.config.roundSpokenValues !== false && this.speaksAnswers(conversationId),
                 satelliteTimer: (voice, seconds, text) => this.satelliteTimer(voice, seconds, text),
                 historyInstance: () => this.historyInstance(),
                 restartList: this.restartList,
@@ -1329,6 +1332,17 @@ class PiAgent extends utils.Adapter {
             this.log.warn(`No answer to the confirmation for ${id}: ${e.message}`);
             return 'timeout';
         }
+    }
+
+    /**
+     * Whether the answers of a conversation are spoken: its sendTo caller sends `language` (ioBroker.assistant).
+     *
+     * @param {unknown} conversationId conversation id
+     * @returns {boolean} true for a conversation of a caller that speaks the answers
+     */
+    speaksAnswers(conversationId) {
+        const key = this.keyOfConversation(conversationId);
+        return Boolean(key && this.callerLanguages.get(key));
     }
 
     /**

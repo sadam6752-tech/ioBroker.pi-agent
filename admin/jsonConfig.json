@@ -451,6 +451,18 @@
                     "lg": 12,
                     "xl": 12
                 },
+                "roundSpokenValues": {
+                    "type": "checkbox",
+                    "label": "Round values for spoken answers",
+                    "help": "For callers that speak the answers, e.g. ioBroker.assistant: temperatures, percentages and wind speeds are read as whole numbers, so the answer says \"1 to 8 degrees\" instead of \"0.6 to 8 degrees\". Chats keep the exact values.",
+                    "default": true,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
                 "scriptsHeader": {
                     "type": "header",
                     "text": "Scripts of the javascript adapter",

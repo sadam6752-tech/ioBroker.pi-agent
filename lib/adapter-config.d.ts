@@ -51,6 +51,8 @@ declare global {
             allowUpdates: boolean;
             /** Confirmations by text in the conversations of sendTo callers since 0.7.2 (tab "Write permissions"). */
             textConfirmation: boolean;
+            /** Temperatures, percentages and wind as whole numbers for callers that speak the answers (0.10.3). */
+            roundSpokenValues: boolean;
             /** Scripts of the javascript adapter by the agent since 0.8.0 (tab "Write permissions"). */
             allowScripts: boolean;
             scriptInstance: string;
