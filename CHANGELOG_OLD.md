@@ -1,5 +1,10 @@
 # Older Changelog
 
+### 0.9.2 (2026-11-04)
+
+- Telegram: a warning in the log when the telegram instance also hands messages to an assistant instance (since
+  telegram 6.1.0 also voice messages) or to text2command, because then every message gets two answers
+
 ### 0.9.1 (2026-11-03)
 
 - Confirmation by voice: besides the plain yes word, "okay", "klar", "конечно" and the like count as yes, also with

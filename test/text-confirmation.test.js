@@ -219,3 +219,37 @@ test('switched off: the write is blocked as before and the first ask gets the fi
     assert.deepEqual(db.writes, []);
     await stopAgent(agent);
 });
+
+test('a late reply (callback.ack) is no request and gets no answer, so two adapters cannot loop', async () => {
+    const { agent } = await startAgent({ dataDir: tmp(), seed: SEED(), config: CONFIG(), responses: [] });
+    const before = agent.sent.length;
+    await agent.onMessage({
+        command: 'ask',
+        message: { error: 'empty question' },
+        from: 'system.adapter.assistant.0',
+        callback: { ack: true, id: 17, message: { text: 'x' }, time: Date.now() },
+    });
+    assert.equal(agent.sent.length, before, 'nothing sent back');
+    await stopAgent(agent);
+});
+
+test('a Russian question on a satellite that listens in German is confirmed in Russian, a "Da" counts as yes', async () => {
+    const f = await faux();
+    const { agent, db } = await startAgent({
+        dataDir: tmp(),
+        seed: SEED(),
+        config: CONFIG(),
+        responses: [
+            f.fauxAssistantMessage(f.fauxToolCall('set_state', { id: LAMP, val: true }), { stopReason: 'toolUse' }),
+            f.fauxAssistantMessage('Лампа включена.'),
+        ],
+    });
+    // context in German first, as ioBroker.assistant sends it; only the question counts
+    const question = await ask(agent, 'Uhrzeit: 17:30\nWetter: 12 °C\n\nВключи лампу на кухне', { language: 'de' });
+    assert.ok(question.answer.startsWith('Установить Лампа на кухне в true? Скажи да или нет.'), question.answer);
+    assert.match(question.answer, /\[\[LISTEN\]\]$/);
+    assert.equal(question.language, 'ru');
+    assert.deepEqual(await ask(agent, 'Da.', { language: 'de' }), { answer: 'Лампа включена.', language: 'ru' });
+    assert.deepEqual(db.writes, [[LAMP, true]]);
+    await stopAgent(agent);
+});

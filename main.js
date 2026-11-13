@@ -3031,6 +3031,13 @@ class PiAgent extends utils.Adapter {
 
     /** @param {ioBroker.Message} obj message from a script or another adapter */
     async onMessage(obj) {
+        // a reply whose callback is gone (the caller asked a process of ours that has stopped since) is no request:
+        // answering it would send the reply back, and a caller that does the same keeps both in a loop (assistant 1.9.0
+        // after its own update, 2026-11-13: about 25 empty "ask" a second)
+        if (obj?.callback?.ack) {
+            this.log.debug(`Ignoring a late reply from ${obj.from} to "${obj.command}"`);
+            return;
+        }
         // output and end of a command on the host (an update of an adapter)
         if (this.hostCommands.onMessage(obj)) {
             return;
@@ -3205,10 +3212,14 @@ class PiAgent extends utils.Adapter {
                 message.requestId || requestIdFor(crypto, Date.now(), text || `${images.length} image(s)`);
             const target = sendToTarget(obj.from, message);
             const key = this.chatKeyOf(target);
-            const language = String(message.language ?? '')
+            const named = String(message.language ?? '')
                 .trim()
                 .toLowerCase()
                 .slice(0, 10);
+            // ioBroker.assistant names the language its satellites listen in, also for a Russian question: the
+            // letters of the question (without the context the caller puts in front) tell better
+            const heard = named ? scriptLanguage(spokenAnswer(text)) : '';
+            const language = heard && heard !== named.split('-')[0] ? heard : named;
             if (key && language) {
                 this.callerLanguages.set(key, language);
             }

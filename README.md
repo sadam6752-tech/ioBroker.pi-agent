@@ -572,6 +572,16 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.10.2 (2026-11-13)
+
+- (sadam6752-tech) Confirmation by voice: the model no longer asks "Shall I?" itself before an action that the tool
+  confirms, so the user answers once instead of twice
+- (sadam6752-tech) A Russian request on a satellite that listens in German is confirmed in Russian (the letters of the
+  question decide, not the context in front of it), and "Da" counts as yes
+- (sadam6752-tech) A late reply of another adapter (its callback gone, because the adapter restarted while pi-agent
+  answered it) is no longer taken for a request. ioBroker.assistant 1.9.0 and pi-agent answered each other in an
+  endless loop after an update of the assistant
+
 ### 0.10.1 (2026-11-12)
 
 - (sadam6752-tech) `ask` with `language` (ioBroker.assistant): the answer comes with the language it is written in
@@ -622,11 +632,6 @@ the last copy.
   on the photos of Telegram this way. The type is taken from the content; other files and larger pictures are dropped
   with a warning, so a picture the model refuses cannot block the conversation. A model without image input gets a
   note instead; `chat.pending` keeps only the text
-
-### 0.9.2 (2026-11-04)
-
-- Telegram: a warning in the log when the telegram instance also hands messages to an assistant instance (since
-  telegram 6.1.0 also voice messages) or to text2command, because then every message gets two answers
 
 Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 
