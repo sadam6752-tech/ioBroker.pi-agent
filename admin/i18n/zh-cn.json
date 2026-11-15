@@ -128,5 +128,7 @@
 	"Only when the server sets IOB_RAG_TOKEN": "仅当服务器设置了 IOB_RAG_TOKEN 时",
 	"Test documentation search": "测试文档搜索",
 	"Round values for spoken answers": "为语音回答取整数值",
-	"For callers that speak the answers, e.g. ioBroker.assistant: temperatures, percentages and wind speeds are read as whole numbers, so the answer says \"1 to 8 degrees\" instead of \"0.6 to 8 degrees\". Chats keep the exact values.": "对于朗读回答的调用方（例如 ioBroker.assistant）：温度、百分比和风速以整数读取，回答会说“1 到 8 度”而不是“0.6 到 8 度”。聊天保留精确值。"
+	"For callers that speak the answers, e.g. ioBroker.assistant: temperatures, percentages and wind speeds are read as whole numbers, so the answer says \"1 to 8 degrees\" instead of \"0.6 to 8 degrees\". Chats keep the exact values.": "对于朗读回答的调用方（例如 ioBroker.assistant）：温度、百分比和风速以整数读取，回答会说“1 到 8 度”而不是“0.6 到 8 度”。聊天保留精确值。",
+	"Tokens per request (context)": "每次请求的令牌数（上下文）",
+	"Upper limit for the context of one request: instructions, tools and the history of the conversation. When a conversation reaches it, its older part is summarised, so every request and the first one after a pause cost less. Smallest value 24000; 32000-48000 suits voice and chat. 0 = up to the window of the model (as before). The debug log shows the tokens of every model call.": "单次请求上下文的上限：指令、工具和对话历史。对话达到上限时，较早的部分会被总结，因此每次请求以及暂停后的第一次请求花费更少。最小值 24000；语音和聊天适合 32000–48000。0 = 直到模型的上下文窗口（与以前相同）。调试日志会显示每次模型调用的令牌数。"
 }

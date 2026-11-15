@@ -4,6 +4,7 @@ const utils = require('@iobroker/adapter-core');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
+const { contextLimitOf, compactionPolicyFor } = require('./lib/context-size');
 const { parseAllowlist, parseWriteRules, requestIdFor, isWriteAllowed, toggleColumn } = require('./lib/guard');
 const { createIoBrokerExtension } = require('./lib/tools');
 const { createModelsWithKey, listModels, testModel } = require('./lib/providers');
@@ -715,6 +716,38 @@ class PiAgent extends utils.Adapter {
     }
 
     /**
+     * Run settings of the harness: the limit of the context of a request (setting "contextTokens", lib/context-size.js).
+     *
+     * @param {{ getModel: (provider: string, id: string) => { contextWindow?: number } | undefined }} models models of the provider
+     * @param {string} provider provider of the model
+     * @param {string} modelId id of the model
+     * @returns {object | undefined} settings, undefined for the defaults of the harness
+     */
+    harnessSettings(models, provider, modelId) {
+        const limit = contextLimitOf(this.config.contextTokens);
+        if (!limit) {
+            return undefined;
+        }
+        let contextWindow = 0;
+        try {
+            contextWindow = Number(models.getModel(provider, modelId)?.contextWindow) || 0;
+        } catch {
+            // unknown model: the defaults apply
+        }
+        const policy = compactionPolicyFor(limit, contextWindow);
+        if (!policy) {
+            this.log.info(
+                `Context limit ${limit} tokens: the model ${provider}/${modelId} has a window of ${contextWindow || 'unknown'} tokens, the default applies`,
+            );
+            return undefined;
+        }
+        this.log.info(
+            `The context of a request stays below ${limit} tokens (window of ${provider}/${modelId}: ${contextWindow}); older history is summarised`,
+        );
+        return { compaction: { modelOverrides: { [`${provider}/${modelId}`]: policy } } };
+    }
+
+    /**
      * Load the ESM packages and open the durable harness on the instance data directory.
      *
      * @param {string} apiKey API key of the provider (may be empty for a custom server)
@@ -823,7 +856,8 @@ class PiAgent extends utils.Adapter {
             // the chats' conversations lived in the old store
             await this.setStateAsync('telegram.chats', { val: '', ack: true });
         }
-        this.harness = await durable.Harness.open(storage, { models, registry }, this.context);
+        const settings = this.harnessSettings(models, provider, modelId);
+        this.harness = await durable.Harness.open(storage, { models, registry, settings }, this.context);
 
         this.model = { provider, modelId };
         this.root = await this.harness.root(this.context, { agent: { model: this.model } });

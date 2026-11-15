@@ -234,6 +234,17 @@ Two limits stop a request before the model is asked, so a runaway costs no token
   messages and tool results so far), and the provider reads the part it has seen from its cache for about a tenth of
   the price. Counted in full they were over 90 % of the tokens of a day. A new conversation after a change of topic
   keeps the requests small.
+- **Tokens per request (context)** (default 0 = up to the window of the model): every request carries the
+  instructions, the tool descriptions (together about 5-10k tokens) and the history of the conversation. Without a
+  limit the history grows until the window of the model is nearly full (with 128k tokens up to about 100k per request)
+  and is summarised only then. With a limit, e.g. 40000, the older part of a conversation is summarised in the
+  background from three quarters of the limit on and before the request at the limit; the last 30 % of the limit stay
+  word for word. That makes every request cheaper, above all the first one after a pause, when the cache of the
+  provider is gone and every token costs the full price. A summary is one extra model call. Smallest value 24000;
+  32000-48000 suits voice and chat. A satellite conversation that lives for weeks profits most.
+  The debug log shows every model call, e.g.
+  `Model call deepseek/deepseek-flash: context 41234 tokens (39000 from the cache = 95 %, 2234 new), answer 85, cost $0.00091`,
+  and `Summarising the older part of a conversation (threshold): 58 messages` when a summary starts.
 
 ### Messengers: Telegram and MAX
 
@@ -578,6 +589,12 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### 0.10.5 (2026-11-15)
+
+- (sadam6752-tech) New setting "Tokens per request (context)" (0 = as before): above it the older part of a
+  conversation is summarised, so a long satellite conversation no longer sends up to 100k tokens with every request.
+  The debug log shows the tokens of every model call (context, share from the cache, answer, cost)
+
 ### 0.10.4 (2026-11-13)
 
 - (sadam6752-tech) Confirmation by voice: a bare yes or no keeps the language of the conversation. A spoken "Да" came
@@ -630,14 +647,6 @@ the last copy.
   (off for rows saved before). Telegram saves photos only with "Save files"; "Delete received files after (days)" of
   telegram 6.3.0 removes old ones
 - A picture whose answer has no picture notes is no longer taken for one that was never sent
-
-### 0.9.5 (2026-11-05)
-
-- Reminders asked on a voice satellite of ioBroker.assistant (1.4.9+) come back there: within 24 hours as a timer on
-  the satellite (countdown, ring, the text spoken), else spoken on the satellite when due. Before, they went to
-  `chat.answer` only. Scheduled writes, watches and background jobs of such a conversation are told on that satellite
-
-Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 
 ## License
 

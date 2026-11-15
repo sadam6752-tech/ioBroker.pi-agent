@@ -314,6 +314,19 @@
                     "md": 4,
                     "lg": 4,
                     "xl": 4
+                },
+                "contextTokens": {
+                    "type": "number",
+                    "label": "Tokens per request (context)",
+                    "help": "Upper limit for the context of one request: instructions, tools and the history of the conversation. When a conversation reaches it, its older part is summarised, so every request and the first one after a pause cost less. Smallest value 24000; 32000-48000 suits voice and chat. 0 = up to the window of the model (as before). The debug log shows the tokens of every model call.",
+                    "min": 0,
+                    "max": 2000000,
+                    "default": 0,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
                 }
             }
         },

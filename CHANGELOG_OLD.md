@@ -1,5 +1,13 @@
 # Older Changelog
 
+### 0.9.5 (2026-11-05)
+
+- Reminders asked on a voice satellite of ioBroker.assistant (1.4.9+) come back there: within 24 hours as a timer on
+  the satellite (countdown, ring, the text spoken), else spoken on the satellite when due. Before, they went to
+  `chat.answer` only. Scheduled writes, watches and background jobs of such a conversation are told on that satellite
+
+Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
+
 ### 0.9.4 (2026-11-04)
 
 - Pictures go to the model only once: the model keeps notes of what a picture shows, later questions get the notes

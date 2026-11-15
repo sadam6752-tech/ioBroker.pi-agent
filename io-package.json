@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.10.4",
+		"version": "0.10.5",
 		"news": {
+			"0.10.5": {
+				"en": "New setting \"Tokens per request (context)\": above it the older part of a conversation is summarised, so a long satellite conversation no longer sends its whole history with every request. The debug log shows the tokens of every model call.",
+				"de": "Neue Einstellung „Tokens pro Anfrage (Kontext)“: darüber wird der ältere Teil eines Gesprächs zusammengefasst, sodass ein langes Satelliten-Gespräch nicht mehr seinen ganzen Verlauf mit jeder Anfrage sendet. Das Debug-Log zeigt die Tokens jedes Modellaufrufs.",
+				"ru": "Новая настройка «Токенов на запрос (контекст)»: выше неё старая часть разговора сжимается в краткое содержание, поэтому длинный разговор сателлита больше не отправляет всю историю с каждым запросом. Отладочный лог показывает токены каждого вызова модели.",
+				"pt": "Nova definição \"Tokens por pedido (contexto)\": acima dela a parte mais antiga de uma conversa é resumida, pelo que uma conversa longa do satélite já não envia todo o histórico em cada pedido. O registo de depuração mostra os tokens de cada chamada ao modelo.",
+				"nl": "Nieuwe instelling \"Tokens per verzoek (context)\": daarboven wordt het oudere deel van een gesprek samengevat, zodat een lang satellietgesprek niet meer zijn hele geschiedenis met elk verzoek meestuurt. Het debuglog toont de tokens van elke modelaanroep.",
+				"fr": "Nouveau réglage « Jetons par requête (contexte) » : au-delà, la partie la plus ancienne d'une conversation est résumée, de sorte qu'une longue conversation du satellite n'envoie plus tout son historique à chaque requête. Le journal de débogage montre les jetons de chaque appel au modèle.",
+				"it": "Nuova impostazione \"Token per richiesta (contesto)\": oltre questo valore la parte più vecchia di una conversazione viene riassunta, così una lunga conversazione del satellite non invia più tutta la cronologia a ogni richiesta. Il log di debug mostra i token di ogni chiamata al modello.",
+				"es": "Nuevo ajuste \"Tokens por solicitud (contexto)\": por encima de él, la parte más antigua de una conversación se resume, de modo que una conversación larga del satélite ya no envía todo su historial con cada solicitud. El registro de depuración muestra los tokens de cada llamada al modelo.",
+				"pl": "Nowe ustawienie „Tokeny na zapytanie (kontekst)”: powyżej niego starsza część rozmowy jest streszczana, więc długa rozmowa satelity nie wysyła już całej historii z każdym zapytaniem. Dziennik debugowania pokazuje tokeny każdego wywołania modelu.",
+				"uk": "Нове налаштування «Токенів на запит (контекст)»: вище нього старша частина розмови стискається в короткий зміст, тому довга розмова сателіта більше не надсилає всю історію з кожним запитом. Журнал налагодження показує токени кожного виклику моделі.",
+				"zh-cn": "新设置“每次请求的令牌数（上下文）”：超过该值时，对话中较早的部分会被总结，因此卫星的长对话不再在每次请求时发送全部历史。调试日志会显示每次模型调用的令牌数。"
+			},
 			"0.10.4": {
 				"en": "Confirmation by voice: a bare yes or no keeps the language of the conversation; a spoken \"Да\" came back from speech recognition as \"Yeah.\", and the confirmation that followed was asked in German instead of Russian",
 				"de": "Bestätigung per Sprache: ein bloßes Ja oder Nein behält die Sprache des Gesprächs; ein gesprochenes „Да“ kam von der Spracherkennung als „Yeah.“ zurück, und die folgende Bestätigung wurde auf Deutsch statt auf Russisch gefragt",
@@ -80,19 +93,6 @@
 				"pl": "send_to: model najpierw pyta adapter o jego polecenia przez \"help\" (np. satellite-display 0.2.0: dodawanie kafelków na wyświetlacze przez czat)",
 				"uk": "send_to: модель спершу запитує в адаптера його команди через \"help\" (наприклад, satellite-display 0.2.0: плитки на дисплеї через чат)",
 				"zh-cn": "send_to：模型先用 \"help\" 询问适配器的命令（例如 satellite-display 0.2.0：通过聊天向显示屏添加磁贴）"
-			},
-			"0.9.6": {
-				"en": "Photos sent to the bots go to the model with their caption, the photos of an album as one question (at most 4); a text right after photos without caption is their question. Only the largest size of a photo is used, the model sees it once and keeps notes of it. New column \"Photos\" on the tab \"Messengers\" (off for existing rows); Telegram needs \"Save files\", \"Delete received files after (days)\" of telegram 6.3.0 removes old ones",
-				"de": "An die Bots gesendete Fotos gehen mit ihrer Beschriftung an das Modell, die Fotos eines Albums als eine Frage (höchstens 4); ein Text direkt nach Fotos ohne Beschriftung ist ihre Frage. Nur die größte Auflösung eines Fotos wird verwendet, das Modell sieht es einmal und behält Notizen dazu. Neue Spalte „Fotos“ im Reiter „Messenger“ (bei bestehenden Zeilen aus); Telegram braucht „Dateien speichern“, „Empfangene Dateien löschen nach (Tagen)“ von telegram 6.3.0 entfernt alte",
-				"ru": "Фото, отправленные ботам, уходят модели вместе с подписью, фото альбома — одним вопросом (не больше 4); текст сразу после фото без подписи считается вопросом к ним. Берётся только самый большой размер фото, модель видит его один раз и сохраняет заметки. Новая колонка «Фото» на вкладке «Мессенджеры» (для существующих строк выключена); Telegram нужен «Сохранять файлы», «Удалять полученные файлы через (дней)» из telegram 6.3.0 удаляет старые",
-				"pt": "As fotos enviadas aos bots vão para o modelo com a legenda, as fotos de um álbum como uma pergunta (no máximo 4); um texto logo após fotos sem legenda é a pergunta delas. Só o maior tamanho de uma foto é usado, o modelo vê-a uma vez e guarda notas. Nova coluna \"Fotos\" no separador \"Messengers\" (desligada nas linhas existentes); o Telegram precisa de \"Salvar arquivos\", \"Excluir arquivos recebidos após (dias)\" do telegram 6.3.0 remove os antigos",
-				"nl": "Foto's die naar de bots worden gestuurd gaan met hun bijschrift naar het model, de foto's van een album als één vraag (maximaal 4); een tekst direct na foto's zonder bijschrift is hun vraag. Alleen het grootste formaat van een foto wordt gebruikt, het model ziet die één keer en bewaart notities. Nieuwe kolom 'Foto's' op het tabblad 'Messengers' (uit bij bestaande rijen); Telegram heeft 'Bestanden opslaan' nodig, 'Ontvangen bestanden verwijderen na (dagen)' van telegram 6.3.0 verwijdert oude",
-				"fr": "Les photos envoyées aux bots vont au modèle avec leur légende, les photos d’un album comme une seule question (4 au plus) ; un texte juste après des photos sans légende est leur question. Seule la plus grande taille d’une photo est utilisée, le modèle la voit une fois et en garde des notes. Nouvelle colonne « Photos » dans l’onglet « Messengers » (désactivée pour les lignes existantes) ; Telegram a besoin de « Enregistrer les fichiers », « Supprimer les fichiers reçus après (jours) » de telegram 6.3.0 supprime les anciennes",
-				"it": "Le foto inviate ai bot vanno al modello con la didascalia, le foto di un album come un’unica domanda (al massimo 4); un testo subito dopo foto senza didascalia è la loro domanda. Si usa solo la dimensione più grande di una foto, il modello la vede una volta e ne conserva note. Nuova colonna \"Foto\" nella scheda \"Messengers\" (disattivata per le righe esistenti); Telegram richiede \"Salva file\", \"Elimina i file ricevuti dopo (giorni)\" di telegram 6.3.0 rimuove quelle vecchie",
-				"es": "Las fotos enviadas a los bots llegan al modelo con su pie, las fotos de un álbum como una sola pregunta (como máximo 4); un texto justo después de fotos sin pie es su pregunta. Solo se usa el tamaño más grande de una foto, el modelo la ve una vez y guarda notas. Nueva columna \"Fotos\" en la pestaña \"Messengers\" (desactivada en las filas existentes); Telegram necesita \"Guardar archivos\", \"Eliminar archivos recibidos después de (días)\" de telegram 6.3.0 borra las antiguas",
-				"pl": "Zdjęcia wysłane do botów trafiają do modelu z podpisem, zdjęcia albumu jako jedno pytanie (najwyżej 4); tekst zaraz po zdjęciach bez podpisu jest pytaniem do nich. Używany jest tylko największy rozmiar zdjęcia, model widzi je raz i zachowuje notatki. Nowa kolumna „Zdjęcia” w zakładce „Messengers” (wyłączona dla istniejących wierszy); Telegram potrzebuje „Zapisuj pliki”, „Usuwaj odebrane pliki po (dniach)” z telegram 6.3.0 usuwa stare",
-				"uk": "Фото, надіслані ботам, йдуть до моделі разом із підписом, фото альбому — одним питанням (не більше 4); текст одразу після фото без підпису вважається питанням до них. Береться лише найбільший розмір фото, модель бачить його один раз і зберігає нотатки. Нова колонка «Фото» на вкладці «Месенджери» (для наявних рядків вимкнена); Telegram потрібне «Зберігати файли», «Видаляти отримані файли через (днів)» з telegram 6.3.0 видаляє старі",
-				"zh-cn": "发送给机器人的照片连同说明一起交给模型，一个相册的照片作为一个问题（最多 4 张）；紧跟在无说明照片之后的文字就是对它们的提问。只使用照片的最大尺寸，模型只看一次并保留笔记。“消息”选项卡新增“照片”列（现有行默认关闭）；Telegram 需要开启“保存文件”，telegram 6.3.0 的“在（天）后删除收到的文件”会删除旧照片"
 			}
 		},
 		"titleLang": {
@@ -230,6 +230,7 @@
 		"codeMode": false,
 		"requestsPerMinute": 10,
 		"dailyTokens": 0,
+		"contextTokens": 0,
 		"messengers": [],
 		"speechService": "",
 		"speechBaseUrl": "",

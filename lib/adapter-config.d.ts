@@ -21,6 +21,8 @@ declare global {
             codeMode: boolean;
             requestsPerMinute: number;
             dailyTokens: number;
+            /** Upper limit for the context of a request in tokens, 0 = the window of the model (lib/context-size.js). */
+            contextTokens: number;
             /** Messenger instances (telegram, max) since 0.1.0: one row per instance. */
             messengers: Array<{
                 enabled?: boolean;
