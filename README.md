@@ -609,7 +609,7 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 0.11.0 (2026-11-18)
 
 - (sadam6752-tech) With ioBroker.recorder installed, four read-only tools: `house_events` (what was switched, when and by whom), `house_snapshot` (the house at a moment in the past), `house_anomalies` and `usual_value`; `get_history` reads from the recorder when the history instance has nothing for a state
 
@@ -662,15 +662,6 @@ the last copy.
 
 - send_to: the model asks an adapter for its commands with "help" first, when it does not know them —
   e.g. satellite-display 0.2.0, which adds, moves and removes tiles of the displays by chat
-
-### 0.9.6 (2026-11-08)
-
-- Photos sent to the bots of Telegram and MAX go to the model with their caption, the photos of an album as one
-  question (at most 4); a text right after photos without caption is their question. Only the largest size of a
-  Telegram photo is used; the model sees it once and keeps notes of it. New column "Photos" on the tab "Messengers"
-  (off for rows saved before). Telegram saves photos only with "Save files"; "Delete received files after (days)" of
-  telegram 6.3.0 removes old ones
-- A picture whose answer has no picture notes is no longer taken for one that was never sent
 
 ## License
 

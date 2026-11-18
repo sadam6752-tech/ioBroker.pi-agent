@@ -1,5 +1,14 @@
 # Older Changelog
 
+### 0.9.6 (2026-11-08)
+
+- Photos sent to the bots of Telegram and MAX go to the model with their caption, the photos of an album as one
+  question (at most 4); a text right after photos without caption is their question. Only the largest size of a
+  Telegram photo is used; the model sees it once and keeps notes of it. New column "Photos" on the tab "Messengers"
+  (off for rows saved before). Telegram saves photos only with "Save files"; "Delete received files after (days)" of
+  telegram 6.3.0 removes old ones
+- A picture whose answer has no picture notes is no longer taken for one that was never sent
+
 ### 0.9.5 (2026-11-05)
 
 - Reminders asked on a voice satellite of ioBroker.assistant (1.4.9+) come back there: within 24 hours as a timer on
