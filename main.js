@@ -387,6 +387,8 @@ class PiAgent extends utils.Adapter {
         });
         /** Instances with "Restart allowed" in the write permissions. */
         this.restartList = [];
+        /** The instance of ioBroker.recorder found at the start (findRecorder), "" without one. */
+        this.recorderInstance = '';
         /** How long a restarted instance may take to run again. */
         this.restartWaitMs = 45_000;
         /** Enabled instances of the scheduler adapter fullcalendar, e.g. ["fullcalendar.0"]. */
@@ -785,6 +787,13 @@ class PiAgent extends utils.Adapter {
             registry.install(createCodemodeExtension({ sandbox: this.codemodeSandbox, models: false }));
             this.log.info('Code mode is on: the agent may answer with scripts that call its tools');
         }
+        // ioBroker.recorder: its tools are part of the agent only when an instance is there at the start
+        this.recorderInstance = await this.findRecorder();
+        if (this.recorderInstance) {
+            this.log.info(
+                `${this.recorderInstance} found: the agent can read the recorded house (events, snapshots, anomalies, usual values)`,
+            );
+        }
         registry.install(
             createIoBrokerExtension(this, { ...durable, schema }, () => ({
                 allowlist: this.allowlist,
@@ -801,6 +810,7 @@ class PiAgent extends utils.Adapter {
                     this.config.roundSpokenValues !== false && this.speaksAnswers(conversationId),
                 satelliteTimer: (voice, seconds, text) => this.satelliteTimer(voice, seconds, text),
                 historyInstance: () => this.historyInstance(),
+                recorder: () => this.recorderInstance || '',
                 restartList: this.restartList,
                 restartInstance: instance => this.restartInstance(instance),
                 memory: this.memory,
@@ -1769,6 +1779,29 @@ class PiAgent extends utils.Adapter {
             `Job ${job.id}: confirmation for ${id} needed, but the job reports to no messenger or admin chat`,
         );
         return 'unavailable';
+    }
+
+    /**
+     * The enabled instance of ioBroker.recorder with the lowest number ("recorder.0"), "" without one.
+     *
+     * @returns {Promise<string>} instance
+     */
+    async findRecorder() {
+        try {
+            const view = await this.getObjectViewAsync('system', 'instance', {
+                startkey: 'system.adapter.recorder.',
+                endkey: 'system.adapter.recorder.香',
+            });
+            const found = (view?.rows || [])
+                .filter(row => row.value?.common?.enabled !== false)
+                .map(row => row.id.slice('system.adapter.'.length))
+                .filter(id => /^recorder\.\d+$/.test(id))
+                .sort((a, b) => Number(a.split('.')[1]) - Number(b.split('.')[1]));
+            return found[0] || '';
+        } catch (e) {
+            this.log.debug(`No recorder instance: ${e.message}`);
+            return '';
+        }
     }
 
     /** @returns {Promise<string>} configured history instance, else the system default, else "" */

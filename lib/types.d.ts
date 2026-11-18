@@ -53,6 +53,8 @@ export interface Policy {
     ) => Promise<{ id?: unknown; fireAt?: unknown } | undefined>;
     /** History instance to query, or "". */
     historyInstance?: () => Promise<string>;
+    /** Instance of ioBroker.recorder found at the start, e.g. "recorder.0", or "": its tools exist only with one. */
+    recorder?: () => string;
     /** Instances with "Restart allowed", e.g. "telegram.0". */
     restartList?: string[];
     /** Restart an instance and wait until it runs again; resolves to a text for the model. */

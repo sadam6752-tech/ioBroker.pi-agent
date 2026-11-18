@@ -206,7 +206,7 @@ middle, they continue on the next start. The answer of a request from `chat.inpu
   state). Scheduled writes and watches of such a conversation are told there, too. In simulation mode nothing is
   spoken. Only a `tts` state of the asking instance itself is used.
 - **History:** `get_history` reads past values (up to 31 days, averaged to at most 200 values) from the history
-  instance.
+  instance; when it has nothing for a state, from ioBroker.recorder (see below).
 - **Usage:** `pi-agent.0.usage.*` shows input, output and total tokens and the cost in USD over all conversations
   (the cost needs prices in the model catalog; it can stay 0 for a provider without them), `usage.json` per model,
   `usage.tokensToday` the tokens since midnight in the time zone of the house that count for the daily limit (new
@@ -481,6 +481,26 @@ documents.
 - The agent waits up to 30 seconds for the answer; many adapters do not answer, then the command may still have worked.
   A command is never sent a second time after an interruption. In simulation mode nothing is sent.
 
+## The recorded house (ioBroker.recorder)
+
+[ioBroker.recorder](https://github.com/ioBroker/ioBroker.recorder) records every relevant state of the house without
+configuring each one, with who switched it, and learns what is usual for each hour of the week. When an instance of it
+is enabled at the start of pi-agent, the agent gets four tools that only read:
+
+| Tool | Command of the recorder | For questions like |
+|---|---|---|
+| `house_events` | `getEvents` | "What was switched yesterday evening?", "Who opened the garage?" |
+| `house_snapshot` | `getSnapshot` | "Was the bedroom window open at 22:00?", "How warm was the living room at 3 am?" |
+| `house_anomalies` | `getAnomalies` | "Was anything unusual last night?", "Why did I get this notification?" |
+| `usual_value` | `getProfile` | "Is 23 °C normal in the bathroom now?" |
+
+- Times are local times of the house; "22:00" means the last 22:00. A room is found in any language ("kitchen" finds
+  "Küche"), categories are those of the recorder (`light`, `shading`, `climate`, `windowsDoors`, `motion`, `security`,
+  `sockets`, `media`, `weather`, `energy`).
+- They need no write permission and no confirmation. Motion and presence are only there when they are enabled in the
+  recorder; a profile for `usual_value` is learned after 14 days.
+- An instance installed later is used after a restart of pi-agent.
+
 ## Documentation search (RAG)
 
 Models, local ones above all, invent functions of the script API or settings of adapters. With a server of the
@@ -588,6 +608,10 @@ the last copy.
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+
+- (sadam6752-tech) With ioBroker.recorder installed, four read-only tools: `house_events` (what was switched, when and by whom), `house_snapshot` (the house at a moment in the past), `house_anomalies` and `usual_value`; `get_history` reads from the recorder when the history instance has nothing for a state
 
 ### 0.10.5 (2026-11-15)
 
