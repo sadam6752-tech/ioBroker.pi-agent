@@ -88,6 +88,7 @@ test('DeepSeek: tool call reaches the ioBroker tool and the answer comes back', 
         assert.equal(requests[0].body.model, 'deepseek-flash');
         const toolNames = requests[0].body.tools.map(t => t.function.name).sort();
         assert.deepEqual(toolNames, [
+            'adapter_help',
             'cancel_scheduled',
             'check_npm',
             'create_job',
