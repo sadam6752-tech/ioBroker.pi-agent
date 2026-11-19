@@ -619,7 +619,7 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 0.11.1 (2026-11-19)
 
 - (@GermanBluefox) Tool `adapter_help`: before the first `send_to` to an adapter the agent reads the description the
   adapter gives of its commands and states (message `help`, `common.supportedMessages.help`), without a write
@@ -674,11 +674,6 @@ the last copy.
 - Daily token limit: at 80 %, 90 % and 99 % the user gets a warning under the answer, once a day each; the log too
 - Admin chat: a request refused by the daily limit (or failed otherwise) showed "thinking …" for ever; the chat now
   shows the error
-
-### 0.9.7 (2026-11-11)
-
-- send_to: the model asks an adapter for its commands with "help" first, when it does not know them —
-  e.g. satellite-display 0.2.0, which adds, moves and removes tiles of the displays by chat
 
 ## License
 

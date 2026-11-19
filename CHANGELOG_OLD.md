@@ -1,5 +1,10 @@
 # Older Changelog
 
+### 0.9.7 (2026-11-11)
+
+- send_to: the model asks an adapter for its commands with "help" first, when it does not know them —
+  e.g. satellite-display 0.2.0, which adds, moves and removes tiles of the displays by chat
+
 ### 0.9.6 (2026-11-08)
 
 - Photos sent to the bots of Telegram and MAX go to the model with their caption, the photos of an album as one

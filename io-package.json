@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.11.0",
+		"version": "0.11.1",
 		"news": {
+			"0.11.1": {
+				"en": "New tool adapter_help: before the first send_to the agent reads the description an adapter gives of its commands (message help), without a write permission. list_instances marks those adapters.",
+				"de": "Neues Werkzeug adapter_help: vor dem ersten send_to liest der Agent die Beschreibung, die ein Adapter von seinen Befehlen gibt (Nachricht help), ohne Schreibrecht. list_instances markiert diese Adapter.",
+				"ru": "Новый инструмент adapter_help: перед первым send_to агент читает описание команд, которое даёт адаптер (сообщение help), без права записи. list_instances отмечает такие адаптеры.",
+				"pt": "Nova ferramenta adapter_help: antes do primeiro send_to o agente lê a descrição que um adaptador dá dos seus comandos (mensagem help), sem permissão de escrita. list_instances marca esses adaptadores.",
+				"nl": "Nieuwe tool adapter_help: vóór de eerste send_to leest de agent de beschrijving die een adapter van zijn commando's geeft (bericht help), zonder schrijfrecht. list_instances markeert die adapters.",
+				"fr": "Nouvel outil adapter_help : avant le premier send_to, l'agent lit la description qu'un adaptateur donne de ses commandes (message help), sans droit d'écriture. list_instances marque ces adaptateurs.",
+				"it": "Nuovo strumento adapter_help: prima del primo send_to l'agente legge la descrizione che un adattatore dà dei suoi comandi (messaggio help), senza permesso di scrittura. list_instances contrassegna questi adattatori.",
+				"es": "Nueva herramienta adapter_help: antes del primer send_to el agente lee la descripción que un adaptador da de sus comandos (mensaje help), sin permiso de escritura. list_instances marca esos adaptadores.",
+				"pl": "Nowe narzędzie adapter_help: przed pierwszym send_to agent czyta opis poleceń, który podaje adapter (wiadomość help), bez prawa zapisu. list_instances oznacza takie adaptery.",
+				"uk": "Новий інструмент adapter_help: перед першим send_to агент читає опис команд, який дає адаптер (повідомлення help), без права запису. list_instances позначає такі адаптери.",
+				"zh-cn": "新工具 adapter_help：在第一次 send_to 之前，代理读取适配器对其命令的说明（消息 help），无需写入权限。list_instances 会标记这些适配器。"
+			},
 			"0.11.0": {
 				"en": "With ioBroker.recorder installed, the agent reads the recorded house: what was switched, when and by whom, how the house was at a moment in the past, unusual events and usual values. get_history uses the recorder for states without history.",
 				"de": "Mit installiertem ioBroker.recorder liest der Agent das aufgezeichnete Haus: was wann von wem geschaltet wurde, wie das Haus zu einem Zeitpunkt in der Vergangenheit war, ungewöhnliche Ereignisse und übliche Werte. get_history nutzt den Recorder für Datenpunkte ohne History.",
@@ -80,19 +93,6 @@
 				"pl": "Odpowiedzi głosowe we właściwym języku: gdy ioBroker.assistant przesyła swój język, odpowiedź wraca z językiem, w którym jest napisana (language), więc satelita wypowie rosyjską odpowiedź rosyjskim głosem zamiast ją literować",
 				"uk": "Голосові відповіді потрібною мовою: якщо ioBroker.assistant передає свою мову, відповідь повертається з мовою, якою вона написана (language), і сателіт може озвучити російську відповідь російським голосом, а не по літерах",
 				"zh-cn": "语音回答使用正确的语言：当 ioBroker.assistant 发送其语言时，回答会附带其书写语言（language），这样卫星设备可以用俄语语音朗读俄语回答，而不是逐个字母拼读"
-			},
-			"0.10.0": {
-				"en": "Documentation search: with the URL of an ioBrokerRAG server the agent looks up the ioBroker documentation before it writes a script or explains an adapter; the daily token limit no longer counts cache reads and warns at 80, 90 and 99 %; the admin chat shows a refused request instead of thinking for ever",
-				"de": "Dokumentationssuche: mit der URL eines ioBrokerRAG-Servers schlägt der Agent in der ioBroker-Dokumentation nach, bevor er ein Skript schreibt oder einen Adapter erklärt; das Tageslimit für Tokens zählt keine Cache-Lesezugriffe mehr und warnt bei 80, 90 und 99 %; der Admin-Chat zeigt eine abgelehnte Anfrage, statt endlos nachzudenken",
-				"ru": "Поиск по документации: с URL сервера ioBrokerRAG агент сверяется с документацией ioBroker, прежде чем писать скрипт или объяснять адаптер; дневной лимит токенов больше не учитывает чтение из кэша и предупреждает на 80, 90 и 99 %; чат в admin показывает отклонённый запрос, а не думает бесконечно",
-				"pt": "Pesquisa na documentação: com o URL de um servidor ioBrokerRAG, o agente consulta a documentação do ioBroker antes de escrever um script ou explicar um adaptador; o limite diário de tokens já não conta leituras da cache e avisa a 80, 90 e 99 %; o chat do admin mostra um pedido recusado em vez de pensar sem fim",
-				"nl": "Zoeken in de documentatie: met de URL van een ioBrokerRAG-server zoekt de agent in de ioBroker-documentatie voordat hij een script schrijft of een adapter uitlegt; de daglimiet voor tokens telt geen cache-leesacties meer en waarschuwt bij 80, 90 en 99 %; de admin-chat toont een geweigerd verzoek in plaats van eindeloos na te denken",
-				"fr": "Recherche dans la documentation : avec l'URL d'un serveur ioBrokerRAG, l'agent consulte la documentation d'ioBroker avant d'écrire un script ou d'expliquer un adaptateur ; la limite quotidienne de jetons ne compte plus les lectures du cache et avertit à 80, 90 et 99 % ; le chat de l'admin affiche une requête refusée au lieu de réfléchir sans fin",
-				"it": "Ricerca nella documentazione: con l'URL di un server ioBrokerRAG l'agente consulta la documentazione di ioBroker prima di scrivere uno script o spiegare un adattatore; il limite giornaliero di token non conta più le letture dalla cache e avvisa all'80, 90 e 99 %; la chat dell'admin mostra una richiesta rifiutata invece di pensare all'infinito",
-				"es": "Búsqueda en la documentación: con la URL de un servidor ioBrokerRAG, el agente consulta la documentación de ioBroker antes de escribir un script o explicar un adaptador; el límite diario de tokens ya no cuenta las lecturas de la caché y avisa al 80, 90 y 99 %; el chat del admin muestra una petición rechazada en lugar de pensar sin fin",
-				"pl": "Wyszukiwanie w dokumentacji: z adresem URL serwera ioBrokerRAG agent sprawdza dokumentację ioBrokera, zanim napisze skrypt lub wyjaśni adapter; dzienny limit tokenów nie liczy już odczytów z pamięci podręcznej i ostrzega przy 80, 90 i 99 %; czat w adminie pokazuje odrzucone żądanie zamiast myśleć bez końca",
-				"uk": "Пошук у документації: з URL сервера ioBrokerRAG агент звіряється з документацією ioBroker, перш ніж писати скрипт або пояснювати адаптер; денний ліміт токенів більше не враховує читання з кешу й попереджає на 80, 90 і 99 %; чат в admin показує відхилений запит замість нескінченного очікування",
-				"zh-cn": "文档搜索：配置 ioBrokerRAG 服务器的 URL 后，代理在编写脚本或解释适配器之前会查阅 ioBroker 文档；每日令牌限额不再计入缓存读取，并在 80%、90% 和 99% 时发出警告；管理界面聊天会显示被拒绝的请求，而不再无限思考"
 			}
 		},
 		"titleLang": {
