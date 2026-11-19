@@ -623,7 +623,8 @@ the last copy.
 
 - (@GermanBluefox) Tool `adapter_help`: before the first `send_to` to an adapter the agent reads the description the
   adapter gives of its commands and states (message `help`, `common.supportedMessages.help`), without a write
-  permission; `list_instances` marks those adapters with `"help": true`
+  permission; `list_instances` marks those adapters with `"help": true`; the description of `send_to` points to it
+  instead of telling the model to send `help` itself (that needed a write permission)
 
 ### 0.11.0 (2026-11-18)
 

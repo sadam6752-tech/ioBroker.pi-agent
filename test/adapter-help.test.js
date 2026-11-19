@@ -164,3 +164,12 @@ test('adapter_help sends nothing to an instance that takes no messages, is stopp
     assert.match(await callTool(ctx, 'adapter_help', { instance: 'telegram' }), /is no adapter instance/);
     assert.deepEqual(ctx.adapter.sent, []);
 });
+
+test('send_to points to adapter_help and no longer asks to send "help" itself (that needs a write permission)', async () => {
+    const { ext } = await setup();
+    const sendTo = ext.tools.find(t => t.name === 'send_to');
+    assert.ok(sendTo, 'send_to exists');
+    assert.match(sendTo.description, /adapter_help/);
+    assert.doesNotMatch(sendTo.description, /send it first/);
+    assert.match(sendTo.description, /do not send "help" with send_to/);
+});
