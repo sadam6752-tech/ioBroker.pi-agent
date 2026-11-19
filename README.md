@@ -481,6 +481,16 @@ documents.
 - The agent waits up to 30 seconds for the answer; many adapters do not answer, then the command may still have worked.
   A command is never sent a second time after an interruption. In simulation mode nothing is sent.
 
+Before the first command to an adapter the agent reads what the adapter says about itself, with the tool
+`adapter_help`: the adapter answers the message `help` with its commands, their parameters and answers, its
+important states, and which commands only read and which change something. `list_instances` marks the instances that
+declare it (`common.supportedMessages.help` in their `io-package.json`) with `"help": true`. Without a help the agent
+uses only commands the adapter documents and does not guess.
+
+- `adapter_help` only reads: it needs no row in "Write permissions" and no confirmation.
+- It asks only running instances that take messages; an adapter that does not declare `help` gets 3 seconds to
+  answer anyway, one that declares it 10 seconds.
+
 ## The recorded house (ioBroker.recorder)
 
 [ioBroker.recorder](https://github.com/ioBroker/ioBroker.recorder) records every relevant state of the house without
@@ -608,6 +618,13 @@ the last copy.
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+
+- (@GermanBluefox) Tool `adapter_help`: before the first `send_to` to an adapter the agent reads the description the
+  adapter gives of its commands and states (message `help`, `common.supportedMessages.help`), without a write
+  permission; `list_instances` marks those adapters with `"help": true`; the description of `send_to` points to it
+  instead of telling the model to send `help` itself (that needed a write permission)
 
 ### 0.11.0 (2026-11-18)
 
