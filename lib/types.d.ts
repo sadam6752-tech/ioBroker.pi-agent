@@ -1,7 +1,27 @@
 // Types shared by the JavaScript sources, for the type check only.
 
+/** A voice satellite of ioBroker.assistant that asked: where to speak and to set timers. */
+export interface Voice {
+    /** The assistant instance, e.g. "assistant.0". */
+    instance: string;
+    /** Its id in the assistant, e.g. "Gast". */
+    satellite: string;
+    /** The state that speaks on it, e.g. "assistant.0.satellites.Gast.tts". */
+    tts: string;
+    /** Language it listens in, e.g. "de". */
+    language?: string;
+}
+
 /** What the tools read from the adapter at every use, and the adapter functions they call back into. */
 export interface Policy {
+    /** Documentation search on a RAG server (0.10.0); missing or enabled() false: no search_docs tool. */
+    docs?: {
+        enabled: () => boolean;
+        search: (
+            question: string,
+            topK?: number,
+        ) => Promise<{ results: Array<Record<string, unknown>>; left: number; unmatched?: number; ms: number }>;
+    };
     /** States the agent may write. */
     allowlist: RegExp[];
     /** States whose write the user must confirm first (missing: none). */
@@ -20,9 +40,21 @@ export interface Policy {
         action?: string;
     }) => Promise<string>;
     /** Send a reminder that is due. */
-    deliverReminder?: (conversationId: unknown, text: string) => Promise<void>;
+    deliverReminder?: (conversationId: unknown, text: string, voice?: Voice) => Promise<void>;
+    /** The voice satellite a conversation was last asked on (ioBroker.assistant 1.4.9+). */
+    voiceOf?: (conversationId: unknown) => Voice | undefined;
+    /** Read temperatures, percentages and wind as whole numbers in this conversation (spoken answers, checkbox). */
+    roundSpoken?: (conversationId: unknown) => boolean;
+    /** Set a timer with a text on a voice satellite; undefined when the assistant cannot. */
+    satelliteTimer?: (
+        voice: Voice,
+        seconds: number,
+        text: string,
+    ) => Promise<{ id?: unknown; fireAt?: unknown } | undefined>;
     /** History instance to query, or "". */
     historyInstance?: () => Promise<string>;
+    /** Instance of ioBroker.recorder found at the start, e.g. "recorder.0", or "": its tools exist only with one. */
+    recorder?: () => string;
     /** Instances with "Restart allowed", e.g. "telegram.0". */
     restartList?: string[];
     /** Restart an instance and wait until it runs again; resolves to a text for the model. */

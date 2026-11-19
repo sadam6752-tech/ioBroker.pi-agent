@@ -21,8 +21,17 @@ declare global {
             codeMode: boolean;
             requestsPerMinute: number;
             dailyTokens: number;
+            /** Upper limit for the context of a request in tokens, 0 = the window of the model (lib/context-size.js). */
+            contextTokens: number;
             /** Messenger instances (telegram, max) since 0.1.0: one row per instance. */
-            messengers: Array<{ enabled?: boolean; instance: string; users: string; prefix: string; voice?: boolean }>;
+            messengers: Array<{
+                enabled?: boolean;
+                instance: string;
+                users: string;
+                prefix: string;
+                voice?: boolean;
+                photos?: boolean;
+            }>;
             /** Speech recognition of voice messages since 0.9.0: "" off, "server" (OpenAI-compatible URL) or "openrouter". */
             speechService: '' | 'server' | 'openrouter';
             speechBaseUrl: string;
@@ -30,6 +39,9 @@ declare global {
             speechApiKey: string;
             /** Two letters; empty: detected for every message. */
             speechLanguage: string;
+            /** Documentation search (ioBrokerRAG, REST API v1) since 0.10.0: URL of the server, "" off; token optional. */
+            docsUrl: string;
+            docsToken: string;
             /** Single fields of 0.0.5 and earlier, moved into messengers at the first start. */
             telegramInstance: string;
             telegramUsers: string;
@@ -41,6 +53,8 @@ declare global {
             allowUpdates: boolean;
             /** Confirmations by text in the conversations of sendTo callers since 0.7.2 (tab "Write permissions"). */
             textConfirmation: boolean;
+            /** Temperatures, percentages and wind as whole numbers for callers that speak the answers (0.10.3). */
+            roundSpokenValues: boolean;
             /** Scripts of the javascript adapter by the agent since 0.8.0 (tab "Write permissions"). */
             allowScripts: boolean;
             scriptInstance: string;

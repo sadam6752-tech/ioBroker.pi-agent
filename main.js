@@ -4,6 +4,7 @@ const utils = require('@iobroker/adapter-core');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
+const { contextLimitOf, compactionPolicyFor } = require('./lib/context-size');
 const { parseAllowlist, parseWriteRules, requestIdFor, isWriteAllowed, toggleColumn } = require('./lib/guard');
 const { createIoBrokerExtension } = require('./lib/tools');
 const { createModelsWithKey, listModels, testModel } = require('./lib/providers');
@@ -72,10 +73,20 @@ const { channelsFromConfig, legacyRows, chatKey, parseChatKey, migrateChats } = 
 const { createDrivers, messengerType, MESSENGER_ADAPTERS } = require('./lib/messengers');
 const { ADMIN, ADMIN_INSTRUCTIONS, historyOf, userText, withNotices, createAdminChat } = require('./lib/admin-chat');
 const { isAllowedUser, stripPrefix, telegramRequestId } = require('./lib/telegram');
-const { TextConfirmations, isYes, spokenAnswer, languageOf, confirmationQuestion } = require('./lib/text-confirmation');
+const {
+    TextConfirmations,
+    isYes,
+    isBareAnswer,
+    spokenAnswer,
+    languageOf,
+    confirmationQuestion,
+} = require('./lib/text-confirmation');
 const { createScriptHistory, scriptName } = require('./lib/scripts');
 const { speechSettings, transcribe, listSpeechModels, silenceWav } = require('./lib/speech');
+const { docsSettings, searchDocs, testDocs } = require('./lib/docs');
 const { MAX_STORED_PICTURES, trimStoredPictures, withoutPictureNotes } = require('./lib/pictures');
+const { withLanguageRule, withLanguageReminder, takeLanguage, scriptLanguage } = require('./lib/answer-language');
+const { isPhotoPath, largestPhotos, PhotoCollector } = require('./lib/photos');
 
 /**
  * Text blocks of the model messages of one transcript entry.
@@ -144,8 +155,11 @@ const MAX_CALLER_INSTRUCTIONS = 20000;
  * ("conversation"), e.g. one per room of a voice assistant. Such a conversation keeps its own history and
  * takes the instructions the caller sends with it.
  *
+ * A caller that sends `language` (ioBroker.assistant) speaks the answers: its conversation also gets the rule to mark
+ * the language of each answer, which comes back as `language` of the result.
+ *
  * @param {unknown} from sender of the message, e.g. "system.adapter.assistant.0"
- * @param {{ conversation?: unknown, instructions?: unknown }} message message of the caller
+ * @param {{ conversation?: unknown, instructions?: unknown, language?: unknown }} message message of the caller
  * @returns {{ kind: 'sendTo', instance?: string, chatId?: string, instructions?: string }} target
  */
 function sendToTarget(from, message) {
@@ -160,9 +174,10 @@ function sendToTarget(from, message) {
     const caller = String(from || '')
         .replace(/^system\.adapter\./, '')
         .replace(/\//g, '_');
-    const instructions = String(message.instructions ?? '')
+    const own = String(message.instructions ?? '')
         .trim()
         .slice(0, MAX_CALLER_INSTRUCTIONS);
+    const instructions = String(message.language ?? '').trim() ? withLanguageRule(own) : own;
     return {
         kind: 'sendTo',
         instance: `sendTo:${caller || '?'}`,
@@ -170,6 +185,41 @@ function sendToTarget(from, message) {
         ...(instructions ? { instructions } : {}),
     };
 }
+
+/**
+ * The voice satellite an "ask" came from (ioBroker.assistant 1.4.9+: `satellite` and `tts`), to speak on it later.
+ * The tts state must belong to the caller, so an "ask" cannot make pi-agent write any other state.
+ *
+ * @param {string} from sender of the message, e.g. "system.adapter.assistant.0"
+ * @param {{ satellite?: unknown, tts?: unknown }} message the message
+ * @returns {{ instance: string, satellite: string, tts: string } | undefined} the satellite
+ */
+function callerVoice(from, message) {
+    const instance = String(from || '').replace(/^system\.adapter\./, '');
+    const tts = String(message.tts ?? '').trim();
+    if (!instance || !tts.startsWith(`${instance}.`) || /[\s*?]/.test(tts) || tts.length > 200) {
+        return undefined;
+    }
+    const satellite = String(message.satellite ?? '')
+        .trim()
+        .slice(0, 100);
+    return { instance, satellite, tts };
+}
+
+/** "Reminder" in the language of a satellite, before the text it speaks. */
+const REMINDER_WORD = {
+    de: 'Erinnerung',
+    en: 'Reminder',
+    ru: 'Напоминание',
+    uk: 'Нагадування',
+    fr: 'Rappel',
+    nl: 'Herinnering',
+    it: 'Promemoria',
+    es: 'Recordatorio',
+    pl: 'Przypomnienie',
+    pt: 'Lembrete',
+    'zh-cn': '提醒',
+};
 
 /** At most this many pictures per "ask" (ioBroker.assistant sends up to 4) */
 const MAX_ASK_IMAGES = 4;
@@ -242,6 +292,26 @@ function contentText(content) {
     return typeof content === 'string' ? content : userText(content);
 }
 
+/**
+ * Tokens that count for the daily limit: new input, output and cache writes of all models and tools. Cache reads do
+ * not count: every request sends the whole conversation again, and the provider reads its start from the cache for
+ * about a tenth of the price; counted in full they made up over 90 % of the day.
+ *
+ * @param {{ models?: Record<string, Record<string, unknown>>, tools?: Record<string, Record<string, unknown>> }} usage usage of the harness
+ * @returns {number} tokens
+ */
+function countedTokens(usage) {
+    const all = [...Object.values(usage?.models || {}), ...Object.values(usage?.tools || {})];
+    return all.reduce(
+        (total, u) =>
+            total +
+            (Number(u?.input) || 0) +
+            (Number(u?.output) || 0) +
+            (Number(u?.cacheWrite) || 0) +
+            (Number(u?.cacheWrite1h) || 0),
+        0,
+    );
+}
 class PiAgent extends utils.Adapter {
     /** @param {Partial<utils.AdapterOptions>} [options] adapter options */
     constructor(options = {}) {
@@ -276,11 +346,22 @@ class PiAgent extends utils.Adapter {
         this.drivers = createDrivers(this);
         /** Confirmations by text in the conversations of sendTo callers (setting "textConfirmation"). */
         this.textConfirmations = new TextConfirmations(this);
+        /** Photos sent to the bots, gathered with their caption (lib/photos.js). */
+        this.photos = new PhotoCollector(message => void this.onPhotoMessage(message), {
+            setTimeout: (fn, ms) => this.setTimeout(fn, ms),
+            /** @param {ioBroker.Timeout | undefined} timer handle of setTimeout */
+            clearTimeout: timer => timer && this.clearTimeout(timer),
+        });
         /**
          * Per sendTo conversation: the language the caller named in its last "ask" (e.g. "ru"), for the questions to
          * confirm. A voice satellite listens in it; a question in another language gets an answer it cannot hear.
          */
         this.callerLanguages = new Map();
+        /**
+         * Per sendTo conversation: the voice satellite of its last "ask" (ioBroker.assistant 1.4.9+), so reminders,
+         * scheduled writes and watches are told on the satellite they were asked on: instance, satellite, tts.
+         */
+        this.callerVoices = new Map();
         /** Questions, errors and reminders of the chat in the admin tab, per ioBroker user. */
         this.adminChat = createAdminChat(this);
         /** Long-term memory shared by all conversations (lib/memory.js). */
@@ -306,6 +387,8 @@ class PiAgent extends utils.Adapter {
         });
         /** Instances with "Restart allowed" in the write permissions. */
         this.restartList = [];
+        /** The instance of ioBroker.recorder found at the start (findRecorder), "" without one. */
+        this.recorderInstance = '';
         /** How long a restarted instance may take to run again. */
         this.restartWaitMs = 45_000;
         /** Enabled instances of the scheduler adapter fullcalendar, e.g. ["fullcalendar.0"]. */
@@ -635,6 +718,38 @@ class PiAgent extends utils.Adapter {
     }
 
     /**
+     * Run settings of the harness: the limit of the context of a request (setting "contextTokens", lib/context-size.js).
+     *
+     * @param {{ getModel: (provider: string, id: string) => { contextWindow?: number } | undefined }} models models of the provider
+     * @param {string} provider provider of the model
+     * @param {string} modelId id of the model
+     * @returns {object | undefined} settings, undefined for the defaults of the harness
+     */
+    harnessSettings(models, provider, modelId) {
+        const limit = contextLimitOf(this.config.contextTokens);
+        if (!limit) {
+            return undefined;
+        }
+        let contextWindow = 0;
+        try {
+            contextWindow = Number(models.getModel(provider, modelId)?.contextWindow) || 0;
+        } catch {
+            // unknown model: the defaults apply
+        }
+        const policy = compactionPolicyFor(limit, contextWindow);
+        if (!policy) {
+            this.log.info(
+                `Context limit ${limit} tokens: the model ${provider}/${modelId} has a window of ${contextWindow || 'unknown'} tokens, the default applies`,
+            );
+            return undefined;
+        }
+        this.log.info(
+            `The context of a request stays below ${limit} tokens (window of ${provider}/${modelId}: ${contextWindow}); older history is summarised`,
+        );
+        return { compaction: { modelOverrides: { [`${provider}/${modelId}`]: policy } } };
+    }
+
+    /**
      * Load the ESM packages and open the durable harness on the instance data directory.
      *
      * @param {string} apiKey API key of the provider (may be empty for a custom server)
@@ -672,6 +787,13 @@ class PiAgent extends utils.Adapter {
             registry.install(createCodemodeExtension({ sandbox: this.codemodeSandbox, models: false }));
             this.log.info('Code mode is on: the agent may answer with scripts that call its tools');
         }
+        // ioBroker.recorder: its tools are part of the agent only when an instance is there at the start
+        this.recorderInstance = await this.findRecorder();
+        if (this.recorderInstance) {
+            this.log.info(
+                `${this.recorderInstance} found: the agent can read the recorded house (events, snapshots, anomalies, usual values)`,
+            );
+        }
         registry.install(
             createIoBrokerExtension(this, { ...durable, schema }, () => ({
                 allowlist: this.allowlist,
@@ -681,11 +803,21 @@ class PiAgent extends utils.Adapter {
                 codeMode: this.config.codeMode === true,
                 instructions: String(this.config.instructions || ''),
                 requestConfirmation: request => this.requestConfirmation(request),
-                deliverReminder: (conversationId, text) => this.deliverReminder(conversationId, text),
+                deliverReminder: (conversationId, text, voice) => this.deliverReminder(conversationId, text, voice),
+                voiceOf: conversationId => this.voiceOf(conversationId),
+                // checkbox "Round values for spoken answers" (on by default)
+                roundSpoken: conversationId =>
+                    this.config.roundSpokenValues !== false && this.speaksAnswers(conversationId),
+                satelliteTimer: (voice, seconds, text) => this.satelliteTimer(voice, seconds, text),
                 historyInstance: () => this.historyInstance(),
+                recorder: () => this.recorderInstance || '',
                 restartList: this.restartList,
                 restartInstance: instance => this.restartInstance(instance),
                 memory: this.memory,
+                docs: {
+                    enabled: () => Boolean(docsSettings(this.config).url),
+                    search: (question, topK) => searchDocs(docsSettings(this.config), question, { topK }, this.fetch),
+                },
                 scripts: {
                     allowed: () => this.config.allowScripts === true,
                     foreign: () => this.config.allowScripts === true && this.config.allowForeignScripts === true,
@@ -734,7 +866,8 @@ class PiAgent extends utils.Adapter {
             // the chats' conversations lived in the old store
             await this.setStateAsync('telegram.chats', { val: '', ack: true });
         }
-        this.harness = await durable.Harness.open(storage, { models, registry }, this.context);
+        const settings = this.harnessSettings(models, provider, modelId);
+        this.harness = await durable.Harness.open(storage, { models, registry, settings }, this.context);
 
         this.model = { provider, modelId };
         this.root = await this.harness.root(this.context, { agent: { model: this.model } });
@@ -747,10 +880,16 @@ class PiAgent extends utils.Adapter {
     /** Listen to the configured messenger instances, if any. */
     async startMessengers() {
         this.channels = new Map();
+        const speech = speechSettings(this.config);
         for (const channel of channelsFromConfig(this.config)) {
             const driver = this.drivers[messengerType(channel.instance)];
             if (driver) {
-                this.channels.set(channel.instance, { ...channel, driver });
+                this.channels.set(channel.instance, {
+                    ...channel,
+                    driver,
+                    voiceOn: Boolean(channel.voice && speech.service && driver.voiceMessages),
+                    photosOn: Boolean(channel.photos && driver.photoMessages),
+                });
             } else {
                 this.log.warn(
                     `Messenger ${channel.instance} ignored: only ${MESSENGER_ADAPTERS.join(' and ')} are supported`,
@@ -774,8 +913,7 @@ class PiAgent extends utils.Adapter {
                 this.context,
             );
         }
-        const speech = speechSettings(this.config);
-        for (const { instance, allowed, prefix, voice, driver } of this.channels.values()) {
+        for (const { instance, allowed, prefix, voiceOn, photosOn, driver } of this.channels.values()) {
             if (allowed.size === 0) {
                 this.log.warn(`${driver.label} ${instance}: no user is allowed, every message is ignored.`);
             }
@@ -784,13 +922,55 @@ class PiAgent extends utils.Adapter {
                 `${driver.label}: listening on ${instance} for ${allowed.size} allowed user(s)${prefix ? `, prefix "${prefix}"` : ''}`,
             );
             await this.warnOfSecondAnswer(instance, driver.label);
-            // the telegram adapter saves every voice message and writes its path to communicate.pathFile
-            if (voice && speech.service && driver.voiceMessages) {
+            // the messenger adapter saves voice messages and photos and writes their path to communicate.pathFile
+            if (voiceOn || photosOn) {
                 await this.subscribeForeignStatesAsync(`${instance}.communicate.pathFile`);
+            }
+            if (voiceOn) {
                 this.log.info(
                     `${driver.label}: voice messages on ${instance} are recognized by ${speech.service === 'openrouter' ? 'OpenRouter' : speech.baseUrl} (${speech.model || 'no model'})`,
                 );
             }
+            if (photosOn) {
+                this.log.info(`${driver.label}: photos on ${instance} go to the model`);
+                await this.checkPhotoSettings(instance, driver);
+            }
+        }
+    }
+
+    /**
+     * Hints for photos: the telegram adapter saves photos only with "Save files", tells a caption of a photo (sent
+     * before the photo) only with "Remember raw request data", and keeps photos until "Delete received files after (days)"
+     * (6.3.0) is set. The max adapter always saves them and removes old ones itself.
+     *
+     * @param {string} instance messenger instance
+     * @param {{ label: string, photoSettings?: boolean }} driver messenger driver
+     */
+    async checkPhotoSettings(instance, driver) {
+        if (!driver.photoSettings) {
+            return;
+        }
+        let native;
+        try {
+            native = (await this.getForeignObjectAsync(`system.adapter.${instance}`))?.native;
+        } catch {
+            return; // only a hint
+        }
+        if (!native) {
+            return;
+        }
+        if (!native.saveFiles) {
+            this.log.warn(
+                `${driver.label} ${instance} does not save received files ("Save files" in its settings is off): photos do not reach the agent`,
+            );
+        } else if (!native.storeRawRequest) {
+            this.log.warn(
+                `${driver.label} ${instance} does not store raw requests ("Remember raw request data" on the tab Messages of its settings is off): a photo and its caption get two separate answers`,
+            );
+        } else if (!(Number(native.deleteFilesAfterDays) > 0)) {
+            this.log.info(
+                `${driver.label} ${instance} keeps received photos for ever; "Delete received files after (days)" (telegram 6.3.0+) removes old ones`,
+            );
         }
     }
 
@@ -856,8 +1036,8 @@ class PiAgent extends utils.Adapter {
      */
     async onVoiceMessage(instance, state) {
         const filePath = String(state?.val || '');
-        // pathFile also names photos and documents when the telegram adapter saves those
-        if (!/[\\/]voice[\\/][^\\/]+$/.test(filePath)) {
+        // pathFile also names documents, videos and audio files when the telegram adapter saves those
+        if (!this.channels.get(instance)?.voiceOn || !/[\\/]voice[\\/][^\\/]+$/.test(filePath)) {
             return;
         }
         const { allowed, driver } = this.channels.get(instance);
@@ -868,7 +1048,7 @@ class PiAgent extends utils.Adapter {
         }
         let text;
         try {
-            const audio = await this.readVoiceFile(instance, filePath);
+            const audio = await this.readReceivedFile(instance, filePath, 'voice');
             const started = Date.now();
             text = await transcribe(
                 await this.speechSettingsOf(this.config),
@@ -897,14 +1077,82 @@ class PiAgent extends utils.Adapter {
     }
 
     /**
-     * The file of a voice message. The telegram adapter names a path in its data folder; with "save files to
-     * ioBroker" the file is in its file storage instead, under the same name below "voice".
+     * A photo was saved: check the sender and gather it with the other photos and the caption of the message.
+     *
+     * @param {string} instance messenger instance
+     * @param {ioBroker.State | null | undefined} state value of <instance>.communicate.pathFile
+     */
+    async onPhoto(instance, state) {
+        const channel = this.channels.get(instance);
+        if (!channel?.photosOn) {
+            return;
+        }
+        const { allowed, driver } = channel;
+        const request = await driver.readRequest(instance, '');
+        if (!request.chatId || !this.senderAllowed(instance, driver, allowed, request)) {
+            return;
+        }
+        this.photos.addPhoto(instance, request.chatId, request.messageId, String(state?.val || ''));
+    }
+
+    /**
+     * The photos of a message (or album) are complete: one question with the largest size of each photo and the
+     * caption. A picture goes to the model only with this question (lib/pictures.js).
+     *
+     * @param {{ instance: string, chatId: string, messageId: unknown, files: string[], text: string, waited: boolean }} message gathered photos
+     */
+    async onPhotoMessage(message) {
+        const { instance, chatId, messageId, files, text, waited } = message;
+        const driver = this.channels.get(instance)?.driver;
+        if (!driver) {
+            return;
+        }
+        if (waited) {
+            this.log.warn(
+                `${driver.label} ${instance}: the photos of a message did not arrive, only its caption is answered (is "Save files" on?)`,
+            );
+        }
+        const raw = [];
+        for (const file of largestPhotos(files)) {
+            try {
+                raw.push({ data: (await this.readReceivedFile(instance, file, 'photo')).toString('base64') });
+            } catch (e) {
+                this.log.warn(`${driver.label} ${instance}: photo ${file} cannot be read: ${e.message}`);
+            }
+        }
+        const { images, dropped } = askImages(raw);
+        if (dropped.length) {
+            this.log.warn(`${driver.label} ${instance}: ${dropped.join('; ')}, not sent to the model`);
+        }
+        if (!images.length && !text) {
+            if (files.length) {
+                driver.send(instance, chatId, '📷 The photo could not be read.');
+            }
+            return;
+        }
+        if (images.length) {
+            this.log.info(
+                `${driver.label} ${instance}: ${images.length} photo(s)${text ? ' with a question' : ''} go to the model`,
+            );
+        }
+        const content = images.length ? [...(text ? [{ type: 'text', text }] : []), ...images] : text;
+        const requestId =
+            messageId !== null && messageId !== undefined
+                ? telegramRequestId(instance, chatId, messageId)
+                : requestIdFor(crypto, Date.now(), files[0] || text);
+        await this.process({ requestId, content, target: { kind: 'chat', instance, chatId } });
+    }
+
+    /**
+     * A file the messenger adapter received. It names a path in its data folder; with "save files to ioBroker" the
+     * telegram adapter keeps the file in its file storage instead, under the same name below the folder.
      *
      * @param {string} instance messenger instance
      * @param {string} filePath value of communicate.pathFile
+     * @param {string} folder "voice" or "photo"
      * @returns {Promise<Buffer>} the file
      */
-    async readVoiceFile(instance, filePath) {
+    async readReceivedFile(instance, filePath, folder) {
         try {
             return await fs.promises.readFile(filePath);
         } catch (e) {
@@ -913,7 +1161,7 @@ class PiAgent extends utils.Adapter {
             }
         }
         const name = filePath.split(/[\\/]/).pop();
-        const { file } = await this.readFileAsync(instance, `voice/${name}`);
+        const { file } = await this.readFileAsync(instance, `${folder}/${name}`);
         return Buffer.isBuffer(file) ? file : Buffer.from(file);
     }
 
@@ -1138,12 +1386,78 @@ class PiAgent extends utils.Adapter {
     }
 
     /**
-     * A reminder is due: send it to the messenger chat of its conversation, or to chat.answer.
+     * Whether the answers of a conversation are spoken: its sendTo caller sends `language` (ioBroker.assistant).
+     *
+     * @param {unknown} conversationId conversation id
+     * @returns {boolean} true for a conversation of a caller that speaks the answers
+     */
+    speaksAnswers(conversationId) {
+        const key = this.keyOfConversation(conversationId);
+        return Boolean(key && this.callerLanguages.get(key));
+    }
+
+    /**
+     * The voice satellite a conversation was last asked on, with its language.
+     *
+     * @param {unknown} conversationId conversation id
+     * @returns {{ instance: string, satellite: string, tts: string, language?: string } | undefined} satellite
+     */
+    voiceOf(conversationId) {
+        const key = this.keyOfConversation(conversationId);
+        const voice = key ? this.callerVoices.get(key) : undefined;
+        if (!voice) {
+            return undefined;
+        }
+        const language = this.callerLanguages.get(key);
+        return language ? { ...voice, language } : { ...voice };
+    }
+
+    /**
+     * Set a timer with a text on a voice satellite (ioBroker.assistant 1.4.9+, sendTo "setTimer"): it counts down on
+     * the device, rings, and the text is spoken.
+     *
+     * @param {{ instance: string, satellite: string, language?: string }} voice the satellite
+     * @param {number} seconds from now
+     * @param {string} text what to remind of
+     * @returns {Promise<{ id?: unknown, fireAt?: unknown } | undefined>} the timer, undefined when the assistant
+     *     cannot set one (older version, unknown satellite, no answer)
+     */
+    async satelliteTimer(voice, seconds, text) {
+        if (!voice.satellite) {
+            return undefined;
+        }
+        const word = REMINDER_WORD[languageOf(voice.language || (await this.systemLanguage()))] || REMINDER_WORD.en;
+        try {
+            const result = await this.sendToAsync(
+                voice.instance,
+                'setTimer',
+                { satellite: voice.satellite, seconds: Math.round(seconds), name: text, announce: `${word}: ${text}` },
+                { timeout: 5000 },
+            );
+            const answer = Object(result);
+            if (answer.ok) {
+                return { id: answer.id, fireAt: answer.fireAt };
+            }
+            this.log.info(
+                `${voice.instance} set no timer on ${voice.satellite} (${JSON.stringify(result)?.slice(0, 200)}): the reminder is spoken when due`,
+            );
+        } catch (e) {
+            this.log.info(
+                `${voice.instance} set no timer on ${voice.satellite} (${e.message}): the reminder is spoken when due`,
+            );
+        }
+        return undefined;
+    }
+
+    /**
+     * A reminder is due: send it to the messenger chat of its conversation, speak it on the voice satellite it was
+     * asked on, or write it to chat.answer.
      *
      * @param {unknown} conversationId conversation that set the reminder
      * @param {string} text reminder text
+     * @param {{ tts: string, language?: string }} [voice] the satellite it was asked on (kept with the reminder)
      */
-    async deliverReminder(conversationId, text) {
+    async deliverReminder(conversationId, text, voice) {
         const job = this.jobs.byConversation(conversationId);
         if (job) {
             this.log.info(`Reminder due for job ${job.id}`);
@@ -1154,6 +1468,19 @@ class PiAgent extends utils.Adapter {
         if (user) {
             this.log.info(`Reminder due for the admin chat of ${user}`);
             this.adminChat.addNotice(user, `⏰ ${text}`);
+            return;
+        }
+        const satellite = voice?.tts ? voice : this.voiceOf(conversationId);
+        if (satellite?.tts) {
+            const word =
+                REMINDER_WORD[languageOf(satellite.language || (await this.systemLanguage()))] || REMINDER_WORD.en;
+            const spoken = `${word}: ${String(text).replace(/^⏰\s*/, '')}`;
+            if (this.config.dryRun) {
+                this.log.info(`Reminder due: simulation mode, not spoken on ${satellite.tts}: ${spoken}`);
+            } else {
+                this.log.info(`Reminder due, spoken on ${satellite.tts}`);
+                await this.setForeignStateAsync(satellite.tts, { val: spoken, ack: false });
+            }
             return;
         }
         const chat = this.chatOf(conversationId);
@@ -1200,6 +1527,11 @@ class PiAgent extends utils.Adapter {
      */
     async voiceState(ownerKey) {
         const exists = async id => Boolean(await this.getForeignObjectAsync(id).catch(() => null));
+        // the satellite the job was asked on (ioBroker.assistant 1.4.9+ names it in "ask")
+        const asked = ownerKey ? this.callerVoices.get(ownerKey)?.tts : undefined;
+        if (asked && (await exists(asked))) {
+            return asked;
+        }
         if (ownerKey?.startsWith('sendTo:')) {
             const { instance, chatId } = parseChatKey(ownerKey.slice('sendTo:'.length), '');
             for (const id of [`${instance}.satellites.${chatId}.tts`, `${instance}.tts.text`]) {
@@ -1447,6 +1779,29 @@ class PiAgent extends utils.Adapter {
             `Job ${job.id}: confirmation for ${id} needed, but the job reports to no messenger or admin chat`,
         );
         return 'unavailable';
+    }
+
+    /**
+     * The enabled instance of ioBroker.recorder with the lowest number ("recorder.0"), "" without one.
+     *
+     * @returns {Promise<string>} instance
+     */
+    async findRecorder() {
+        try {
+            const view = await this.getObjectViewAsync('system', 'instance', {
+                startkey: 'system.adapter.recorder.',
+                endkey: 'system.adapter.recorder.香',
+            });
+            const found = (view?.rows || [])
+                .filter(row => row.value?.common?.enabled !== false)
+                .map(row => row.id.slice('system.adapter.'.length))
+                .filter(id => /^recorder\.\d+$/.test(id))
+                .sort((a, b) => Number(a.split('.')[1]) - Number(b.split('.')[1]));
+            return found[0] || '';
+        } catch (e) {
+            this.log.debug(`No recorder instance: ${e.message}`);
+            return '';
+        }
     }
 
     /** @returns {Promise<string>} configured history instance, else the system default, else "" */
@@ -2186,11 +2541,22 @@ class PiAgent extends utils.Adapter {
             timeZone: this.timeZone,
             log: this.log,
         });
-        const [today, total] = await Promise.all([
+        const [today, stored] = await Promise.all([
             this.getStateAsync('usage.tokensToday'),
-            this.getStateAsync('usage.tokensTotal'),
+            this.getStateAsync('usage.json'),
         ]);
-        this.limits.restore(Number(today?.val) || 0, today?.ts || 0, total ? Number(total.val) || 0 : null);
+        let usage = null;
+        try {
+            usage = stored?.val ? JSON.parse(String(stored.val)) : null;
+        } catch {
+            // no usage yet
+        }
+        if (usage && Number.isFinite(usage.limitBase)) {
+            this.limits.restore(Number(today?.val) || 0, today?.ts || 0, usage.limitBase);
+        } else {
+            // up to 0.9.7 the day counted the cache reads too; that count is not comparable, so the day starts anew
+            this.limits.restore(0, today?.ts || 0, usage ? countedTokens(usage) : null);
+        }
         await this.setStateAsync('usage.limitReached', { val: this.limits.reached(), ack: true });
     }
 
@@ -2203,13 +2569,14 @@ class PiAgent extends utils.Adapter {
             await this.setStateAsync('usage.tokensInput', { val: sum(u => u.input), ack: true });
             await this.setStateAsync('usage.tokensOutput', { val: sum(u => u.output), ack: true });
             await this.setStateAsync('usage.tokensTotal', { val: sum(u => u.totalTokens), ack: true });
+            const limitBase = countedTokens(state);
             if (this.limits) {
-                const today = this.limits.count(sum(u => u.totalTokens));
+                const today = this.limits.count(limitBase);
                 await this.setStateAsync('usage.tokensToday', { val: today.tokens, ack: true });
                 await this.setStateAsync('usage.limitReached', { val: today.reached, ack: true });
             }
             await this.setStateAsync('usage.cost', { val: Math.round(sum(u => u.cost?.total) * 1e6) / 1e6, ack: true });
-            await this.setStateAsync('usage.json', { val: JSON.stringify(state), ack: true });
+            await this.setStateAsync('usage.json', { val: JSON.stringify({ ...state, limitBase }), ack: true });
         } catch (e) {
             this.log.warn(`Usage could not be published: ${e.message}`);
         }
@@ -2272,7 +2639,8 @@ class PiAgent extends utils.Adapter {
                 }
                 const answer = await this.lastAnswer(conversation);
                 await this.removePending(requestId);
-                void this.updateUsage();
+                // counted before the answer goes out, so a warning about the daily limit can go with it
+                await this.updateUsage();
                 return answer;
             } catch (e) {
                 if (!this.stopping) {
@@ -2318,13 +2686,20 @@ class PiAgent extends utils.Adapter {
     /**
      * Run a request and deliver the answer (or the error) to its target.
      *
-     * @param {{ requestId: string, content: string, target: { kind: string, instance?: string, chatId?: string } }} entry request
+     * @param {{ requestId: string, content: string | Array<object>, target: { kind: string, instance?: string, chatId?: string } }} entry request
      * @param {{ resumed?: boolean }} [options] resumed: continued after a restart
      */
     async process(entry, options = {}) {
         try {
             const answer = await this.ask(entry.content, entry.requestId, entry.target, options);
-            await this.deliver(entry.target, answer);
+            const warning = this.limitWarning();
+            if (warning && entry.target.kind === 'admin') {
+                this.adminChat.addNotice(String(entry.target.chatId), warning);
+            }
+            await this.deliver(
+                entry.target,
+                warning && entry.target.kind !== 'admin' ? `${answer}\n\n${warning}` : answer,
+            );
         } catch (e) {
             if (this.stopping) {
                 // The request stays pending, so the next start continues it.
@@ -2338,6 +2713,19 @@ class PiAgent extends utils.Adapter {
             }
             await this.deliver(entry.target, `Error: ${e.message}`);
         }
+    }
+
+    /**
+     * The warning about the share of the daily token limit used, once a day at 80, 90 and 99 %; also in the log.
+     *
+     * @returns {string} text for the user, "" when there is nothing new
+     */
+    limitWarning() {
+        const warning = this.limits?.takeWarning() || '';
+        if (warning) {
+            this.log.warn(warning.replace(/^⚠️ /, 'Daily token limit: '));
+        }
+        return warning;
     }
 
     /**
@@ -2411,9 +2799,11 @@ class PiAgent extends utils.Adapter {
         if (this.channels.has(instance)) {
             return this.onChatMessage(instance, state);
         }
-        const voiceOf = id.endsWith('.communicate.pathFile') ? id.slice(0, -'.communicate.pathFile'.length) : '';
-        if (this.channels.get(voiceOf)?.voice) {
-            return this.onVoiceMessage(voiceOf, state);
+        const fileOf = id.endsWith('.communicate.pathFile') ? id.slice(0, -'.communicate.pathFile'.length) : '';
+        if (this.channels.has(fileOf)) {
+            return isPhotoPath(String(state?.val || ''))
+                ? this.onPhoto(fileOf, state)
+                : this.onVoiceMessage(fileOf, state);
         }
         if (this.watches.handles(id)) {
             await this.watches.onState(id, state);
@@ -2447,7 +2837,7 @@ class PiAgent extends utils.Adapter {
         if (!state || !state.val) {
             return;
         }
-        const { allowed, prefix, driver } = this.channels.get(instance);
+        const { allowed, prefix, driver, photosOn } = this.channels.get(instance);
         const request = await driver.readRequest(instance, state.val);
         const { chatId, messageId, text } = request;
         if (!chatId) {
@@ -2459,6 +2849,17 @@ class PiAgent extends utils.Adapter {
         }
         if (driver.takeButton(instance, request)) {
             return; // a button of a confirmation, not a message for the model
+        }
+        if (photosOn) {
+            // the prefix does not apply to photos and their caption
+            const caption = stripPrefix(text, prefix) ?? text;
+            if (request.withPhotos) {
+                this.photos.holdCaption(instance, chatId, messageId, caption);
+                return; // telegram: the photos follow
+            }
+            if (this.photos.takeText(instance, chatId, caption)) {
+                return; // max: the caption after the photos, or a question right after photos without caption
+            }
         }
         const content = stripPrefix(text, prefix);
         if (content === null) {
@@ -2718,6 +3119,13 @@ class PiAgent extends utils.Adapter {
 
     /** @param {ioBroker.Message} obj message from a script or another adapter */
     async onMessage(obj) {
+        // a reply whose callback is gone (the caller asked a process of ours that has stopped since) is no request:
+        // answering it would send the reply back, and a caller that does the same keeps both in a loop (assistant 1.9.0
+        // after its own update, 2026-11-13: about 25 empty "ask" a second)
+        if (obj?.callback?.ack) {
+            this.log.debug(`Ignoring a late reply from ${obj.from} to "${obj.command}"`);
+            return;
+        }
         // output and end of a command on the host (an update of an adapter)
         if (this.hostCommands.onMessage(obj)) {
             return;
@@ -2816,6 +3224,22 @@ class PiAgent extends utils.Adapter {
             }
             return;
         }
+        if (obj?.command === 'testDocs') {
+            // block "Documentation search" of the tab "General", with the unsaved values of the form
+            let answer;
+            try {
+                answer = {
+                    result: await testDocs(docsSettings({ ...this.config, ...Object(obj.message) }), this.fetch),
+                };
+            } catch (e) {
+                this.log.debug(`testDocs: ${e.message}`);
+                answer = { error: e.message };
+            }
+            if (obj.callback) {
+                this.sendTo(obj.from, obj.command, answer, obj.callback);
+            }
+            return;
+        }
         if (obj?.command === 'listSpeechModels' || obj?.command === 'testSpeech') {
             // block "Speech recognition" of the tab "Messengers", with the unsaved values of the form
             let answer;
@@ -2876,12 +3300,22 @@ class PiAgent extends utils.Adapter {
                 message.requestId || requestIdFor(crypto, Date.now(), text || `${images.length} image(s)`);
             const target = sendToTarget(obj.from, message);
             const key = this.chatKeyOf(target);
-            const language = String(message.language ?? '')
+            const named = String(message.language ?? '')
                 .trim()
                 .toLowerCase()
                 .slice(0, 10);
+            // ioBroker.assistant names the language its satellites listen in, also for a Russian question: the
+            // letters of the question (without the context the caller puts in front) tell better
+            const heard = named ? scriptLanguage(spokenAnswer(text)) : '';
+            // a bare yes or no tells no language ("Да" came back as "Yeah."): the conversation keeps the one it has
+            const earlier = key && !heard && isBareAnswer(text) ? this.callerLanguages.get(key) : '';
+            const language = earlier || (heard && heard !== named.split('-')[0] ? heard : named);
             if (key && language) {
                 this.callerLanguages.set(key, language);
+            }
+            const voice = key ? callerVoice(obj.from, message) : undefined;
+            if (voice) {
+                this.callerVoices.set(key, voice);
             }
             let run;
             if (key && this.textConfirmations.has(key)) {
@@ -2893,11 +3327,38 @@ class PiAgent extends utils.Adapter {
                 );
                 run = this.textConfirmations.decide(key, yes);
             } else {
-                const content = images.length ? [...(text ? [{ type: 'text', text }] : []), ...images] : text;
+                const question = images.length ? [...(text ? [{ type: 'text', text }] : []), ...images] : text;
+                // a caller that speaks the answer needs its language (lib/answer-language.js)
+                const content = message.language ? withLanguageReminder(question) : question;
                 run = this.ask(content, String(requestId), target);
             }
             // a conversation of its own may get a question to confirm before the answer
-            result = { answer: key ? await this.textConfirmations.answerOf(key, run) : await run };
+            const answer = key ? await this.textConfirmations.answerOf(key, run) : await run;
+            // not into the answer: a satellite would speak it; the caller may show it
+            const warning = this.limitWarning();
+            // the mark of the language rule (lib/answer-language.js) becomes a field; without one the field is missing
+            const spoken = takeLanguage(answer);
+            // without a mark the letters still tell Russian, Ukrainian and Chinese
+            const byLetters = message.language && !spoken.language ? scriptLanguage(spoken.text) : '';
+            if (byLetters) {
+                spoken.language = byLetters;
+            }
+            if (message.language) {
+                // a different language than the caller listens in is worth a line: its voice must change
+                const asked = String(message.language).toLowerCase();
+                const how = byLetters ? ' (by its letters, no mark)' : '';
+                const line = `Answer to ${String(obj.from).replace(/^system\.adapter\./, '')} in ${spoken.language ? `${spoken.language}${how}` : 'an unknown language (no mark)'}${spoken.language && !asked.startsWith(spoken.language) ? `, it listens in ${asked}` : ''}`;
+                if (spoken.language && spoken.language !== asked.split('-')[0]) {
+                    this.log.info(line);
+                } else {
+                    this.log.debug(line);
+                }
+            }
+            result = {
+                answer: spoken.text,
+                ...(spoken.language ? { language: spoken.language } : {}),
+                ...(warning ? { warning } : {}),
+            };
         } catch (e) {
             result = {
                 error: this.stopping
@@ -2917,6 +3378,7 @@ class PiAgent extends utils.Adapter {
         this.watches.stop();
         this.jobs.stop();
         this.textConfirmations.stop();
+        this.photos.stop();
         const done = async () => {
             try {
                 await this.harness?.close(this.context);

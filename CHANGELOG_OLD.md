@@ -1,5 +1,66 @@
 # Older Changelog
 
+### 0.9.6 (2026-11-08)
+
+- Photos sent to the bots of Telegram and MAX go to the model with their caption, the photos of an album as one
+  question (at most 4); a text right after photos without caption is their question. Only the largest size of a
+  Telegram photo is used; the model sees it once and keeps notes of it. New column "Photos" on the tab "Messengers"
+  (off for rows saved before). Telegram saves photos only with "Save files"; "Delete received files after (days)" of
+  telegram 6.3.0 removes old ones
+- A picture whose answer has no picture notes is no longer taken for one that was never sent
+
+### 0.9.5 (2026-11-05)
+
+- Reminders asked on a voice satellite of ioBroker.assistant (1.4.9+) come back there: within 24 hours as a timer on
+  the satellite (countdown, ring, the text spoken), else spoken on the satellite when due. Before, they went to
+  `chat.answer` only. Scheduled writes, watches and background jobs of such a conversation are told on that satellite
+
+Older changelog entries can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
+
+### 0.9.4 (2026-11-04)
+
+- Pictures go to the model only once: the model keeps notes of what a picture shows, later questions get the notes
+  instead of the picture. The store keeps the newest 20 pictures, older ones are removed at the start
+
+### 0.9.3 (2026-11-04)
+
+- (@GermanBluefox) Pictures in `ask`: `images: [{ data: <base64>, mimeType }]` (JPEG, PNG, GIF, WebP, at most 4 of up
+  to about 3.9 MB) go to the model with the text; a request may consist of pictures only. ioBroker.assistant passes
+  on the photos of Telegram this way. The type is taken from the content; other files and larger pictures are dropped
+  with a warning, so a picture the model refuses cannot block the conversation. A model without image input gets a
+  note instead; `chat.pending` keeps only the text
+
+### 0.9.2 (2026-11-04)
+
+- Telegram: a warning in the log when the telegram instance also hands messages to an assistant instance (since
+  telegram 6.1.0 also voice messages) or to text2command, because then every message gets two answers
+
+### 0.9.1 (2026-11-03)
+
+- Confirmation by voice: besides the plain yes word, "okay", "klar", "конечно" and the like count as yes, also with
+  "bitte" or "please", and so do "Ya" and "Yup", which Whisper made of a short spoken "Ja". The model no longer tells
+  a voice user to press a button
+
+### 0.9.0 (2026-11-03)
+
+- Voice messages: voice messages of Telegram and MAX (max 0.1.13 or newer) are turned into text by a local server with the transcription API of OpenAI
+  (e.g. speaches with faster-whisper) or by OpenRouter, shown in the chat and answered like a written message. New
+  block "Speech recognition" and column "Voice" on the tab "Messengers"
+
+### 0.8.9 (2026-11-03)
+
+- Updates: `list_updates` with `npm: true` compares every installed adapter with npm in one call, pi-agent included;
+  `check_npm` and `update_adapter` also find an adapter by its title. The agent is told to call the tools again when
+  asked to check, instead of answering from earlier results of the conversation
+
+### 0.8.8 (2026-11-03)
+
+- Limits: at most 10 requests per minute per conversation (setting) stop a loop of a script or another adapter
+  before the model is asked; an optional limit of tokens per day stops all requests until midnight. New states
+  `usage.tokensToday` and `usage.limitReached`
+- OpenRouter: a model outside the catalog gets its prices, context window and answer length from the public model
+  list of OpenRouter, so its cost is counted
+
 ### 0.8.7 (2026-11-03)
 
 - Update of the agent runtime to pi-durable 1.5.0 (`@earendil-works/*` 1.5.0): the tool schemas are built with

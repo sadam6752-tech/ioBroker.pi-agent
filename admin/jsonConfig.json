@@ -220,6 +220,65 @@
                     "lg": 4,
                     "xl": 4
                 },
+                "_docsHeader": {
+                    "type": "header",
+                    "text": "Documentation search (RAG)",
+                    "size": 4,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "_docsInfo": {
+                    "type": "staticText",
+                    "text": "The agent can search the ioBroker documentation (the official docs, the source code of the core and the READMEs of the adapters) on a server of the project ioBrokerRAG (REST API v1), before it writes a script or answers how an adapter works. The question of the model is sent to this server. Only passages of permissively licensed sources go to the model. Empty URL: off.",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "docsUrl": {
+                    "type": "text",
+                    "label": "RAG server URL",
+                    "help": "For example http://192.168.1.10:8000 (without /query)",
+                    "default": "",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "docsToken": {
+                    "type": "password",
+                    "label": "Token of the RAG server (optional)",
+                    "help": "Only when the server sets IOB_RAG_TOKEN",
+                    "default": "",
+                    "hidden": "!data.docsUrl",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "testDocs": {
+                    "type": "sendTo",
+                    "command": "testDocs",
+                    "label": "Test documentation search",
+                    "jsonData": "{\"docsUrl\": ${JSON.stringify(data.docsUrl || '')}, \"docsToken\": ${JSON.stringify(data.docsToken || '')}}",
+                    "variant": "outlined",
+                    "showProcess": true,
+                    "hidden": "!data.docsUrl",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
+                },
                 "_limitsHeader": {
                     "type": "header",
                     "text": "Limits",
@@ -249,6 +308,19 @@
                     "label": "Tokens per day",
                     "help": "When the tokens of the day (from midnight in the time zone of the house, state usage.tokensToday) reach this number, the agent stops asking the model until midnight and answers every request with a note; usage.limitReached is then true. 0 = no limit.",
                     "min": 0,
+                    "default": 0,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "contextTokens": {
+                    "type": "number",
+                    "label": "Tokens per request (context)",
+                    "help": "Upper limit for the context of one request: instructions, tools and the history of the conversation. When a conversation reaches it, its older part is summarised, so every request and the first one after a pause cost less. Smallest value 24000; 32000-48000 suits voice and chat. 0 = up to the window of the model (as before). The debug log shows the tokens of every model call.",
+                    "min": 0,
+                    "max": 2000000,
                     "default": 0,
                     "xs": 12,
                     "sm": 6,
@@ -385,6 +457,18 @@
                     "label": "Confirmation by text in sendTo conversations",
                     "help": "For callers with a conversation of their own, e.g. ioBroker.assistant: the question is the answer, the next message decides. Only a plain \"yes\" confirms; anything else or 2 minutes of silence is no. By voice anyone in the room can say yes.",
                     "default": false,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "roundSpokenValues": {
+                    "type": "checkbox",
+                    "label": "Round values for spoken answers",
+                    "help": "For callers that speak the answers, e.g. ioBroker.assistant: temperatures, percentages and wind speeds are read as whole numbers, so the answer says \"1 to 8 degrees\" instead of \"0.6 to 8 degrees\". Chats keep the exact values.",
+                    "default": true,
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
@@ -546,7 +630,7 @@
                             "type": "text",
                             "attr": "users",
                             "title": "Allowed users",
-                            "width": "40%",
+                            "width": "30%",
                             "default": ""
                         },
                         {
@@ -562,8 +646,25 @@
                             "title": "Voice",
                             "width": "10%",
                             "default": true
+                        },
+                        {
+                            "type": "checkbox",
+                            "attr": "photos",
+                            "title": "Photos",
+                            "width": "10%",
+                            "default": true
                         }
                     ]
+                },
+                "photosHelp": {
+                    "type": "staticText",
+                    "text": "Photos: photos sent to the bot go to the model with their caption, the photos of an album as one question (at most 4). A text sent right after photos without caption is their question. The model sees a photo only once and keeps notes of it for later questions. Telegram saves photos only with \"Save files\" in its settings; set \"Delete received files after (days)\" there (telegram 6.3.0+) so old ones are removed. MAX saves them always.",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
                 },
                 "_speechHeader": {
                     "type": "header",

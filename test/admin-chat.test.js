@@ -267,3 +267,18 @@ test('withNotices: a reminder stands before the first question asked after it', 
         ['a', 'A', 'n20', 'b', 'B', 'n40'],
     );
 });
+
+test('a request refused by the daily limit ends with its error in the chat, not with "thinking"', async () => {
+    const { agent } = await startAgent({ dataDir: tmp(), config: { dailyTokens: 1000 }, responses: [] });
+    // the day is over the limit
+    agent.limits.restore(5000, Date.now(), 0);
+    assert.deepEqual(await call(agent, 'chatSend', { text: 'hello' }), { accepted: true });
+    const history = await settled(agent);
+    assert.equal(history.busy, false);
+    assert.ok(Array.isArray(history.entries));
+    assert.match(String(history.error), /daily token limit \(1000\) is reached/);
+    // the page takes such an answer as the chat, not as "the adapter does not answer"
+    const page = fs.readFileSync(path.join(__dirname, '../admin/tab.html'), 'utf8');
+    assert.match(page, /offline = Boolean\(answer\.error\) && !Array\.isArray\(answer\.entries\);/);
+    await stopAgent(agent);
+});

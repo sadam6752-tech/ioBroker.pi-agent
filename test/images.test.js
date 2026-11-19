@@ -10,7 +10,13 @@ const os = require('node:os');
 const path = require('node:path');
 const { startAgent, stopAgent } = require('./helpers/agent-harness');
 const { historyOf } = require('../lib/admin-chat');
-const { PICTURE_GONE, PICTURE_REMOVED, trimStoredPictures } = require('../lib/pictures');
+const {
+    PICTURE_GONE,
+    PICTURE_REMOVED,
+    PICTURE_SEEN,
+    picturesForRequest,
+    trimStoredPictures,
+} = require('../lib/pictures');
 
 /** The request for picture notes that the newest message with pictures gets (lib/pictures.js). */
 const notesRequest = block => block.type === 'text' && block.text.includes('<picture-notes>');
@@ -232,4 +238,18 @@ test('the store keeps only the newest pictures; an unknown schema is not touched
     other.close();
     assert.match(String(trimStoredPictures(dir, { keep: 0 }).skipped), /schema version 3/);
     assert.deepEqual(read()[1 + 1][1], picture(3), 'unchanged');
+});
+
+test('a picture whose answer has no notes points to the answer, not to notes', () => {
+    const image = { type: 'image', data: 'x', mimeType: 'image/jpeg' };
+    const messages = picturesForRequest([
+        { role: 'user', content: [{ type: 'text', text: 'Was ist das?' }, image] },
+        { role: 'assistant', content: [{ type: 'text', text: 'Ein Logo.' }] },
+        { role: 'user', content: [{ type: 'text', text: 'Und das?' }, image] },
+        { role: 'assistant', content: [{ type: 'text', text: 'Ein Herz.<picture-notes>rotes Herz</picture-notes>' }] },
+        { role: 'user', content: 'Welche Bilder hast du gesehen?' },
+    ]);
+    assert.ok(messages);
+    assert.deepEqual(messages[0].content[1], { type: 'text', text: PICTURE_SEEN });
+    assert.deepEqual(messages[2].content[1], { type: 'text', text: PICTURE_GONE });
 });

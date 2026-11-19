@@ -117,5 +117,18 @@
 	"API key for speech (optional)": "API key for speech (optional)",
 	"Two letters, for example de or ru. Empty: detected for every message (a local server then needs longer)": "Two letters, for example de or ru. Empty: detected for every message (a local server then needs longer)",
 	"Test speech recognition": "Test speech recognition",
-	"Language": "Language"
+	"Language": "Language",
+	"Photos": "Photos",
+	"Photos: photos sent to the bot go to the model with their caption, the photos of an album as one question (at most 4). A text sent right after photos without caption is their question. The model sees a photo only once and keeps notes of it for later questions. Telegram saves photos only with \"Save files\" in its settings; set \"Delete received files after (days)\" there (telegram 6.3.0+) so old ones are removed. MAX saves them always.": "Photos: photos sent to the bot go to the model with their caption, the photos of an album as one question (at most 4). A text sent right after photos without caption is their question. The model sees a photo only once and keeps notes of it for later questions. Telegram saves photos only with \"Save files\" in its settings; set \"Delete received files after (days)\" there (telegram 6.3.0+) so old ones are removed. MAX saves them always.",
+	"Documentation search (RAG)": "Documentation search (RAG)",
+	"The agent can search the ioBroker documentation (the official docs, the source code of the core and the READMEs of the adapters) on a server of the project ioBrokerRAG (REST API v1), before it writes a script or answers how an adapter works. The question of the model is sent to this server. Only passages of permissively licensed sources go to the model. Empty URL: off.": "The agent can search the ioBroker documentation (the official docs, the source code of the core and the READMEs of the adapters) on a server of the project ioBrokerRAG (REST API v1), before it writes a script or answers how an adapter works. The question of the model is sent to this server. Only passages of permissively licensed sources go to the model. Empty URL: off.",
+	"RAG server URL": "RAG server URL",
+	"For example http://192.168.1.10:8000 (without /query)": "For example http://192.168.1.10:8000 (without /query)",
+	"Token of the RAG server (optional)": "Token of the RAG server (optional)",
+	"Only when the server sets IOB_RAG_TOKEN": "Only when the server sets IOB_RAG_TOKEN",
+	"Test documentation search": "Test documentation search",
+	"Round values for spoken answers": "Round values for spoken answers",
+	"For callers that speak the answers, e.g. ioBroker.assistant: temperatures, percentages and wind speeds are read as whole numbers, so the answer says \"1 to 8 degrees\" instead of \"0.6 to 8 degrees\". Chats keep the exact values.": "For callers that speak the answers, e.g. ioBroker.assistant: temperatures, percentages and wind speeds are read as whole numbers, so the answer says \"1 to 8 degrees\" instead of \"0.6 to 8 degrees\". Chats keep the exact values.",
+	"Tokens per request (context)": "Tokens per request (context)",
+	"Upper limit for the context of one request: instructions, tools and the history of the conversation. When a conversation reaches it, its older part is summarised, so every request and the first one after a pause cost less. Smallest value 24000; 32000-48000 suits voice and chat. 0 = up to the window of the model (as before). The debug log shows the tokens of every model call.": "Upper limit for the context of one request: instructions, tools and the history of the conversation. When a conversation reaches it, its older part is summarised, so every request and the first one after a pause cost less. Smallest value 24000; 32000-48000 suits voice and chat. 0 = up to the window of the model (as before). The debug log shows the tokens of every model call."
 }

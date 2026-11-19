@@ -9,7 +9,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { startAgent, stopAgent, waitFor } = require('./helpers/agent-harness');
-const { isYes, confirmationQuestion } = require('../lib/text-confirmation');
+const { isYes, isBareAnswer, confirmationQuestion } = require('../lib/text-confirmation');
 
 const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'pi-agent-textconfirm-'));
 const faux = () => import('@earendil-works/pi-ai/providers/faux');
@@ -217,5 +217,87 @@ test('switched off: the write is blocked as before and the first ask gets the fi
     });
     assert.deepEqual(await ask(agent, 'Включи лампу'), { answer: 'Не могу подтвердить.' });
     assert.deepEqual(db.writes, []);
+    await stopAgent(agent);
+});
+
+test('a late reply (callback.ack) is no request and gets no answer, so two adapters cannot loop', async () => {
+    const { agent } = await startAgent({ dataDir: tmp(), seed: SEED(), config: CONFIG(), responses: [] });
+    const before = agent.sent.length;
+    await agent.onMessage({
+        command: 'ask',
+        message: { error: 'empty question' },
+        from: 'system.adapter.assistant.0',
+        callback: { ack: true, id: 17, message: { text: 'x' }, time: Date.now() },
+    });
+    assert.equal(agent.sent.length, before, 'nothing sent back');
+    await stopAgent(agent);
+});
+
+test('a Russian question on a satellite that listens in German is confirmed in Russian, a "Da" counts as yes', async () => {
+    const f = await faux();
+    const { agent, db } = await startAgent({
+        dataDir: tmp(),
+        seed: SEED(),
+        config: CONFIG(),
+        responses: [
+            f.fauxAssistantMessage(f.fauxToolCall('set_state', { id: LAMP, val: true }), { stopReason: 'toolUse' }),
+            f.fauxAssistantMessage('Лампа включена.'),
+        ],
+    });
+    // context in German first, as ioBroker.assistant sends it; only the question counts
+    const question = await ask(agent, 'Uhrzeit: 17:30\nWetter: 12 °C\n\nВключи лампу на кухне', { language: 'de' });
+    assert.ok(question.answer.startsWith('Установить Лампа на кухне в true? Скажи да или нет.'), question.answer);
+    assert.match(question.answer, /\[\[LISTEN\]\]$/);
+    assert.equal(question.language, 'ru');
+    assert.deepEqual(await ask(agent, 'Da.', { language: 'de' }), { answer: 'Лампа включена.', language: 'ru' });
+    assert.deepEqual(db.writes, [[LAMP, true]]);
+    await stopAgent(agent);
+});
+
+test('isBareAnswer: only yes or no words, at most three', () => {
+    for (const text of ['Yeah.', 'Да', 'Да, пожалуйста.', 'Nein', 'ja ja', 'Uhrzeit: 17:30\n\nNo.']) {
+        assert.ok(isBareAnswer(text), text);
+    }
+    for (const text of ['', 'Yes, but first the lamp', 'Wie spät ist es?', 'ja ja ja ja']) {
+        assert.ok(!isBareAnswer(text), text);
+    }
+});
+
+test('a bare yes in Latin letters keeps the language of the conversation: "Да" heard as "Yeah."', async () => {
+    const f = await faux();
+    const { agent, db } = await startAgent({
+        dataDir: tmp(),
+        seed: SEED(),
+        config: CONFIG(),
+        responses: [
+            // the model asks itself first (2026-11-13), the "yes" to it goes to the model
+            f.fauxAssistantMessage('Включить лампу на кухне?'),
+            f.fauxAssistantMessage(f.fauxToolCall('set_state', { id: LAMP, val: true }), { stopReason: 'toolUse' }),
+            f.fauxAssistantMessage('Лампа включена.'),
+        ],
+    });
+    await ask(agent, 'Включи лампу на кухне', { language: 'de' });
+    const question = await ask(agent, 'Yeah.', { language: 'de' });
+    assert.ok(question.answer.startsWith('Установить Лампа на кухне в true?'), question.answer);
+    assert.equal(question.language, 'ru');
+    assert.deepEqual(await ask(agent, 'Yeah.', { language: 'de' }), { answer: 'Лампа включена.', language: 'ru' });
+    assert.deepEqual(db.writes, [[LAMP, true]]);
+    await stopAgent(agent);
+});
+
+test('a new German question after a Russian one is asked in German again', async () => {
+    const f = await faux();
+    const { agent } = await startAgent({
+        dataDir: tmp(),
+        seed: SEED(),
+        config: CONFIG(),
+        responses: [
+            f.fauxAssistantMessage('Готово.'),
+            f.fauxAssistantMessage(f.fauxToolCall('set_state', { id: LAMP, val: true }), { stopReason: 'toolUse' }),
+        ],
+    });
+    await ask(agent, 'Который час?', { language: 'de' });
+    const question = await ask(agent, 'Schalte die Küchenlampe ein', { language: 'de' });
+    assert.ok(question.answer.startsWith('Kitchen lamp auf true setzen?'), question.answer);
     await stopAgent(agent);
 });
