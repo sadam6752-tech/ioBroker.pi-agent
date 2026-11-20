@@ -10,7 +10,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { startAgent, stopAgent, waitFor, NAMESPACE } = require('./helpers/agent-harness');
-const { normalizeTrigger, triggerText, MAX_WAKES_PER_DAY } = require('../lib/jobs');
+const { normalizeTrigger, triggerText, maxDaysOf, MAX_WAKES_PER_DAY, MAX_DAILY_DAYS } = require('../lib/jobs');
 
 const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'pi-agent-jobs-'));
 const faux = () => import('@earendil-works/pi-ai/providers/faux');
@@ -104,7 +104,11 @@ test('normalizeTrigger: state, daily and interval; wrong ones are refused', () =
 
 test('create_job: a state trigger wakes the job, its answer reaches the chat; [[SILENT]] tells nothing; again only after the condition broke off', async () => {
     const f = await faux();
-    const { agent, db, faux: provider } = await startAgent({
+    const {
+        agent,
+        db,
+        faux: provider,
+    } = await startAgent({
         dataDir: tmp(),
         seed: SEED(),
         responses: turn(f, 'create_job', WINDOW_JOB),
@@ -136,7 +140,11 @@ test('create_job: a state trigger wakes the job, its answer reaches the chat; [[
 
 test('a job asks before every write, also without "Confirmation required"', async () => {
     const f = await faux();
-    const { agent, db, faux: provider } = await startAgent({
+    const {
+        agent,
+        db,
+        faux: provider,
+    } = await startAgent({
         dataDir: tmp(),
         config: { dryRun: false, writeRules: [{ scope: 'hm-rpc.0', write: true }] },
         seed: SEED(),
@@ -151,7 +159,10 @@ test('a job asks before every write, also without "Confirmation required"', asyn
     assert.deepEqual([question.id, question.val], [HEATER, false]);
     await call('chatConfirm', { nonce: question.nonce, answer: 'no' });
     await waitFor(async () => notices(agent).some(n => n.includes('Not switched.')), 'the answer of the job');
-    assert.deepEqual(db.writes.filter(([id]) => id === HEATER), []);
+    assert.deepEqual(
+        db.writes.filter(([id]) => id === HEATER),
+        [],
+    );
     await stopAgent(agent);
 });
 
@@ -206,7 +217,11 @@ test('voice: spoken by the assistant only with the write permission; a job canno
     assert.match(await ask(refused.agent, 'tell me by voice'), /Write allowed" for assistant\.0\.tts\.text/);
     await stopAgent(refused.agent);
 
-    const { agent, db, faux: provider } = await startAgent({
+    const {
+        agent,
+        db,
+        faux: provider,
+    } = await startAgent({
         dataDir: tmp(),
         config: { dryRun: false, writeRules: [{ scope: 'assistant.0.tts', write: true }] },
         seed: SEED(),
@@ -298,4 +313,84 @@ test('admin tab: chatHistory lists the jobs; chatJobStop and chatJobResume act o
     assert.deepEqual((await call('chatJobStop', { id: job.id })).jobs, []);
     assert.deepEqual(agent.jobs.list(), []);
     await stopAgent(agent);
+});
+
+test(`a report every morning may run ${MAX_DAILY_DAYS} days, a job with a state trigger at most 30`, async () => {
+    assert.equal(maxDaysOf([{ kind: 'daily' }, { kind: 'daily' }]), MAX_DAILY_DAYS);
+    assert.equal(maxDaysOf([{ kind: 'daily' }, { kind: 'state' }]), 30);
+    const f = await faux();
+    const MORNING = {
+        name: 'Morning',
+        task: 'Every morning tell me the weather.',
+        triggers: [{ kind: 'daily', time: '07:00' }],
+    };
+    const { agent } = await startAgent({
+        dataDir: tmp(),
+        seed: SEED(),
+        responses: [...turn(f, 'create_job', MORNING), ...turn(f, 'create_job', { ...WINDOW_JOB, days: 60 })],
+    });
+    const created = JSON.parse(await ask(agent, 'a report every morning'));
+    const job = agent.jobs.list()[0];
+    assert.equal(created.created.name, 'Morning');
+    assert.equal(Math.round((job.until - job.created) / 86_400_000), MAX_DAILY_DAYS, 'the default is the longest');
+    assert.match(await ask(agent, 'watch the window for 60 days'), /at most 30 days/);
+    await stopAgent(agent);
+});
+
+test('the conversation of a job older than 30 days is replaced at the next wake-up, the old one is queued for deletion', async () => {
+    const f = await faux();
+    const MORNING = {
+        name: 'Morning',
+        task: 'Every morning tell me the weather.',
+        triggers: [{ kind: 'daily', time: '07:00' }],
+    };
+    const { agent, faux: provider } = await startAgent({
+        dataDir: tmp(),
+        seed: SEED(),
+        responses: turn(f, 'create_job', MORNING),
+    });
+    await ask(agent, 'a report every morning');
+    const job = agent.jobs.list()[0];
+    const old = job.conversationId;
+    assert.equal(agent.jobs.conversationExpired(job), false);
+    job.conversationSince = Date.now() - 31 * 86_400_000;
+    assert.equal(agent.jobs.conversationExpired(job), true);
+
+    provider.setResponses([f.fauxAssistantMessage('Sunny today.')]);
+    await agent.wakeJob(job, 'daily 07:00');
+    await waitFor(async () => notices(agent).some(n => n.includes('Sunny today.')), 'the report');
+    assert.notEqual(job.conversationId, old);
+    assert.equal(agent.jobs.conversationExpired(job), false);
+    assert.ok(agent.logs.some(([, m]) => /its conversation starts anew/.test(m)));
+    const queued = require('../lib/purge').queuedPurges(agent.dataDir);
+    assert.ok(queued.includes(old), 'the old conversation is deleted at the next start');
+    await stopAgent(agent);
+});
+
+test('unlimited: a report every morning without an end; a job with a state trigger cannot have one', async () => {
+    const f = await faux();
+    const MORNING = {
+        name: 'Morning',
+        task: 'Every morning tell me the weather.',
+        triggers: [{ kind: 'daily', time: '07:00' }],
+        unlimited: true,
+    };
+    const dataDir = tmp();
+    const { agent } = await startAgent({
+        dataDir,
+        seed: SEED(),
+        responses: [...turn(f, 'create_job', MORNING), ...turn(f, 'create_job', { ...WINDOW_JOB, unlimited: true })],
+    });
+    const created = JSON.parse(await ask(agent, 'a report every morning, without an end'));
+    assert.equal(created.created.until, 'no end (unlimited)');
+    assert.match(created.note, /without an end/);
+    assert.equal(agent.jobs.list()[0].until, null);
+    assert.equal(agent.jobRows()[0].until, 0, 'the admin tab shows "no end"');
+    assert.match(await ask(agent, 'watch the window for ever'), /Only a job whose triggers are all "daily"/);
+    await stopAgent(agent);
+
+    const again = await startAgent({ dataDir, responses: [] });
+    assert.equal(again.agent.jobs.list().length, 1, 'still there after a restart, not ended');
+    assert.equal(again.agent.jobs.list()[0].until, null);
+    await stopAgent(again.agent);
 });

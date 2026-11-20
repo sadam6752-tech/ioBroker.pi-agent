@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.11.1",
+		"version": "0.12.0",
 		"news": {
+			"0.12.0": {
+				"en": "New adapters are noticed: a recorder installed or switched on later restarts the agent with its tools, list_updates names the adapters installed since the last look. A report every morning can run a year or without an end (the agent asks), its conversation starts anew every 30 days, and with a recorder it tells what happened in the house.",
+				"de": "Neue Adapter werden bemerkt: ein später installierter oder eingeschalteter Recorder startet den Agenten mit seinen Werkzeugen neu, list_updates nennt die seit dem letzten Blick installierten Adapter. Ein Bericht jeden Morgen kann ein Jahr oder unbefristet laufen (der Agent fragt), sein Gespräch beginnt alle 30 Tage neu, und mit dem Recorder erzählt er, was im Haus passiert ist.",
+				"ru": "Новые адаптеры замечаются: recorder, установленный или включённый позже, перезапускает агента с его инструментами, list_updates называет адаптеры, установленные с прошлого просмотра. Отчёт каждое утро может работать год или бессрочно (агент спрашивает), его разговор начинается заново каждые 30 дней, а с recorder он рассказывает, что происходило в доме.",
+				"pt": "Novos adaptadores são notados: um recorder instalado ou ligado mais tarde reinicia o agente com as suas ferramentas, list_updates indica os adaptadores instalados desde a última vez. Um relatório todas as manhãs pode durar um ano ou sem fim (o agente pergunta), a sua conversa recomeça a cada 30 dias e, com o recorder, conta o que aconteceu em casa.",
+				"nl": "Nieuwe adapters worden opgemerkt: een later geïnstalleerde of ingeschakelde recorder herstart de agent met zijn tools, list_updates noemt de adapters die sinds de vorige keer zijn geïnstalleerd. Een rapport elke ochtend kan een jaar of zonder einde lopen (de agent vraagt het), het gesprek begint elke 30 dagen opnieuw en met de recorder vertelt het wat er in huis gebeurde.",
+				"fr": "Les nouveaux adaptateurs sont remarqués : un recorder installé ou activé plus tard redémarre l'agent avec ses outils, list_updates nomme les adaptateurs installés depuis la dernière fois. Un rapport chaque matin peut durer un an ou sans fin (l'agent demande), sa conversation recommence tous les 30 jours et, avec le recorder, il raconte ce qui s'est passé dans la maison.",
+				"it": "I nuovi adattatori vengono notati: un recorder installato o attivato più tardi riavvia l'agente con i suoi strumenti, list_updates indica gli adattatori installati dall'ultima volta. Un rapporto ogni mattina può durare un anno o senza fine (l'agente lo chiede), la sua conversazione ricomincia ogni 30 giorni e, con il recorder, racconta cosa è successo in casa.",
+				"es": "Se detectan adaptadores nuevos: un recorder instalado o activado más tarde reinicia el agente con sus herramientas, list_updates nombra los adaptadores instalados desde la última vez. Un informe cada mañana puede durar un año o sin fin (el agente pregunta), su conversación empieza de nuevo cada 30 días y, con el recorder, cuenta lo que pasó en casa.",
+				"pl": "Nowe adaptery są zauważane: recorder zainstalowany lub włączony później uruchamia agenta ponownie z jego narzędziami, list_updates wymienia adaptery zainstalowane od ostatniego sprawdzenia. Raport każdego ranka może działać rok lub bezterminowo (agent pyta), jego rozmowa zaczyna się od nowa co 30 dni, a z recorderem opowiada, co działo się w domu.",
+				"uk": "Нові адаптери помічаються: recorder, встановлений або увімкнений пізніше, перезапускає агента з його інструментами, list_updates називає адаптери, встановлені з минулого перегляду. Звіт щоранку може працювати рік або безстроково (агент питає), його розмова починається заново кожні 30 днів, а з recorder він розповідає, що відбувалося в домі.",
+				"zh-cn": "新适配器会被发现：之后安装或启用的 recorder 会让代理带着它的工具重启，list_updates 会列出自上次查看以来安装的适配器。每天早上的报告可以运行一年或无期限（代理会询问），其对话每 30 天重新开始，有 recorder 时会讲述家里发生了什么。"
+			},
 			"0.11.1": {
 				"en": "New tool adapter_help: before the first send_to the agent reads the description an adapter gives of its commands (message help), without a write permission. list_instances marks those adapters.",
 				"de": "Neues Werkzeug adapter_help: vor dem ersten send_to liest der Agent die Beschreibung, die ein Adapter von seinen Befehlen gibt (Nachricht help), ohne Schreibrecht. list_instances markiert diese Adapter.",
@@ -80,19 +93,6 @@
 				"pl": "Potwierdzenia głosowe: model nie pyta już sam „Zrobić?” przed akcją, którą potwierdza narzędzie, więc użytkownik odpowiada tylko raz; rosyjska prośba na satelicie, który słucha po niemiecku, jest potwierdzana po rosyjsku, a „Da” liczy się jako tak; spóźniona odpowiedź innego adaptera nie jest już brana za prośbę (nieskończona pętla z ioBroker.assistant po jego aktualizacji)",
 				"uk": "Підтвердження голосом: модель більше не питає сама «Зробити?» перед дією, яку підтверджує інструмент, і користувач відповідає один раз; російський запит на сателіті, який слухає німецькою, підтверджується російською, а «Da» вважається «так»; запізніла відповідь іншого адаптера більше не сприймається як запит (нескінченний цикл з ioBroker.assistant після його оновлення)",
 				"zh-cn": "语音确认：在由工具请求确认的操作之前，模型不再自己询问“要我做吗？”，因此用户只需回答一次；在以德语收听的卫星设备上提出的俄语请求会用俄语确认，“Da”也算作“是”；其他适配器迟到的回复不再被当作请求（ioBroker.assistant 更新后出现的无限循环）"
-			},
-			"0.10.1": {
-				"en": "Voice answers in the right language: when ioBroker.assistant sends its language, the answer comes back with the language it is written in (language), so a satellite can speak a Russian answer with a Russian voice instead of spelling it",
-				"de": "Sprachantworten in der richtigen Sprache: sendet ioBroker.assistant seine Sprache, kommt die Antwort mit der Sprache zurück, in der sie geschrieben ist (language), damit ein Satellit eine russische Antwort mit einer russischen Stimme spricht, statt sie zu buchstabieren",
-				"ru": "Голосовые ответы на нужном языке: если ioBroker.assistant передаёт свой язык, ответ возвращается с языком, на котором он написан (language), и сателлит может озвучить русский ответ русским голосом, а не по буквам",
-				"pt": "Respostas de voz no idioma certo: quando o ioBroker.assistant envia o seu idioma, a resposta volta com o idioma em que está escrita (language), para que um satélite fale uma resposta em russo com uma voz russa em vez de a soletrar",
-				"nl": "Spraakantwoorden in de juiste taal: als ioBroker.assistant zijn taal meestuurt, komt het antwoord terug met de taal waarin het geschreven is (language), zodat een satelliet een Russisch antwoord met een Russische stem uitspreekt in plaats van het te spellen",
-				"fr": "Réponses vocales dans la bonne langue : quand ioBroker.assistant envoie sa langue, la réponse revient avec la langue dans laquelle elle est écrite (language), pour qu'un satellite prononce une réponse en russe avec une voix russe au lieu de l'épeler",
-				"it": "Risposte vocali nella lingua giusta: quando ioBroker.assistant invia la sua lingua, la risposta torna con la lingua in cui è scritta (language), così un satellite pronuncia una risposta in russo con una voce russa invece di sillabarla",
-				"es": "Respuestas de voz en el idioma correcto: cuando ioBroker.assistant envía su idioma, la respuesta vuelve con el idioma en que está escrita (language), para que un satélite diga una respuesta en ruso con una voz rusa en lugar de deletrearla",
-				"pl": "Odpowiedzi głosowe we właściwym języku: gdy ioBroker.assistant przesyła swój język, odpowiedź wraca z językiem, w którym jest napisana (language), więc satelita wypowie rosyjską odpowiedź rosyjskim głosem zamiast ją literować",
-				"uk": "Голосові відповіді потрібною мовою: якщо ioBroker.assistant передає свою мову, відповідь повертається з мовою, якою вона написана (language), і сателіт може озвучити російську відповідь російським голосом, а не по літерах",
-				"zh-cn": "语音回答使用正确的语言：当 ioBroker.assistant 发送其语言时，回答会附带其书写语言（language），这样卫星设备可以用俄语语音朗读俄语回答，而不是逐个字母拼读"
 			}
 		},
 		"titleLang": {

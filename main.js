@@ -35,7 +35,7 @@ const { autoBackupDelay } = require('./lib/backup-schedule');
 const { queuedPurges, queuePurge, purgeQueued } = require('./lib/purge');
 const { createMemory } = require('./lib/memory');
 const { createWatches } = require('./lib/watches');
-const { createJobs, localDay, MAX_WAKES_PER_DAY } = require('./lib/jobs');
+const { createJobs, localDay, MAX_WAKES_PER_DAY, CONVERSATION_DAYS } = require('./lib/jobs');
 const { createLimits } = require('./lib/limits');
 const { findLogFile } = require('./lib/diagnostics');
 const {
@@ -49,6 +49,7 @@ const {
     updateRefusal,
     npmLatest,
     createHostCommands,
+    newAdapters,
 } = require('./lib/updates');
 const {
     copyBackupToRemote,
@@ -389,6 +390,9 @@ class PiAgent extends utils.Adapter {
         this.restartList = [];
         /** The instance of ioBroker.recorder found at the start (findRecorder), "" without one. */
         this.recorderInstance = '';
+        /** Timer of checkRecorder after a change of a recorder instance, and its delay (shorter in the tests). */
+        this.recorderCheck = undefined;
+        this.recorderCheckMs = 5000;
         /** How long a restarted instance may take to run again. */
         this.restartWaitMs = 45_000;
         /** Enabled instances of the scheduler adapter fullcalendar, e.g. ["fullcalendar.0"]. */
@@ -787,12 +791,18 @@ class PiAgent extends utils.Adapter {
             registry.install(createCodemodeExtension({ sandbox: this.codemodeSandbox, models: false }));
             this.log.info('Code mode is on: the agent may answer with scripts that call its tools');
         }
-        // ioBroker.recorder: its tools are part of the agent only when an instance is there at the start
+        // ioBroker.recorder: its tools are part of the agent when an instance is there; the tools are fixed at the
+        // start, so the instance restarts when a recorder is installed, switched on, off or removed (onObjectChange)
         this.recorderInstance = await this.findRecorder();
         if (this.recorderInstance) {
             this.log.info(
                 `${this.recorderInstance} found: the agent can read the recorded house (events, snapshots, anomalies, usual values)`,
             );
+        }
+        try {
+            await this.subscribeForeignObjectsAsync('system.adapter.recorder.*');
+        } catch (e) {
+            this.log.debug(`Cannot watch the recorder instances: ${e.message}`);
         }
         registry.install(
             createIoBrokerExtension(this, { ...durable, schema }, () => ({
@@ -1503,7 +1513,13 @@ class PiAgent extends utils.Adapter {
             `Your answer is sent to the user as a message (messenger, admin chat or spoken by a voice assistant): short and plain, in the language of the task. When nothing needs to be told (e.g. a false alarm, or the task says to stay quiet in this case), answer exactly ${SILENT} and nothing else.`,
             'Every action (set_state, schedule_set_state, send_to, restart_instance, update_adapter, scripts) is asked to the user with yes/no first, so do only what the task asks for. A refused or unanswered question is not repeated at the next wake-up unless the situation changed.',
             `When the task is complete (e.g. something that should be told once has happened), call stop_job with id ${job.id}. You cannot create jobs.`,
-        ].join('\n');
+            this.recorderInstance
+                ? 'For a report about the night, the last day or the last week, house_events and house_anomalies tell what happened in the house (who switched what, unusual things), house_snapshot how it was at a moment, and usual_value whether a value is usual for this hour of the week. Use them instead of reading many states one by one.'
+                : '',
+            `Your conversation starts anew every ${CONVERSATION_DAYS} days: do not rely on what you wrote at earlier wake-ups beyond that.`,
+        ]
+            .filter(Boolean)
+            .join('\n');
     }
 
     /** Load the jobs, bring their conversations to the current model, start their triggers. */
@@ -1640,7 +1656,9 @@ class PiAgent extends utils.Adapter {
         return JSON.stringify({
             created: this.jobs.row(job),
             note: [
-                `Tell the user: the job "${job.name}" runs until ${formatLocal(job.until, this.timeZone)}, where its messages go, and that it can be stopped any time.`,
+                job.until
+                    ? `Tell the user: the job "${job.name}" runs until ${formatLocal(job.until, this.timeZone)}, where its messages go, and that it can be stopped any time.`
+                    : `Tell the user: the job "${job.name}" runs without an end until it is stopped (list_jobs, stop_job or the admin chat), and where its messages go.`,
                 confirmable
                     ? 'Actions of the job are asked with yes/no in the messenger or admin chat it reports to.'
                     : 'The job reports only by voice (or chat.answer): it cannot ask to confirm actions, so it only tells. Mention that a messenger or the admin chat would allow actions with yes/no.',
@@ -1701,17 +1719,42 @@ class PiAgent extends utils.Adapter {
     /**
      * A trigger of a job fired: ask its conversation, the answer goes to the job's targets (see deliver).
      *
-     * @param {{ id: string, seq: number, wakes: number, until: number }} job the job
+     * @param {{ id: string, name: string, task: string, conversationId: string, seq: number, wakes: number, until: number | null }} job the job
      * @param {string} reason what fired
      */
     async wakeJob(job, reason) {
+        if (this.jobs.conversationExpired(job)) {
+            await this.renewJobConversation(job);
+        }
         const content = [
             `[Wake-up] Trigger: ${reason}.`,
             `Local time: ${formatLocal(Date.now(), this.timeZone)}.`,
-            `Wake-up ${job.wakes} of at most ${MAX_WAKES_PER_DAY} today; the job runs until ${formatLocal(job.until, this.timeZone)}.`,
+            `Wake-up ${job.wakes} of at most ${MAX_WAKES_PER_DAY} today; ${job.until ? `the job runs until ${formatLocal(job.until, this.timeZone)}` : 'the job runs without an end'}.`,
         ].join(' ');
         // not awaited: the trigger must not wait for the model, and a question to confirm may take minutes
         void this.process({ requestId: `job:${job.id}:${job.seq}`, content, target: { kind: 'job', chatId: job.id } });
+    }
+
+    /**
+     * Replace the conversation of a job that is older than CONVERSATION_DAYS (a report every morning for a year must
+     * not send a year of history with every wake-up); the old one is deleted at the next start. When this fails, the
+     * old conversation goes on.
+     *
+     * @param {{ id: string, name: string, task: string, conversationId: string }} job the job
+     */
+    async renewJobConversation(job) {
+        const old = job.conversationId;
+        try {
+            const created = await this.harness.createConversation(
+                { ownership: { kind: 'ownerless' }, agent: { model: this.model } },
+                this.context,
+            );
+            await created.configure({ model: this.model, instructions: this.jobInstructions(job) }, this.context);
+            await this.jobs.renewConversation(job, created.id);
+            queuePurge(utils.getAbsoluteInstanceDataDir(this), old);
+        } catch (e) {
+            this.log.warn(`Job ${job.id}: no new conversation, the old one goes on: ${e.message}`);
+        }
     }
 
     /**
@@ -2187,11 +2230,12 @@ class PiAgent extends utils.Adapter {
      * The installed adapters that have a newer version in the active repositories, or with withNpm also on npm.
      *
      * @param {boolean} [withNpm] also ask npm for every installed adapter
-     * @returns {Promise<{ repositories: string[], checkedOnNpm?: number, notOnNpm?: string[], updates: Array<Record<string, unknown>> }>} updates for the model
+     * @returns {Promise<{ repositories: string[], checkedOnNpm?: number, notOnNpm?: string[], updates: Array<Record<string, unknown>>, newAdapters?: Array<Record<string, unknown>> }>} updates for the model
      */
     async listUpdates(withNpm = false) {
         const { names, json } = await repositoryJson(this);
         const installedList = await installedAdapters(this);
+        const fresh = await this.newSinceLastLook(installedList);
         // npm is asked for every installed adapter at once; one that is not on npm (or not reachable) is listed apart
         const onNpm = withNpm
             ? await Promise.all(installedList.map(a => npmLatest(a.name, this.fetch).catch(() => '')))
@@ -2224,7 +2268,39 @@ class PiAgent extends utils.Adapter {
             repositories: names,
             ...(withNpm ? { checkedOnNpm: installedList.length - notOnNpm.length, notOnNpm } : {}),
             updates,
+            ...(fresh.length ? { newAdapters: fresh } : {}),
         };
+    }
+
+    /**
+     * The adapters installed since the last list_updates (remembered in update.knownAdapters), for the model: with
+     * help: true it describes its commands (adapter_help), the recorder brings tools of its own.
+     *
+     * @param {Array<{ name: string, title: string, version: string, instances: string[], help?: boolean }>} installedList installed adapters
+     * @returns {Promise<Array<Record<string, unknown>>>} the new ones, [] at the first look
+     */
+    async newSinceLastLook(installedList) {
+        let known = null;
+        try {
+            const stored = (await this.getStateAsync('update.knownAdapters'))?.val;
+            known = stored ? JSON.parse(String(stored)) : null;
+        } catch {
+            // an unreadable list counts as the first look
+        }
+        const names = installedList.map(a => a.name).sort();
+        if (!Array.isArray(known) || known.join() !== names.join()) {
+            await this.setStateAsync('update.knownAdapters', { val: JSON.stringify(names), ack: true });
+        }
+        return newAdapters(installedList, known).map(a => ({
+            adapter: a.name,
+            title: a.title,
+            version: a.version,
+            instances: a.instances,
+            ...(a.help ? { help: true } : {}),
+            ...(a.name === 'recorder' && this.recorderInstance
+                ? { tools: 'house_events, house_snapshot, house_anomalies, usual_value (part of the agent now)' }
+                : {}),
+        }));
     }
 
     /**
@@ -2426,7 +2502,27 @@ class PiAgent extends utils.Adapter {
         }
         if (String(id).startsWith('system.adapter.fullcalendar.')) {
             void this.refreshSchedulers();
+            return;
         }
+        if (/^system\.adapter\.recorder\.\d+$/.test(String(id))) {
+            // installing writes the object more than once: look once things have settled
+            this.clearTimeout(this.recorderCheck);
+            this.recorderCheck = this.setTimeout(() => void this.checkRecorder(), this.recorderCheckMs);
+        }
+    }
+
+    /** Restart when the recorder instance the tools were built for is no longer the one found now. */
+    async checkRecorder() {
+        const found = await this.findRecorder();
+        if (this.stopping || found === (this.recorderInstance || '')) {
+            return;
+        }
+        this.log.info(
+            found
+                ? `${found} is there now: the instance restarts so that the agent gets the tools of the recorder`
+                : `${this.recorderInstance} is switched off or removed: the instance restarts without the tools of the recorder`,
+        );
+        this.restart();
     }
 
     /** Keep the list of fullcalendar instances current when one is installed, removed, switched on or off. */
@@ -2976,7 +3072,7 @@ class PiAgent extends utils.Adapter {
             name: job.name,
             task: job.task,
             paused: Boolean(job.paused),
-            until: job.until,
+            until: job.until || 0,
             wakesToday: job.day === today ? job.wakes : 0,
             maxWakes: MAX_WAKES_PER_DAY,
             last: job.last || 0,

@@ -2341,6 +2341,19 @@ const OBJECT_NAMES = {
         'Поточне оновлення самого себе (JSON)',
         '自身更新进行中（JSON）',
     ],
+    'update.knownAdapters': [
+        'Installed adapters at the last look for updates (JSON)',
+        'Installierte Adapter beim letzten Blick auf Updates (JSON)',
+        'Установленные адаптеры при последнем просмотре обновлений (JSON)',
+        'Adaptadores instalados na última verificação de atualizações (JSON)',
+        'Geïnstalleerde adapters bij de laatste blik op updates (JSON)',
+        'Adaptateurs installés lors de la dernière vérification des mises à jour (JSON)',
+        "Adattatori installati all'ultimo controllo degli aggiornamenti (JSON)",
+        'Adaptadores instalados en la última revisión de actualizaciones (JSON)',
+        'Adaptery zainstalowane przy ostatnim sprawdzeniu aktualizacji (JSON)',
+        'Встановлені адаптери під час останнього перегляду оновлень (JSON)',
+        '上次查看更新时已安装的适配器（JSON）',
+    ],
     // the id stays "telegram" (stored since 0.0.1); it holds the chats of every messenger
     telegram: [
         'Messenger chats',

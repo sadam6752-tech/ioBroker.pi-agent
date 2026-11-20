@@ -1,5 +1,16 @@
 # Older Changelog
 
+### 0.10.0 (2026-11-11)
+
+- Documentation search: with the URL of an ioBrokerRAG server (tab "General") the agent searches the ioBroker
+  documentation, the source code of the core and the READMEs of the adapters before it writes a script or explains an
+  adapter (tool `search_docs`); only permissively licensed passages go to the model
+- Daily token limit: cache reads no longer count (they were over 90 % of the tokens of a day); the count of the
+  day starts anew once after the update
+- Daily token limit: at 80 %, 90 % and 99 % the user gets a warning under the answer, once a day each; the log too
+- Admin chat: a request refused by the daily limit (or failed otherwise) showed "thinking …" for ever; the chat now
+  shows the error
+
 ### 0.9.7 (2026-11-11)
 
 - send_to: the model asks an adapter for its commands with "help" first, when it does not know them —
