@@ -1,5 +1,12 @@
 # Older Changelog
 
+### 0.10.1 (2026-11-12)
+
+- (sadam6752-tech) `ask` with `language` (ioBroker.assistant): the answer comes with the language it is written in
+  (`result.language`), so a voice satellite can speak a Russian answer with a Russian voice instead of spelling it.
+  The model marks the language (a reminder goes with each question); without a mark Cyrillic and Chinese letters
+  still tell it. A different language than the caller listens in is logged
+
 ### 0.10.0 (2026-11-11)
 
 - Documentation search: with the URL of an ioBrokerRAG server (tab "General") the agent searches the ioBroker

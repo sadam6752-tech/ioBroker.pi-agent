@@ -624,11 +624,13 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 0.12.1 (2026-11-20)
 
 - (@GermanBluefox) `adapter_help` for adapters that take no messages (web-only ones such as home3d): their help is
   the states they describe in their `io-package.json` (`instanceObjects` with `common.desc`), listed with type,
   whether they are writable and the description; `list_instances` marks them with `"help": true` too
+- (sadam6752-tech) The help from states stays within 20000 characters like any other help; `list_updates` marks
+  a new web-only adapter that describes its states with `"help": true` in `newAdapters`
 
 ### 0.12.0 (2026-11-20)
 
@@ -677,13 +679,6 @@ the last copy.
 - (sadam6752-tech) A late reply of another adapter (its callback gone, because the adapter restarted while pi-agent
   answered it) is no longer taken for a request. ioBroker.assistant 1.9.0 and pi-agent answered each other in an
   endless loop after an update of the assistant
-
-### 0.10.1 (2026-11-12)
-
-- (sadam6752-tech) `ask` with `language` (ioBroker.assistant): the answer comes with the language it is written in
-  (`result.language`), so a voice satellite can speak a Russian answer with a Russian voice instead of spelling it.
-  The model marks the language (a reminder goes with each question); without a mark Cyrillic and Chinese letters
-  still tell it. A different language than the caller listens in is logged
 
 ## License
 
