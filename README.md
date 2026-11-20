@@ -624,6 +624,10 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### **WORK IN PROGRESS**
+
+- (sadam6752-tech) `@iobroker/testing` 6.3.2 (repository checker W0037); the changelog links to CHANGELOG_OLD.md
+
 ### 0.12.1 (2026-11-20)
 
 - (@GermanBluefox) `adapter_help` for adapters that take no messages (web-only ones such as home3d): their help is
@@ -679,6 +683,8 @@ the last copy.
 - (sadam6752-tech) A late reply of another adapter (its callback gone, because the adapter restarted while pi-agent
   answered it) is no longer taken for a request. ioBroker.assistant 1.9.0 and pi-agent answered each other in an
   endless loop after an update of the assistant
+
+Older changes are listed in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 
 ## License
 
