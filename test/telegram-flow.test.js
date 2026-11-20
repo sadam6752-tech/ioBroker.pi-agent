@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startAgent, stopAgent, waitFor, NAMESPACE } = require('./helpers/agent-harness');
+const { startAgent, stopAgent, waitFor, communicateSubscriptions, NAMESPACE } = require('./helpers/agent-harness');
 const { CRASH_SEED } = require('./helpers/crash-fixture');
 
 const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'pi-agent-tg-'));
@@ -41,7 +41,7 @@ test('only allowed users with the prefix reach the agent; each chat has its own 
         config: CONFIG,
         responses: [answer('Hello Alex'), answer('Hello Bob')],
     });
-    assert.deepEqual(agent.foreignSubscriptions, [`${TG}.communicate.request`]);
+    assert.deepEqual(communicateSubscriptions(agent), [`${TG}.communicate.request`]);
 
     // not allowed: ignored with a warning, nothing sent
     await receive(agent, db, { chatId: 300, userId: 3, messageId: 1, name: 'Eve', text: '/ai open the door' });
@@ -86,7 +86,11 @@ test('the first name from the telegram user list is accepted, like in other adap
 
 test('a message delivered twice runs the model once', async () => {
     const f = await faux();
-    const { agent, db, faux: provider } = await startAgent({
+    const {
+        agent,
+        db,
+        faux: provider,
+    } = await startAgent({
         dataDir: tmp(),
         config: CONFIG,
         responses: [f.fauxAssistantMessage('Once'), f.fauxAssistantMessage('Twice?')],
@@ -109,9 +113,7 @@ test('a restart in the middle of a Telegram request answers in the same chat aft
         dataDir,
         config: CONFIG,
         seed: CRASH_SEED,
-        responses: [
-            f.fauxAssistantMessage(f.fauxToolCall('get_state', { id: 'x.0.lamp' }), { stopReason: 'toolUse' }),
-        ],
+        responses: [f.fauxAssistantMessage(f.fauxToolCall('get_state', { id: 'x.0.lamp' }), { stopReason: 'toolUse' })],
         hooks: {
             getForeignState: async () => {
                 entered = true;
@@ -146,7 +148,7 @@ test('a restart in the middle of a Telegram request answers in the same chat aft
 
 test('Telegram is off when no instance is configured', async () => {
     const { agent } = await startAgent({ dataDir: tmp(), responses: [] });
-    assert.equal(agent.foreignSubscriptions, undefined);
+    assert.deepEqual(communicateSubscriptions(agent), []);
     await stopAgent(agent);
 });
 
@@ -248,7 +250,7 @@ test('two Telegram instances: each has its users and prefix, answers go back thr
         },
         responses: [f.fauxAssistantMessage('via bot 0'), f.fauxAssistantMessage('via bot 1')],
     });
-    assert.deepEqual(agent.foreignSubscriptions, [`${TG}.communicate.request`, `${TG2}.communicate.request`]);
+    assert.deepEqual(communicateSubscriptions(agent), [`${TG}.communicate.request`, `${TG2}.communicate.request`]);
 
     // Alex is allowed on telegram.0 only; on telegram.1 no prefix is needed
     await receive(agent, db, { chatId: 100, userId: 1, messageId: 5, name: 'Alex', text: 'hi' }, TG2);
@@ -349,7 +351,7 @@ test('a voice message is recognized, shown in the chat and answered; refused sen
             },
         ],
     });
-    assert.deepEqual(agent.foreignSubscriptions, [`${TG}.communicate.request`, `${TG}.communicate.pathFile`]);
+    assert.deepEqual(communicateSubscriptions(agent), [`${TG}.communicate.request`, `${TG}.communicate.pathFile`]);
     const posted = [];
     agent.fetch = async (url, init) => {
         posted.push({ url, file: init.body.get('file'), model: init.body.get('model') });
@@ -415,13 +417,17 @@ test('a failed speech recognition is reported in the chat; "Voice" off or no ser
         { ...CONFIG, speechService: '' },
     ]) {
         const other = await startAgent({ dataDir: tmp(), config, responses: [] });
-        assert.deepEqual(other.agent.foreignSubscriptions, [`${TG}.communicate.request`]);
+        assert.deepEqual(communicateSubscriptions(other.agent), [`${TG}.communicate.request`]);
         await stopAgent(other.agent);
     }
 });
 
 test('sendTo "testSpeech" checks the unsaved form; OpenRouter without any key says where to enter one', async () => {
-    const { agent } = await startAgent({ dataDir: tmp(), config: { provider: 'deepseek', apiKey: 'x' }, responses: [] });
+    const { agent } = await startAgent({
+        dataDir: tmp(),
+        config: { provider: 'deepseek', apiKey: 'x' },
+        responses: [],
+    });
     const ask = message =>
         new Promise(resolve => {
             agent.sendTo = (to, command, answer) => resolve(answer);

@@ -496,6 +496,22 @@ uses only commands the adapter documents and does not guess.
   language). `list_instances` marks such an adapter with `"help": true` as well. Writing these states with
   `set_state` needs "Write allowed" for them as usual.
 
+Adapters learn new things with updates, while a conversation (a voice satellite keeps its own for weeks) still
+remembers what an older version could do. So pi-agent keeps the helps current:
+
+- At its start it reads the help of every running instance that describes itself. It watches
+  `system.adapter.*.alive` and the instance objects: after a restart of an instance (an update restarts it too) or a
+  change of its object, it asks the instance again. An instance that no longer declares a help, answers without one,
+  is switched off or deleted leaves the list. The log says when a help changed or an instance left the list.
+- The instructions of the model name the instances that describe themselves, and two rules: read `adapter_help`
+  before writing the states of such an instance the first time, and read it again in the same request before telling
+  the user that an adapter or a device cannot do something; an earlier answer in the conversation is no proof.
+- pi-agent notes for each conversation the help of every such instance it used (`get_state`, `set_state`,
+  `send_to`) or read (`adapter_help`). When that help changed since, the model reads in its instructions that the
+  instance was updated and that what the conversation found about it before may be wrong now, until it reads the
+  help again. The notes are kept in `adapter-knowledge.json` in the data directory of the instance, for the last 300
+  conversations.
+
 ## The recorded house (ioBroker.recorder)
 
 [ioBroker.recorder](https://github.com/ioBroker/ioBroker.recorder) records every relevant state of the house without
@@ -626,6 +642,12 @@ the last copy.
 
 ### **WORK IN PROGRESS**
 
+- (@GermanBluefox) The helps of the adapters stay current: pi-agent reads them at its start and again after an
+  instance restarts or its object changes; an instance without a help any more leaves the list. A conversation that
+  used an instance whose help changed since is told to read it again, so it does not answer from what an older
+  version could do (seen with a voice satellite: "the TV takes only exact links" after youtube-remote learned to search)
+- (@GermanBluefox) The instructions name the instances that describe themselves; before telling the user that an
+  adapter cannot do something, the agent reads its help in that request
 - (sadam6752-tech) `@iobroker/testing` 6.3.2 (repository checker W0037); the changelog links to CHANGELOG_OLD.md
 
 ### 0.12.1 (2026-11-20)
