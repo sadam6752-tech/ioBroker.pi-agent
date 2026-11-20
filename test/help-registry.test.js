@@ -182,13 +182,56 @@ test('after a restart with a new help the conversations that used the instance a
     );
 
     const text = await instructions('voice');
-    assert.match(text, /UPDATED since this conversation last used them or read their help: youtube-remote\.0\./);
+    assert.match(
+        text,
+        /UPDATED since this conversation last used them or read their help \(or they gained a help\): youtube-remote\.0\./,
+    );
     assert.match(text, /may be wrong now\. Call adapter_help for them/);
     assert.doesNotMatch(await instructions('other'), /UPDATED/, 'a conversation that never used it is not told');
 
     const help = await call('adapter_help', { instance: 'youtube-remote.0' }, 'voice');
     assert.match(JSON.stringify(help), /Message search/);
     assert.doesNotMatch(await instructions('voice'), /UPDATED/);
+});
+
+test('an instance that gains a help is named to the conversations that used it or heard it has none', async () => {
+    // seen with movieswipe: a voice conversation had heard "takes no messages" from 1.1.6 and after the update to
+    // 1.2.0 with a help kept answering "I have no access to the movie database"
+    const { adapter, registry, instructions, call, restart } = await setup();
+    await registry.start();
+    adapter.objects['telegram.0.info.connection'] = { type: 'state', common: { type: 'boolean', role: 'indicator' } };
+    adapter.states['telegram.0.info.connection'] = { val: true, ack: true, ts: 1, lc: 1 };
+    await call('get_state', { id: 'telegram.0.info.connection' }, 'states');
+    const none = await call('adapter_help', { instance: 'telegram.0' }, 'asked');
+    assert.match(JSON.stringify(none), /gives no description/);
+    // 0_userdata.0 is no adapter: nothing is noted for it
+    adapter.objects['0_userdata.0.lamp'] = { type: 'state', common: { type: 'boolean', role: 'switch' } };
+    adapter.states['0_userdata.0.lamp'] = { val: true, ack: true, ts: 1, lc: 1 };
+    await call('get_state', { id: '0_userdata.0.lamp' }, 'states');
+    for (const c of ['states', 'asked']) {
+        assert.doesNotMatch(await instructions(c), /UPDATED/, 'nothing changed yet');
+    }
+
+    adapter.objects['system.adapter.telegram.0'].common.supportedMessages = { custom: true, help: true };
+    adapter.helps['telegram.0'] = 'send {text, user?}';
+    restart('telegram.0');
+    await fire(adapter);
+    assert.ok(registry.stamps().has('telegram.0'));
+    for (const c of ['states', 'asked']) {
+        assert.match(await instructions(c), /\(or they gained a help\): telegram\.0\./, c);
+    }
+    assert.doesNotMatch(await instructions('other'), /UPDATED/, 'a conversation that never used it is not told');
+
+    await call('adapter_help', { instance: 'telegram.0' }, 'asked');
+    assert.doesNotMatch(await instructions('asked'), /UPDATED/);
+});
+
+test('a failed answer of an instance in the list of helps does not count as "no help"', async () => {
+    const { adapter, registry, instructions, call } = await setup();
+    await registry.start();
+    adapter.silent.set('recorder.0', new Error('timeout'));
+    await call('adapter_help', { instance: 'recorder.0' }, 'c1');
+    assert.doesNotMatch(await instructions('c1'), /UPDATED/);
 });
 
 test('a restart with the same help tells nobody, and the alive of every 15 s asks nothing', async () => {
