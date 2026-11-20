@@ -51,13 +51,40 @@ test('send_to: to an instance with "Write allowed" the command goes out and the 
     await stopAgent(agent);
 });
 
+test('send_to: a picture in the answer (data URL) reaches the model as its type and size, not as its bytes', async () => {
+    const f = await faux();
+    const picture = `data:image/png;base64,${'iVBORw0KGgo'.repeat(6000)}`;
+    const { agent } = await startAgent({
+        dataDir: tmp(),
+        config: { dryRun: false, writeRules: [{ scope: 'echarts.0', write: true, confirm: false }] },
+        hooks: { sendToAsync: async () => ({ data: picture }) },
+        responses: [
+            f.fauxAssistantMessage(
+                f.fauxToolCall('send_to', {
+                    instance: 'echarts.0',
+                    command: 'send',
+                    message: { preset: 'Weather', renderer: 'png', fileName: 'agent/chart.png' },
+                }),
+                { stopReason: 'toolUse' },
+            ),
+            f.fauxAssistantMessage('Rendered.'),
+        ],
+    });
+    const result = await askAndResult(agent, 'render the weather chart');
+    assert.match(result, /^Sent\. Answer of echarts\.0: \{"data":"\(image\/png as a data URL, 48 KB, not shown\)"\}$/);
+    await stopAgent(agent);
+});
+
 test('send_to: not allowed, a pattern row, pi-agent itself and simulation mode send nothing', async () => {
     const f = await faux();
     const tryIt = async (config, args) => {
         const { agent } = await startAgent({
             dataDir: tmp(),
             config,
-            responses: [f.fauxAssistantMessage(f.fauxToolCall('send_to', args), { stopReason: 'toolUse' }), f.fauxAssistantMessage('ok')],
+            responses: [
+                f.fauxAssistantMessage(f.fauxToolCall('send_to', args), { stopReason: 'toolUse' }),
+                f.fauxAssistantMessage('ok'),
+            ],
         });
         const result = await askAndResult(agent, 'send');
         const sent = (agent.asked || []).filter(([instance]) => instance === args.instance);

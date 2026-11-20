@@ -643,6 +643,8 @@ the last copy.
 ### **WORK IN PROGRESS**
 
 - (sadam6752-tech) A conversation that used an adapter without a help, or heard from adapter_help that it has none, is now told when the adapter gains one (the same "UPDATED" line as after a changed help). Seen with movieswipe: a voice conversation had heard "takes no messages" from 1.1.6 and after the update to 1.2.0, which brought a movie search, kept answering that it has no access to the movie database.
+- (@GermanBluefox) `send_to`: a data URL in an answer (e.g. the picture echarts rendered) reaches the model as its
+  type and size instead of 4000 characters of base64
 
 ### 0.12.2 (2026-11-20)
 
