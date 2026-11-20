@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.12.2",
+		"version": "0.12.3",
 		"news": {
+			"0.12.3": {
+				"en": "A conversation now also hears when an adapter that had no help gains one, e.g. after an update that brings new commands, and reads the new help instead of answering from what it found before. Pictures in the answers of other adapters (e.g. a chart from echarts) reach the model as their type and size instead of unreadable characters.",
+				"de": "Ein Gespräch erfährt jetzt auch, wenn ein Adapter, der keine Hilfe hatte, eine bekommt, etwa nach einem Update mit neuen Befehlen, und liest die neue Hilfe, statt aus dem zu antworten, was es vorher fand. Bilder in den Antworten anderer Adapter (z. B. ein Diagramm von echarts) erreichen das Modell als Typ und Größe statt als unlesbare Zeichen.",
+				"ru": "Разговор теперь узнаёт и о том, что у адаптера без справки она появилась, например после обновления с новыми командами, и читает новую справку, а не отвечает по тому, что выяснил раньше. Картинки в ответах других адаптеров (например, график из echarts) доходят до модели как тип и размер, а не как нечитаемые символы.",
+				"pt": "Uma conversa passa a saber também quando um adaptador que não tinha ajuda passa a tê-la, por exemplo após uma atualização com novos comandos, e lê a nova ajuda em vez de responder com base no que encontrou antes. As imagens nas respostas de outros adaptadores (p. ex. um gráfico do echarts) chegam ao modelo como tipo e tamanho em vez de caracteres ilegíveis.",
+				"nl": "Een gesprek hoort nu ook wanneer een adapter zonder hulp er een krijgt, bijvoorbeeld na een update met nieuwe commando's, en leest de nieuwe hulp in plaats van te antwoorden vanuit wat het eerder vond. Afbeeldingen in de antwoorden van andere adapters (bijv. een grafiek van echarts) bereiken het model als type en grootte in plaats van onleesbare tekens.",
+				"fr": "Une conversation apprend désormais aussi qu'un adaptateur sans aide en a reçu une, par exemple après une mise à jour apportant de nouvelles commandes, et lit la nouvelle aide au lieu de répondre d'après ce qu'elle avait trouvé. Les images dans les réponses d'autres adaptateurs (p. ex. un graphique d'echarts) parviennent au modèle sous forme de type et de taille au lieu de caractères illisibles.",
+				"it": "Una conversazione ora viene informata anche quando un adattatore senza aiuto ne ottiene uno, ad esempio dopo un aggiornamento con nuovi comandi, e legge il nuovo aiuto invece di rispondere in base a ciò che aveva trovato prima. Le immagini nelle risposte di altri adattatori (ad es. un grafico di echarts) arrivano al modello come tipo e dimensione invece che come caratteri illeggibili.",
+				"es": "Una conversación ahora también se entera cuando un adaptador que no tenía ayuda obtiene una, por ejemplo tras una actualización con nuevos comandos, y lee la nueva ayuda en lugar de responder según lo que encontró antes. Las imágenes en las respuestas de otros adaptadores (p. ej. un gráfico de echarts) llegan al modelo como tipo y tamaño en lugar de caracteres ilegibles.",
+				"pl": "Rozmowa dowiaduje się teraz także, gdy adapter bez pomocy ją otrzymuje, np. po aktualizacji z nowymi poleceniami, i czyta nową pomoc zamiast odpowiadać na podstawie tego, co ustaliła wcześniej. Obrazy w odpowiedziach innych adapterów (np. wykres z echarts) docierają do modelu jako typ i rozmiar zamiast nieczytelnych znaków.",
+				"uk": "Розмова тепер дізнається й про те, що в адаптера без довідки вона з'явилася, наприклад після оновлення з новими командами, і читає нову довідку, а не відповідає за тим, що з'ясувала раніше. Зображення у відповідях інших адаптерів (наприклад, графік з echarts) доходять до моделі як тип і розмір, а не як нечитабельні символи.",
+				"zh-cn": "当一个原本没有帮助的适配器获得帮助时（例如在带来新命令的更新之后），对话现在也会得知，并读取新的帮助，而不是根据之前的发现回答。其他适配器回答中的图片（例如 echarts 的图表）以类型和大小的形式到达模型，而不是无法读取的字符。"
+			},
 			"0.12.2": {
 				"en": "The helps of the adapters stay current: pi-agent reads them at its start and again after an instance restarts or its object changes. A conversation that used an adapter whose help changed since is told to read it again, so it does not answer from what an older version could do. Before telling the user that an adapter cannot do something, the agent reads its help.",
 				"de": "Die Hilfen der Adapter bleiben aktuell: pi-agent liest sie beim Start und erneut, wenn eine Instanz neu startet oder sich ihr Objekt ändert. Ein Gespräch, das einen Adapter benutzt hat, dessen Hilfe sich seitdem geändert hat, wird aufgefordert, sie neu zu lesen, damit es nicht nach einer älteren Version antwortet. Bevor der Agent sagt, dass ein Adapter etwas nicht kann, liest er dessen Hilfe.",
@@ -80,19 +93,6 @@
 				"pl": "Nowe ustawienie „Tokeny na zapytanie (kontekst)”: powyżej niego starsza część rozmowy jest streszczana, więc długa rozmowa satelity nie wysyła już całej historii z każdym zapytaniem. Dziennik debugowania pokazuje tokeny każdego wywołania modelu.",
 				"uk": "Нове налаштування «Токенів на запит (контекст)»: вище нього старша частина розмови стискається в короткий зміст, тому довга розмова сателіта більше не надсилає всю історію з кожним запитом. Журнал налагодження показує токени кожного виклику моделі.",
 				"zh-cn": "新设置“每次请求的令牌数（上下文）”：超过该值时，对话中较早的部分会被总结，因此卫星的长对话不再在每次请求时发送全部历史。调试日志会显示每次模型调用的令牌数。"
-			},
-			"0.10.4": {
-				"en": "Confirmation by voice: a bare yes or no keeps the language of the conversation; a spoken \"Да\" came back from speech recognition as \"Yeah.\", and the confirmation that followed was asked in German instead of Russian",
-				"de": "Bestätigung per Sprache: ein bloßes Ja oder Nein behält die Sprache des Gesprächs; ein gesprochenes „Да“ kam von der Spracherkennung als „Yeah.“ zurück, und die folgende Bestätigung wurde auf Deutsch statt auf Russisch gefragt",
-				"ru": "Подтверждение голосом: простое «да» или «нет» сохраняет язык разговора; сказанное «Да» распознавание речи вернуло как «Yeah.», и следующее подтверждение спрашивалось по-немецки вместо русского",
-				"pt": "Confirmação por voz: um simples sim ou não mantém o idioma da conversa; um \"Да\" falado voltou do reconhecimento de fala como \"Yeah.\", e a confirmação seguinte foi perguntada em alemão em vez de russo",
-				"nl": "Bevestiging per spraak: een kaal ja of nee behoudt de taal van het gesprek; een gesproken \"Да\" kwam van de spraakherkenning terug als \"Yeah.\", en de bevestiging daarna werd in het Duits gevraagd in plaats van in het Russisch",
-				"fr": "Confirmation vocale : un simple oui ou non garde la langue de la conversation ; un « Да » prononcé revenait de la reconnaissance vocale sous la forme « Yeah. », et la confirmation suivante était demandée en allemand au lieu du russe",
-				"it": "Conferma vocale: un semplice sì o no mantiene la lingua della conversazione; un \"Да\" pronunciato tornava dal riconoscimento vocale come \"Yeah.\", e la conferma successiva veniva chiesta in tedesco invece che in russo",
-				"es": "Confirmación por voz: un simple sí o no mantiene el idioma de la conversación; un \"Да\" hablado volvía del reconocimiento de voz como \"Yeah.\", y la confirmación siguiente se preguntaba en alemán en lugar de ruso",
-				"pl": "Potwierdzenie głosowe: samo tak lub nie zachowuje język rozmowy; wypowiedziane „Да” wracało z rozpoznawania mowy jako „Yeah.”, a następne potwierdzenie było zadawane po niemiecku zamiast po rosyjsku",
-				"uk": "Підтвердження голосом: просте «так» або «ні» зберігає мову розмови; сказане «Да» розпізнавання мовлення повертало як «Yeah.», і наступне підтвердження питалося німецькою замість російської",
-				"zh-cn": "语音确认：单纯的“是”或“否”会保留对话的语言；说出的“Да”被语音识别识别为“Yeah.”，随后的确认用德语而不是俄语提问"
 			}
 		},
 		"titleLang": {

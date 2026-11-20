@@ -1,5 +1,11 @@
 # Older Changelog
 
+### 0.10.3 (2026-11-13)
+
+- (sadam6752-tech) New checkbox "Round values for spoken answers" (on by default): a caller that speaks the answers
+  (ioBroker.assistant) reads temperatures, percentages and wind speeds as whole numbers, so the satellite no longer
+  says "0,6 bis 8 Grad"
+
 ### 0.10.2 (2026-11-13)
 
 - (sadam6752-tech) Confirmation by voice: the model no longer asks "Shall I?" itself before an action that the tool
