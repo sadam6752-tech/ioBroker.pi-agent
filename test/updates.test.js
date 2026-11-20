@@ -439,11 +439,24 @@ test('list_updates: an adapter installed since the last look is listed once, wit
         common: { name: 'sayit', version: '5.7.0', title: 'SayIt', supportedMessages: { help: true } },
     };
     db.objects['system.adapter.sayit.0'] = instanceObj('iobroker');
+    // a web-only adapter: no messages, but it describes the state it is used through
+    db.objects['system.adapter.home3d'] = {
+        type: 'adapter',
+        common: { name: 'home3d', version: '0.2.0', title: 'Home 3D' },
+        instanceObjects: [{ _id: 'show', type: 'state', common: { desc: 'Write a place to fly there' } }],
+    };
+    db.objects['system.adapter.home3d.0'] = instanceObj('iobroker');
     await ask(agent, 'are there updates?');
     result = JSON.parse((await toolResults(agent)).at(-1));
-    assert.deepEqual(result.newAdapters, [
-        { adapter: 'sayit', title: 'SayIt', version: '5.7.0', instances: ['sayit.0'], help: true },
-    ]);
+    const by = Object.fromEntries(result.newAdapters.map(a => [a.adapter, a]));
+    assert.deepEqual(by.sayit, {
+        adapter: 'sayit',
+        title: 'SayIt',
+        version: '5.7.0',
+        instances: ['sayit.0'],
+        help: true,
+    });
+    assert.equal(by.home3d.help, true, 'described states count as a help');
     assert.ok(JSON.parse(db.states[`${NAMESPACE}.update.knownAdapters`].val).includes('sayit'));
     await stopAgent(agent);
 });

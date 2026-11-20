@@ -34,18 +34,44 @@ function fakeAdapter() {
     const instances = {
         'system.adapter.recorder.0': {
             type: 'instance',
-            common: { title: 'Recorder', version: '0.2.0', mode: 'daemon', enabled: true, messagebox: true, supportedMessages: { custom: true, help: true } },
+            common: {
+                title: 'Recorder',
+                version: '0.2.0',
+                mode: 'daemon',
+                enabled: true,
+                messagebox: true,
+                supportedMessages: { custom: true, help: true },
+            },
         },
         'system.adapter.telegram.0': {
             type: 'instance',
-            common: { title: 'Telegram', version: '5.0.0', mode: 'daemon', enabled: true, supportedMessages: { custom: true, notifications: true } },
+            common: {
+                title: 'Telegram',
+                version: '5.0.0',
+                mode: 'daemon',
+                enabled: true,
+                supportedMessages: { custom: true, notifications: true },
+            },
         },
-        'system.adapter.vis.0': { type: 'instance', common: { title: 'Visualisation', version: '1.5.6', mode: 'once', enabled: true } },
+        'system.adapter.vis.0': {
+            type: 'instance',
+            common: { title: 'Visualisation', version: '1.5.6', mode: 'once', enabled: true },
+        },
         'system.adapter.sql.0': {
             type: 'instance',
-            common: { title: 'SQL', version: '4.0.0', mode: 'daemon', enabled: false, messagebox: true, supportedMessages: { custom: true, help: true } },
+            common: {
+                title: 'SQL',
+                version: '4.0.0',
+                mode: 'daemon',
+                enabled: false,
+                messagebox: true,
+                supportedMessages: { custom: true, help: true },
+            },
         },
-        'system.adapter.home3d.0': { type: 'instance', common: { title: '3D Home', version: '0.4.0', mode: 'once', enabled: true, onlyWWW: true } },
+        'system.adapter.home3d.0': {
+            type: 'instance',
+            common: { title: '3D Home', version: '0.4.0', mode: 'once', enabled: true, onlyWWW: true },
+        },
     };
     const others = {
         'system.adapter.home3d': {
@@ -54,16 +80,33 @@ function fakeAdapter() {
             instanceObjects: [
                 { _id: '', type: 'meta', common: { name: 'Files', type: 'meta.user' } },
                 { _id: 'show', type: 'state', common: HOME3D_SHOW },
-                { _id: 'places', type: 'state', common: { name: 'Places', desc: { en: 'JSON of the places.' }, type: 'string', role: 'json', write: false } },
+                {
+                    _id: 'places',
+                    type: 'state',
+                    common: {
+                        name: 'Places',
+                        desc: { en: 'JSON of the places.' },
+                        type: 'string',
+                        role: 'json',
+                        write: false,
+                    },
+                },
                 // no description: not part of the help
                 { _id: 'other', type: 'state', common: { name: 'Other', type: 'number' } },
             ],
         },
         'system.adapter.vis': { type: 'adapter', common: { name: 'vis' }, instanceObjects: [] },
         'home3d.0.show': { type: 'state', common: HOME3D_SHOW },
-        'home3d.0.places': { type: 'state', common: { name: 'Places', desc: { en: 'JSON of the places.' }, type: 'string', role: 'json', write: false } },
+        'home3d.0.places': {
+            type: 'state',
+            common: { name: 'Places', desc: { en: 'JSON of the places.' }, type: 'string', role: 'json', write: false },
+        },
     };
-    const alive = { 'system.adapter.recorder.0.alive': true, 'system.adapter.telegram.0.alive': true, 'system.adapter.sql.0.alive': false };
+    const alive = {
+        'system.adapter.recorder.0.alive': true,
+        'system.adapter.telegram.0.alive': true,
+        'system.adapter.sql.0.alive': false,
+    };
     const sent = [];
     const logs = [];
     return {
@@ -125,7 +168,9 @@ async function callTool(ctx, name, args) {
     const registry = createRegistry();
     registry.install(ctx.ext);
     const harness = await Harness.open(new MemoryStorage(), { models, registry }, context);
-    const root = await harness.root(context, { agent: { model: { provider: provider.provider.id, modelId: provider.getModel().id } } });
+    const root = await harness.root(context, {
+        agent: { model: { provider: provider.provider.id, modelId: provider.getModel().id } },
+    });
     const sub = await root.submit({ type: 'input', content: 'go' }, context);
     await sub.wait(context);
     const { entries } = await root.context(context);
@@ -140,7 +185,10 @@ test('acceptsMessages decides like js-controller: supportedMessages wins over me
     assert.equal(acceptsMessages({}), false);
     assert.equal(acceptsMessages({ supportedMessages: { help: true } }), true);
     // midea: messagebox true, but every supported message false - js-controller delivers nothing
-    assert.equal(acceptsMessages({ messagebox: true, supportedMessages: { custom: false, deviceManager: false } }), false);
+    assert.equal(
+        acceptsMessages({ messagebox: true, supportedMessages: { custom: false, deviceManager: false } }),
+        false,
+    );
 });
 
 test('helpText: the description and the commands split into reading and changing ones', () => {
@@ -165,7 +213,13 @@ test('list_instances marks the instances that describe their commands', async ()
         [...out.matchAll(/\{\\"instance\\":\\"([^\\]+)\\"[^}]*\}/g)].map(m => [m[1], m[0].includes('\\"help\\":true')]),
     );
     // home3d.0 takes no messages but describes its states
-    assert.deepEqual(rows, { 'home3d.0': true, 'recorder.0': true, 'sql.0': true, 'telegram.0': false, 'vis.0': false });
+    assert.deepEqual(rows, {
+        'home3d.0': true,
+        'recorder.0': true,
+        'sql.0': true,
+        'telegram.0': false,
+        'vis.0': false,
+    });
 });
 
 test('adapter_help reads the help without any write permission', async () => {
@@ -174,7 +228,10 @@ test('adapter_help reads the help without any write permission', async () => {
     assert.match(out, /Help of recorder\.0:/);
     assert.match(out, /Commands that change something: ackAnomaly/);
     assert.deepEqual(ctx.adapter.sent, [['recorder.0', 'help', {}, { timeout: 10_000 }]]);
-    assert.ok(ctx.adapter.logs.some(l => /^Tool adapter_help .* -> \d+ characters$/.test(l)), ctx.adapter.logs.join('\n'));
+    assert.ok(
+        ctx.adapter.logs.some(l => /^Tool adapter_help .* -> \d+ characters$/.test(l)),
+        ctx.adapter.logs.join('\n'),
+    );
 });
 
 test('adapter_help without a declared help asks briefly and does not let the model guess', async () => {
@@ -239,5 +296,19 @@ test('adapter_help of an adapter without messages: the states it describes, no m
     assert.match(out, /home3d\.0\.places \(string, json, read-only\)/);
     assert.doesNotMatch(out, /home3d\.0\.other/);
     assert.deepEqual(ctx.adapter.sent, []);
-    assert.ok(ctx.adapter.logs.some(l => /^Tool adapter_help .* -> 2 states, \d+ characters$/.test(l)), ctx.adapter.logs.join('\n'));
+    assert.ok(
+        ctx.adapter.logs.some(l => /^Tool adapter_help .* -> 2 states, \d+ characters$/.test(l)),
+        ctx.adapter.logs.join('\n'),
+    );
+});
+
+test('statesHelp: the whole help stays within 20000 characters', () => {
+    const states = Array.from({ length: 30 }, (_, i) => ({
+        id: `home3d.0.s${i}`,
+        common: { type: 'string', role: 'text', desc: 'x'.repeat(1500) },
+    }));
+    const help = statesHelp('home3d.0', states);
+    assert.ok(help.length < 21_000, `${help.length} characters`);
+    assert.match(help, /more states cut\)$/);
+    assert.match(help, /x… \(cut\)/, 'each description is cut at 1000 characters');
 });
