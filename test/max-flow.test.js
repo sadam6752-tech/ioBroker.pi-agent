@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startAgent, stopAgent, waitFor, NAMESPACE } = require('./helpers/agent-harness');
+const { startAgent, stopAgent, waitFor, communicateSubscriptions, NAMESPACE } = require('./helpers/agent-harness');
 const { CRASH_SEED } = require('./helpers/crash-fixture');
 const { markdownToPlain } = require('../lib/messengers');
 
@@ -37,7 +37,7 @@ test('MAX: a private dialog is answered to the user, a group chat to the chat, i
         seed: knownUser,
         responses: [f.fauxAssistantMessage('**Hi** Alex'), f.fauxAssistantMessage('Hi `group`')],
     });
-    assert.deepEqual(agent.foreignSubscriptions, [`${MAX}.communicate.request`]);
+    assert.deepEqual(communicateSubscriptions(agent), [`${MAX}.communicate.request`]);
     // "Alex" counts: max.0 knows user 7 by this name; user 8 calling himself Alex does not
     await receive(agent, db, { userId: 7, messageId: 'm1', name: 'Alex', text: 'hello' });
     await receive(agent, db, { userId: 8, messageId: 'm2', name: 'Alex', text: 'hello' });
@@ -47,7 +47,9 @@ test('MAX: a private dialog is answered to the user, a group chat to the chat, i
         { command: 'send', userId: '7', text: 'Hi Alex' },
         { command: 'send', chatId: '-55', text: 'Hi group' },
     ]);
-    assert.ok(agent.logs.some(([lvl, m]) => lvl === 'warn' && m.includes('MAX message on max.0 from Alex (8) ignored')));
+    assert.ok(
+        agent.logs.some(([lvl, m]) => lvl === 'warn' && m.includes('MAX message on max.0 from Alex (8) ignored')),
+    );
     const chats = JSON.parse(db.states[`${NAMESPACE}.telegram.chats`].val);
     assert.deepEqual(Object.keys(chats).sort(), [`${MAX}/-55`, `${MAX}/u7`]);
     await stopAgent(agent);
@@ -61,7 +63,9 @@ test('MAX: a confirmation is asked with callback buttons; the pressed button dec
         config: { ...CONFIG, writeAllow: '^x\\.0\\.', confirmRequired: '^x\\.0\\.', dryRun: false },
         seed: { ...CRASH_SEED, states: { ...CRASH_SEED.states, ...knownUser.states } },
         responses: [
-            f.fauxAssistantMessage(f.fauxToolCall('set_state', { id: 'x.0.lamp', val: true }), { stopReason: 'toolUse' }),
+            f.fauxAssistantMessage(f.fauxToolCall('set_state', { id: 'x.0.lamp', val: true }), {
+                stopReason: 'toolUse',
+            }),
             context => {
                 seen.push(JSON.stringify(context));
                 return f.fauxAssistantMessage('Lamp is on.');
@@ -96,7 +100,9 @@ test('MAX and Telegram side by side: each answer goes back through its own bot',
     const f = await faux();
     const { agent, db } = await startAgent({
         dataDir: tmp(),
-        config: { messengers: [...CONFIG.messengers, { enabled: true, instance: 'telegram.0', users: '1', prefix: '' }] },
+        config: {
+            messengers: [...CONFIG.messengers, { enabled: true, instance: 'telegram.0', users: '1', prefix: '' }],
+        },
         seed: knownUser,
         responses: [f.fauxAssistantMessage('via MAX'), f.fauxAssistantMessage('via Telegram')],
     });
@@ -120,7 +126,7 @@ test('a messenger without a driver is ignored with a warning', async () => {
         config: { messengers: [{ enabled: true, instance: 'whatsapp-cmb.0', users: '1', prefix: '' }] },
         responses: [],
     });
-    assert.equal(agent.foreignSubscriptions, undefined);
+    assert.deepEqual(communicateSubscriptions(agent), []);
     assert.ok(agent.logs.some(([lvl, m]) => lvl === 'warn' && m.includes('whatsapp-cmb.0 ignored')));
     await stopAgent(agent);
 });
@@ -147,7 +153,7 @@ test('MAX: a voice message (max 0.1.13 writes communicate.pathFile) is recognize
             },
         ],
     });
-    assert.deepEqual(agent.foreignSubscriptions, [`${MAX}.communicate.request`, `${MAX}.communicate.pathFile`]);
+    assert.deepEqual(communicateSubscriptions(agent), [`${MAX}.communicate.request`, `${MAX}.communicate.pathFile`]);
     agent.fetch = async (url, init) => {
         assert.equal(init.body.get('file').name, 'mid-1.m4a');
         return new Response(JSON.stringify({ text: 'lights off' }), { status: 200 });

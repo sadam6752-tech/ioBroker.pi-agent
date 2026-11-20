@@ -12,6 +12,26 @@ export interface Voice {
     language?: string;
 }
 
+/** What an instance says of itself (readHelp in lib/tools.js). */
+export interface HelpRead {
+    /**
+     * What came: the help of a running instance (help), the described states of a web-only one (states), or why
+     * none came.
+     */
+    status:
+        'self' | 'missing' | 'states' | 'no messages' | 'not declared' | 'stopped' | 'no answer' | 'no help' | 'help';
+    /** The help as the model gets it (help, states). */
+    text?: string;
+    /** Common part of the instance object. */
+    common?: Partial<ioBroker.InstanceCommon>;
+    /** Whether the instance declares a help (common.supportedMessages.help). */
+    declared?: boolean;
+    /** How many states are described (states). */
+    states?: number;
+    /** Why sendTo failed (no answer). */
+    error?: string;
+}
+
 /** What the tools read from the adapter at every use, and the adapter functions they call back into. */
 export interface Policy {
     /** Documentation search on a RAG server (0.10.0); missing or enabled() false: no search_docs tool. */
@@ -59,6 +79,23 @@ export interface Policy {
     restartList?: string[];
     /** Restart an instance and wait until it runs again; resolves to a text for the model. */
     restartInstance?: (instance: string) => Promise<string>;
+    /**
+     * What each conversation knows of the instances that describe themselves (lib/adapter-knowledge.js): the help
+     * it used or read, so the instructions name the instances whose help changed since.
+     */
+    adapterKnowledge?: {
+        used: (conversation: unknown, instance: string, stamp: string) => void;
+        read: (conversation: unknown, instance: string, stamp: string) => void;
+        outdated: (conversation: unknown, stamps: Map<string, string>) => string[];
+    };
+    /**
+     * The instances that describe themselves with a stamp of their help (lib/help-registry.js), read again when an
+     * instance restarts; adapter_help updates it.
+     */
+    helpRegistry?: {
+        stamps: () => Map<string, string>;
+        set: (instance: string, stamp: string) => void;
+    };
     /** The long-term memory shared by all conversations. */
     memory?: {
         enabled: () => boolean;

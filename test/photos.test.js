@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startAgent, stopAgent, waitFor } = require('./helpers/agent-harness');
+const { startAgent, stopAgent, waitFor, communicateSubscriptions } = require('./helpers/agent-harness');
 const { largestPhotos, PhotoCollector, isPhotoPath } = require('../lib/photos');
 
 const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'pi-agent-photos-'));
@@ -138,7 +138,7 @@ test('telegram: the caption waits for its photos, only the largest size goes to 
             return f.fauxAssistantMessage('Eine Katze.<picture-notes>graue Katze auf dem Sofa</picture-notes>');
         },
     ]);
-    assert.deepEqual(agent.foreignSubscriptions, [`${TG}.communicate.request`, `${TG}.communicate.pathFile`]);
+    assert.deepEqual(communicateSubscriptions(agent), [`${TG}.communicate.request`, `${TG}.communicate.pathFile`]);
     assert.ok(agent.logs.some(([, m]) => m.includes('photos on telegram.0 go to the model')));
 
     ids(db, TG, { chatId: 100, userId: 1, messageId: 40, raw: { message_id: 40, photo: [{}, {}], caption: 'x' } });
@@ -231,7 +231,7 @@ test('max: the photos first, then the caption, as one question', async () => {
 
 test('"Photos" off (and rows saved before 0.9.6): photos are not read; telegram hints at its settings', async () => {
     const off = await start({ instance: TG }, []);
-    assert.deepEqual(off.agent.foreignSubscriptions, [`${TG}.communicate.request`]);
+    assert.deepEqual(communicateSubscriptions(off.agent), [`${TG}.communicate.request`]);
     await stopAgent(off.agent);
 
     const noSave = await start({ instance: TG, photos: true }, [], { saveFiles: false });

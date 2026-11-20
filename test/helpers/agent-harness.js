@@ -266,4 +266,15 @@ async function waitFor(condition, what, timeoutMs = 15000) {
     throw new Error(`Timed out waiting for ${what}`);
 }
 
-module.exports = { startAgent, stopAgent, waitFor, NAMESPACE };
+/**
+ * The subscriptions of the messengers (communicate.*), without the ones of other parts, e.g. the alive states that
+ * lib/help-registry.js follows.
+ *
+ * @param {{ foreignSubscriptions?: string[] }} agent started agent
+ * @returns {string[]} the patterns in the order they were subscribed
+ */
+function communicateSubscriptions(agent) {
+    return (agent.foreignSubscriptions || []).filter(pattern => pattern.includes('.communicate.'));
+}
+
+module.exports = { startAgent, stopAgent, waitFor, communicateSubscriptions, NAMESPACE };

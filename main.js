@@ -83,6 +83,8 @@ const {
     confirmationQuestion,
 } = require('./lib/text-confirmation');
 const { createScriptHistory, scriptName } = require('./lib/scripts');
+const { createAdapterKnowledge } = require('./lib/adapter-knowledge');
+const { createHelpRegistry } = require('./lib/help-registry');
 const { speechSettings, transcribe, listSpeechModels, silenceWav } = require('./lib/speech');
 const { docsSettings, searchDocs, testDocs } = require('./lib/docs');
 const { MAX_STORED_PICTURES, trimStoredPictures, withoutPictureNotes } = require('./lib/pictures');
@@ -436,6 +438,12 @@ class PiAgent extends utils.Adapter {
             await ensureObjects(this);
             this.scriptHistory = createScriptHistory(utils.getAbsoluteInstanceDataDir(this));
             this.scriptHistory.load();
+            // what each conversation knows of the adapters that describe themselves (lib/adapter-knowledge.js)
+            this.adapterKnowledge = createAdapterKnowledge(utils.getAbsoluteInstanceDataDir(this));
+            this.adapterKnowledge.load();
+            // the helps of the instances, read again when one restarts (lib/help-registry.js)
+            this.helpRegistry = createHelpRegistry(this);
+            await this.watchHelps();
             // a backup chosen for restore replaces the store before anything opens it
             await this.applyRestore();
             await this.memory.load();
@@ -824,6 +832,8 @@ class PiAgent extends utils.Adapter {
                 restartList: this.restartList,
                 restartInstance: instance => this.restartInstance(instance),
                 memory: this.memory,
+                adapterKnowledge: this.adapterKnowledge,
+                helpRegistry: this.helpRegistry,
                 docs: {
                     enabled: () => Boolean(docsSettings(this.config).url),
                     search: (question, topK) => searchDocs(docsSettings(this.config), question, { topK }, this.fetch),
@@ -2500,6 +2510,10 @@ class PiAgent extends utils.Adapter {
             }
             return;
         }
+        // every instance: its help may have changed (lib/help-registry.js)
+        if (this.helpRegistry?.handlesObject(id)) {
+            this.helpRegistry.onObject(id, changed);
+        }
         if (String(id).startsWith('system.adapter.fullcalendar.')) {
             void this.refreshSchedulers();
             return;
@@ -2523,6 +2537,23 @@ class PiAgent extends utils.Adapter {
                 : `${this.recorderInstance} is switched off or removed: the instance restarts without the tools of the recorder`,
         );
         this.restart();
+    }
+
+    /**
+     * Read the helps of the instances that describe themselves, and again after a restart of one or a change of
+     * its object: an update may change its help, and one without a help leaves the list.
+     */
+    async watchHelps() {
+        try {
+            await this.subscribeForeignStatesAsync('system.adapter.*.alive');
+            await this.subscribeForeignObjectsAsync('system.adapter.*');
+        } catch (e) {
+            this.log.debug(`Cannot watch the restarts of the instances: ${e.message}`);
+        }
+        // in the background: an instance may take up to 10 s to answer
+        void this.helpRegistry.start().then(count => {
+            this.log.debug(`${count} instance(s) describe themselves`);
+        });
     }
 
     /** Keep the list of fullcalendar instances current when one is installed, removed, switched on or off. */
@@ -2900,6 +2931,10 @@ class PiAgent extends utils.Adapter {
             return isPhotoPath(String(state?.val || ''))
                 ? this.onPhoto(fileOf, state)
                 : this.onVoiceMessage(fileOf, state);
+        }
+        if (this.helpRegistry?.handlesState(id)) {
+            // no return: a watch of the user may follow the same alive state
+            this.helpRegistry.onAlive(id, state);
         }
         if (this.watches.handles(id)) {
             await this.watches.onState(id, state);
@@ -3475,6 +3510,7 @@ class PiAgent extends utils.Adapter {
         this.jobs.stop();
         this.textConfirmations.stop();
         this.photos.stop();
+        this.helpRegistry?.stop();
         const done = async () => {
             try {
                 await this.harness?.close(this.context);
