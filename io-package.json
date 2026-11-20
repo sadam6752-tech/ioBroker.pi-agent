@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.12.1",
+		"version": "0.12.2",
 		"news": {
+			"0.12.2": {
+				"en": "The helps of the adapters stay current: pi-agent reads them at its start and again after an instance restarts or its object changes. A conversation that used an adapter whose help changed since is told to read it again, so it does not answer from what an older version could do. Before telling the user that an adapter cannot do something, the agent reads its help.",
+				"de": "Die Hilfen der Adapter bleiben aktuell: pi-agent liest sie beim Start und erneut, wenn eine Instanz neu startet oder sich ihr Objekt ändert. Ein Gespräch, das einen Adapter benutzt hat, dessen Hilfe sich seitdem geändert hat, wird aufgefordert, sie neu zu lesen, damit es nicht nach einer älteren Version antwortet. Bevor der Agent sagt, dass ein Adapter etwas nicht kann, liest er dessen Hilfe.",
+				"ru": "Справки адаптеров остаются актуальными: pi-agent читает их при запуске и снова после перезапуска инстанции или изменения её объекта. Разговору, который пользовался адаптером, чья справка с тех пор изменилась, предлагается прочитать её заново, чтобы он не отвечал по старой версии. Прежде чем сказать, что адаптер чего-то не умеет, агент читает его справку.",
+				"pt": "As ajudas dos adaptadores mantêm-se atuais: o pi-agent lê-as ao iniciar e de novo quando uma instância reinicia ou o seu objeto muda. Uma conversa que usou um adaptador cuja ajuda mudou entretanto é avisada para a ler de novo, para não responder com base numa versão antiga. Antes de dizer que um adaptador não consegue fazer algo, o agente lê a sua ajuda.",
+				"nl": "De hulpteksten van de adapters blijven actueel: pi-agent leest ze bij de start en opnieuw wanneer een instantie herstart of haar object verandert. Een gesprek dat een adapter gebruikte waarvan de hulp sindsdien veranderde, wordt gevraagd die opnieuw te lezen, zodat het niet antwoordt vanuit een oudere versie. Voordat de agent zegt dat een adapter iets niet kan, leest hij de hulp ervan.",
+				"fr": "Les aides des adaptateurs restent à jour : pi-agent les lit au démarrage et de nouveau lorsqu’une instance redémarre ou que son objet change. Une conversation qui a utilisé un adaptateur dont l’aide a changé depuis est invitée à la relire, pour ne pas répondre d’après une ancienne version. Avant de dire qu’un adaptateur ne sait pas faire quelque chose, l’agent lit son aide.",
+				"it": "Gli aiuti degli adattatori restano aggiornati: pi-agent li legge all’avvio e di nuovo quando un’istanza si riavvia o il suo oggetto cambia. Una conversazione che ha usato un adattatore il cui aiuto è cambiato nel frattempo viene invitata a rileggerlo, per non rispondere in base a una versione precedente. Prima di dire che un adattatore non sa fare qualcosa, l’agente ne legge l’aiuto.",
+				"es": "Las ayudas de los adaptadores se mantienen al día: pi-agent las lee al iniciar y de nuevo cuando una instancia se reinicia o cambia su objeto. A una conversación que usó un adaptador cuya ayuda ha cambiado desde entonces se le pide que la vuelva a leer, para que no responda según una versión anterior. Antes de decir que un adaptador no puede hacer algo, el agente lee su ayuda.",
+				"pl": "Pomoce adapterów pozostają aktualne: pi-agent czyta je przy starcie i ponownie, gdy instancja się restartuje lub zmienia się jej obiekt. Rozmowa, która używała adaptera, którego pomoc od tego czasu się zmieniła, dostaje polecenie ponownego jej przeczytania, aby nie odpowiadała według starszej wersji. Zanim agent powie, że adapter czegoś nie potrafi, czyta jego pomoc.",
+				"uk": "Довідки адаптерів залишаються актуальними: pi-agent читає їх під час запуску й знову після перезапуску інстанції або зміни її об’єкта. Розмові, яка користувалася адаптером, чия довідка відтоді змінилася, пропонується прочитати її знову, щоб вона не відповідала за старою версією. Перш ніж сказати, що адаптер чогось не вміє, агент читає його довідку.",
+				"zh-cn": "适配器的帮助保持最新：pi-agent 在启动时读取它们，并在实例重启或其对象更改后再次读取。如果某个对话使用过的适配器的帮助此后发生了变化，该对话会被提示重新读取，以免按旧版本回答。在告诉用户某个适配器做不到某事之前，代理会先读取它的帮助。"
+			},
 			"0.12.1": {
 				"en": "adapter_help also for adapters that take no messages (web-only ones such as home3d): their help is the states they describe, so the agent can use them with set_state. Such a help stays within 20000 characters, and list_updates marks a new one with help.",
 				"de": "adapter_help auch für Adapter, die keine Nachrichten annehmen (reine Web-Adapter wie home3d): ihre Hilfe sind die Datenpunkte, die sie beschreiben, sodass der Agent sie mit set_state nutzen kann. Diese Hilfe bleibt unter 20000 Zeichen, und list_updates markiert einen neuen solchen Adapter mit help.",
@@ -80,19 +93,6 @@
 				"pl": "Potwierdzenie głosowe: samo tak lub nie zachowuje język rozmowy; wypowiedziane „Да” wracało z rozpoznawania mowy jako „Yeah.”, a następne potwierdzenie było zadawane po niemiecku zamiast po rosyjsku",
 				"uk": "Підтвердження голосом: просте «так» або «ні» зберігає мову розмови; сказане «Да» розпізнавання мовлення повертало як «Yeah.», і наступне підтвердження питалося німецькою замість російської",
 				"zh-cn": "语音确认：单纯的“是”或“否”会保留对话的语言；说出的“Да”被语音识别识别为“Yeah.”，随后的确认用德语而不是俄语提问"
-			},
-			"0.10.3": {
-				"en": "New checkbox \"Round values for spoken answers\" (on by default): a caller that speaks the answers (ioBroker.assistant) reads temperatures, percentages and wind speeds as whole numbers, so the satellite no longer says \"0,6 bis 8 Grad\"",
-				"de": "Neues Kontrollkästchen „Werte für gesprochene Antworten runden“ (standardmäßig an): ein Aufrufer, der die Antworten spricht (ioBroker.assistant), liest Temperaturen, Prozente und Windgeschwindigkeiten als ganze Zahlen, der Satellit sagt also nicht mehr „0,6 bis 8 Grad“",
-				"ru": "Новый флажок «Округлять значения для голосовых ответов» (включён по умолчанию): вызывающий, который озвучивает ответы (ioBroker.assistant), получает температуры, проценты и скорость ветра целыми числами, и сателлит больше не говорит «0,6 bis 8 Grad»",
-				"pt": "Nova caixa de seleção \"Arredondar valores para respostas faladas\" (ativa por predefinição): um chamador que fala as respostas (ioBroker.assistant) lê temperaturas, percentagens e velocidades do vento como números inteiros, por isso o satélite já não diz \"0,6 bis 8 Grad\"",
-				"nl": "Nieuw selectievakje \"Waarden afronden voor gesproken antwoorden\" (standaard aan): een aanroeper die de antwoorden uitspreekt (ioBroker.assistant) leest temperaturen, percentages en windsnelheden als hele getallen, zodat de satelliet niet meer \"0,6 bis 8 Grad\" zegt",
-				"fr": "Nouvelle case à cocher « Arrondir les valeurs des réponses parlées » (activée par défaut) : un appelant qui prononce les réponses (ioBroker.assistant) lit les températures, les pourcentages et les vitesses du vent en nombres entiers, le satellite ne dit donc plus « 0,6 bis 8 Grad »",
-				"it": "Nuova casella \"Arrotonda i valori per le risposte vocali\" (attiva per impostazione predefinita): un chiamante che pronuncia le risposte (ioBroker.assistant) legge temperature, percentuali e velocità del vento come numeri interi, quindi il satellite non dice più \"0,6 bis 8 Grad\"",
-				"es": "Nueva casilla \"Redondear valores para respuestas habladas\" (activada por defecto): un llamante que pronuncia las respuestas (ioBroker.assistant) lee temperaturas, porcentajes y velocidades del viento como números enteros, así que el satélite ya no dice \"0,6 bis 8 Grad\"",
-				"pl": "Nowe pole wyboru „Zaokrąglaj wartości w odpowiedziach głosowych” (domyślnie włączone): wywołujący, który wypowiada odpowiedzi (ioBroker.assistant), odczytuje temperatury, procenty i prędkości wiatru jako liczby całkowite, więc satelita nie mówi już „0,6 bis 8 Grad”",
-				"uk": "Новий прапорець «Округлювати значення для голосових відповідей» (увімкнений за замовчуванням): виклик, який озвучує відповіді (ioBroker.assistant), отримує температури, відсотки та швидкість вітру цілими числами, і сателіт більше не каже «0,6 bis 8 Grad»",
-				"zh-cn": "新复选框“为语音回答取整数值”（默认开启）：朗读回答的调用方（ioBroker.assistant）读取的温度、百分比和风速均为整数，因此卫星设备不再说“0,6 bis 8 Grad”"
 			}
 		},
 		"titleLang": {
