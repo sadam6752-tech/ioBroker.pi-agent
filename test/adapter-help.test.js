@@ -5,7 +5,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { createIoBrokerExtension, acceptsMessages, helpText } = require('../lib/tools');
+const { createIoBrokerExtension, acceptsMessages, helpText, describedStates, statesHelp } = require('../lib/tools');
 const { parseAllowlist } = require('../lib/guard');
 
 const RECORDER_HELP = {
@@ -17,7 +17,19 @@ const RECORDER_HELP = {
     ],
 };
 
-/** Instances: recorder.0 declares its help, telegram.0 answers messages without help, vis.0 takes none, sql.0 is stopped. */
+/** A web-only adapter: no process, it is used through the states it describes in its io-package.json. */
+const HOME3D_SHOW = {
+    name: { en: 'Show in the 3D view' },
+    desc: { en: 'Write a place or a device in words and every open 3D view flies there.', de: 'Einen Ort schreiben.' },
+    type: 'string',
+    role: 'text',
+    write: true,
+};
+
+/**
+ * Instances: recorder.0 declares its help, telegram.0 answers messages without help, vis.0 takes none, sql.0 is
+ * stopped, home3d.0 takes none but describes its states.
+ */
 function fakeAdapter() {
     const instances = {
         'system.adapter.recorder.0': {
@@ -33,6 +45,23 @@ function fakeAdapter() {
             type: 'instance',
             common: { title: 'SQL', version: '4.0.0', mode: 'daemon', enabled: false, messagebox: true, supportedMessages: { custom: true, help: true } },
         },
+        'system.adapter.home3d.0': { type: 'instance', common: { title: '3D Home', version: '0.4.0', mode: 'once', enabled: true, onlyWWW: true } },
+    };
+    const others = {
+        'system.adapter.home3d': {
+            type: 'adapter',
+            common: { name: 'home3d' },
+            instanceObjects: [
+                { _id: '', type: 'meta', common: { name: 'Files', type: 'meta.user' } },
+                { _id: 'show', type: 'state', common: HOME3D_SHOW },
+                { _id: 'places', type: 'state', common: { name: 'Places', desc: { en: 'JSON of the places.' }, type: 'string', role: 'json', write: false } },
+                // no description: not part of the help
+                { _id: 'other', type: 'state', common: { name: 'Other', type: 'number' } },
+            ],
+        },
+        'system.adapter.vis': { type: 'adapter', common: { name: 'vis' }, instanceObjects: [] },
+        'home3d.0.show': { type: 'state', common: HOME3D_SHOW },
+        'home3d.0.places': { type: 'state', common: { name: 'Places', desc: { en: 'JSON of the places.' }, type: 'string', role: 'json', write: false } },
     };
     const alive = { 'system.adapter.recorder.0.alive': true, 'system.adapter.telegram.0.alive': true, 'system.adapter.sql.0.alive': false };
     const sent = [];
@@ -46,7 +75,7 @@ function fakeAdapter() {
             warn: m => logs.push(m),
             error: m => logs.push(m),
         },
-        getForeignObjectAsync: async id => instances[id] ?? null,
+        getForeignObjectAsync: async id => instances[id] ?? others[id] ?? null,
         getForeignStateAsync: async id => (id in alive ? { val: alive[id], ack: true, ts: 1 } : null),
         getObjectViewAsync: async (design, search, params) => {
             assert.equal(`${design}/${search}`, 'system/instance');
@@ -135,7 +164,8 @@ test('list_instances marks the instances that describe their commands', async ()
     const rows = Object.fromEntries(
         [...out.matchAll(/\{\\"instance\\":\\"([^\\]+)\\"[^}]*\}/g)].map(m => [m[1], m[0].includes('\\"help\\":true')]),
     );
-    assert.deepEqual(rows, { 'recorder.0': true, 'sql.0': true, 'telegram.0': false, 'vis.0': false });
+    // home3d.0 takes no messages but describes its states
+    assert.deepEqual(rows, { 'home3d.0': true, 'recorder.0': true, 'sql.0': true, 'telegram.0': false, 'vis.0': false });
 });
 
 test('adapter_help reads the help without any write permission', async () => {
@@ -172,4 +202,42 @@ test('send_to points to adapter_help and no longer asks to send "help" itself (t
     assert.match(sendTo.description, /adapter_help/);
     assert.doesNotMatch(sendTo.description, /send it first/);
     assert.match(sendTo.description, /do not send "help" with send_to/);
+});
+
+test('describedStates: the states an adapter describes in its instanceObjects', () => {
+    const adapterObj = {
+        instanceObjects: [
+            { _id: '', type: 'meta', common: { desc: 'the files' } },
+            { _id: 'show', type: 'state', common: { desc: { en: 'Show it' } } },
+            { _id: 'quiet', type: 'state', common: { desc: { en: '  ' } } },
+            { _id: 'plain', type: 'state', common: { name: 'Plain' } },
+            { _id: 'folder', type: 'channel', common: { desc: 'A folder' } },
+        ],
+    };
+    assert.deepEqual(describedStates(adapterObj), ['show']);
+    assert.deepEqual(describedStates(null), []);
+    assert.deepEqual(describedStates({ instanceObjects: 'x' }), []);
+});
+
+test('statesHelp: each state with its type, whether it is writable, and its description', () => {
+    const out = statesHelp('home3d.0', [
+        { id: 'home3d.0.show', common: HOME3D_SHOW },
+        { id: 'home3d.0.places', common: { desc: 'JSON', type: 'string', role: 'json', write: false } },
+    ]);
+    assert.match(out, /^Help of home3d\.0: it takes no commands/);
+    assert.match(out, /\n- home3d\.0\.show \(string, text, writable\): Write a place or a device in words/);
+    assert.match(out, /\n- home3d\.0\.places \(string, json, read-only\): JSON$/);
+    assert.equal(statesHelp('a.0', [{ id: 'a.0.x', common: { type: 'number' } }]), null);
+    assert.match(statesHelp('a.0', [{ id: 'a.0.x', common: { desc: 'x'.repeat(2000) } }]), /… \(cut\)$/);
+});
+
+test('adapter_help of an adapter without messages: the states it describes, no message sent', async () => {
+    const ctx = await setup();
+    const out = await callTool(ctx, 'adapter_help', { instance: 'home3d.0' });
+    assert.match(out, /Help of home3d\.0: it takes no commands/);
+    assert.match(out, /home3d\.0\.show \(string, text, writable\): Write a place or a device in words/);
+    assert.match(out, /home3d\.0\.places \(string, json, read-only\)/);
+    assert.doesNotMatch(out, /home3d\.0\.other/);
+    assert.deepEqual(ctx.adapter.sent, []);
+    assert.ok(ctx.adapter.logs.some(l => /^Tool adapter_help .* -> 2 states, \d+ characters$/.test(l)), ctx.adapter.logs.join('\n'));
 });

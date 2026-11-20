@@ -490,6 +490,11 @@ uses only commands the adapter documents and does not guess.
 - `adapter_help` only reads: it needs no row in "Write permissions" and no confirmation.
 - It asks only running instances that take messages; an adapter that does not declare `help` gets 3 seconds to
   answer anyway, one that declares it 10 seconds.
+- An adapter that takes no messages (a web-only one without a process, e.g. home3d) cannot answer `help`. Its help
+  are the states it describes in its `io-package.json`: the `instanceObjects` of type `state` with a `common.desc`
+  (at most 30), each with its type, role, whether it is writable and its description (English, else the first
+  language). `list_instances` marks such an adapter with `"help": true` as well. Writing these states with
+  `set_state` needs "Write allowed" for them as usual.
 
 ## The recorded house (ioBroker.recorder)
 
@@ -618,6 +623,12 @@ the last copy.
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+
+- (@GermanBluefox) `adapter_help` for adapters that take no messages (web-only ones such as home3d): their help is
+  the states they describe in their `io-package.json` (`instanceObjects` with `common.desc`), listed with type,
+  whether they are writable and the description; `list_instances` marks them with `"help": true` too
 
 ### 0.12.0 (2026-11-20)
 
