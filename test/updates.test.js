@@ -9,7 +9,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { startAgent, stopAgent, waitFor, NAMESPACE } = require('./helpers/agent-harness');
-const { compareVersions, adapterNameOf, updateRefusal } = require('../lib/updates');
+const { compareVersions, adapterNameOf, updateRefusal, newAdapters } = require('../lib/updates');
 
 const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'pi-agent-070-'));
 const faux = () => import('@earendil-works/pi-ai/providers/faux');
@@ -411,5 +411,39 @@ test('list_updates with npm: every installed adapter is compared with npm, pi-ag
     assert.deepEqual([by.zigbee.available, by.zigbee.npm], ['2.0.0', '2.1.0']);
     assert.equal(result.checkedOnNpm, 4);
     assert.deepEqual(result.notOnNpm, []);
+    await stopAgent(agent);
+});
+
+test('newAdapters: nothing at the first look, then the names not remembered', () => {
+    const installed = [{ name: 'telegram' }, { name: 'recorder' }];
+    assert.deepEqual(newAdapters(installed, null), []);
+    assert.deepEqual(newAdapters(installed, ['telegram']), [{ name: 'recorder' }]);
+    assert.deepEqual(newAdapters(installed, ['telegram', 'recorder']), []);
+});
+
+test('list_updates: an adapter installed since the last look is listed once, with help: true when it describes itself', async () => {
+    const f = await faux();
+    const list = f.fauxAssistantMessage(f.fauxToolCall('list_updates', {}), { stopReason: 'toolUse' });
+    const { agent, db } = await startAgent({
+        dataDir: tmp(),
+        seed: SEED(),
+        config: ALLOWED,
+        responses: [list, f.fauxAssistantMessage('ok'), list, f.fauxAssistantMessage('ok')],
+    });
+    await ask(agent, 'are there updates?');
+    let result = JSON.parse((await toolResults(agent)).at(-1));
+    assert.equal(result.newAdapters, undefined, 'the first look only remembers');
+
+    db.objects['system.adapter.sayit'] = {
+        type: 'adapter',
+        common: { name: 'sayit', version: '5.7.0', title: 'SayIt', supportedMessages: { help: true } },
+    };
+    db.objects['system.adapter.sayit.0'] = instanceObj('iobroker');
+    await ask(agent, 'are there updates?');
+    result = JSON.parse((await toolResults(agent)).at(-1));
+    assert.deepEqual(result.newAdapters, [
+        { adapter: 'sayit', title: 'SayIt', version: '5.7.0', instances: ['sayit.0'], help: true },
+    ]);
+    assert.ok(JSON.parse(db.states[`${NAMESPACE}.update.knownAdapters`].val).includes('sayit'));
     await stopAgent(agent);
 });

@@ -446,6 +446,7 @@
                 jobResume: ['Resume', 'Fortsetzen', 'Продолжить', 'Retomar', 'Hervatten', 'Reprendre', 'Riprendi', 'Reanudar', 'Wznów', 'Продовжити', '继续'],
                 confirmJobStop: ['Stop the job "%name"?', 'Den Auftrag „%name“ stoppen?', 'Остановить задание «%name»?', 'Parar a tarefa "%name"?', 'De taak "%name" stoppen?', 'Arrêter la tâche « %name » ?', 'Fermare l\'attività "%name"?', '¿Detener la tarea "%name"?', 'Zatrzymać zadanie „%name”?', 'Зупинити завдання «%name»?', '停止任务“%name”？'],
                 jobUntil: ['until %t', 'bis %t', 'до %t', 'até %t', 'tot %t', "jusqu'au %t", 'fino al %t', 'hasta el %t', 'do %t', 'до %t', '至 %t'],
+                jobNoEnd: ['no end', 'ohne Ende', 'бессрочно', 'sem fim', 'zonder einde', 'sans fin', 'senza fine', 'sin fin', 'bezterminowo', 'безстроково', '无期限'],
                 jobToday: ['today %n of %m', 'heute %n von %m', 'сегодня %n из %m', 'hoje %n de %m', 'vandaag %n van %m', "aujourd'hui %n sur %m", 'oggi %n di %m', 'hoy %n de %m', 'dziś %n z %m', 'сьогодні %n з %m', '今天 %n / %m'],
                 jobLast: ['last %t', 'zuletzt %t', 'последнее %t', 'último %t', 'laatst %t', 'dernier %t', 'ultimo %t', 'último %t', 'ostatnio %t', 'останнє %t', '上次 %t'],
                 triggerDaily: ['every day at %t', 'täglich um %t', 'каждый день в %t', 'todos os dias às %t', 'elke dag om %t', 'chaque jour à %t', 'ogni giorno alle %t', 'cada día a las %t', 'codziennie o %t', 'щодня о %t', '每天 %t'],
@@ -698,7 +699,7 @@
                 jobsBox.append(head);
                 for (const job of list) {
                     const meta = [
-                        t('jobUntil').replace('%t', localTime(job.until)),
+                        job.until ? t('jobUntil').replace('%t', localTime(job.until)) : t('jobNoEnd'),
                         t('jobToday').replace('%n', number(job.wakesToday)).replace('%m', number(job.maxWakes)),
                         ...(job.last ? [t('jobLast').replace('%t', localTime(job.last))] : []),
                         job.notify.map(targetLabel).join(', '),

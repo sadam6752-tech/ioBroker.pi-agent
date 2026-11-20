@@ -272,6 +272,19 @@
 		"uk": "Поточне оновлення самого себе (JSON)",
 		"zh-cn": "自身更新进行中（JSON）"
 	},
+	"update.knownAdapters": {
+		"en": "Installed adapters at the last look for updates (JSON)",
+		"de": "Installierte Adapter beim letzten Blick auf Updates (JSON)",
+		"ru": "Установленные адаптеры при последнем просмотре обновлений (JSON)",
+		"pt": "Adaptadores instalados na última verificação de atualizações (JSON)",
+		"nl": "Geïnstalleerde adapters bij de laatste blik op updates (JSON)",
+		"fr": "Adaptateurs installés lors de la dernière vérification des mises à jour (JSON)",
+		"it": "Adattatori installati all'ultimo controllo degli aggiornamenti (JSON)",
+		"es": "Adaptadores instalados en la última revisión de actualizaciones (JSON)",
+		"pl": "Adaptery zainstalowane przy ostatnim sprawdzeniu aktualizacji (JSON)",
+		"uk": "Встановлені адаптери під час останнього перегляду оновлень (JSON)",
+		"zh-cn": "上次查看更新时已安装的适配器（JSON）"
+	},
 	"telegram": {
 		"en": "Messenger chats",
 		"de": "Messenger-Chats",

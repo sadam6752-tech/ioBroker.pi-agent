@@ -288,3 +288,23 @@ test('house_snapshot before the recording: the answer says when the recording st
     assert.match(seen, /the recording starts 2026-11-18 10:22/);
     await stopAgent(agent);
 });
+
+test('a recorder installed or removed while the agent runs restarts it; a change of its settings does not', async () => {
+    const { agent, db } = await startAgent({ dataDir: tmp(), config: TELEGRAM, responses: [] });
+    agent.recorderCheckMs = 5;
+    assert.equal(agent.recorderInstance, '');
+    db.objects['system.adapter.recorder.0'] = { type: 'instance', common: { name: 'recorder', enabled: true } };
+    agent.onObjectChange('system.adapter.recorder.0', db.objects['system.adapter.recorder.0']);
+    await waitFor(async () => agent.restarted === 1, 'the restart');
+    assert.ok(agent.logs.some(([, m]) => /recorder\.0 is there now/.test(m)));
+
+    agent.recorderInstance = 'recorder.0'; // as after the restart
+    agent.onObjectChange('system.adapter.recorder.0', db.objects['system.adapter.recorder.0']); // settings saved
+    await new Promise(resolve => setTimeout(resolve, 50));
+    assert.equal(agent.restarted, 1);
+
+    db.objects['system.adapter.recorder.0'].common.enabled = false;
+    agent.onObjectChange('system.adapter.recorder.0', db.objects['system.adapter.recorder.0']);
+    await waitFor(async () => agent.restarted === 2, 'the restart without the recorder');
+    await stopAgent(agent);
+});
