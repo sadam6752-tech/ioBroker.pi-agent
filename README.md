@@ -626,6 +626,8 @@ the last copy.
 
 ### **WORK IN PROGRESS**
 
+- (@GermanBluefox) `send_to`: a data URL in an answer (e.g. the picture echarts rendered) reaches the model as its
+  type and size instead of 4000 characters of base64
 - (sadam6752-tech) `@iobroker/testing` 6.3.2 (repository checker W0037); the changelog links to CHANGELOG_OLD.md
 
 ### 0.12.1 (2026-11-20)
