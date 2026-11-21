@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.12.3",
+		"version": "0.12.4",
 		"news": {
+			"0.12.4": {
+				"en": "The instructions name the commands of each adapter that describes itself, so the agent finds the right adapter by what it can do, e.g. \"open it in Lampa\" leads to movieswipe (openInLampa) without reading its help first.",
+				"de": "Die Anweisungen nennen die Befehle jedes Adapters, der sich selbst beschreibt, sodass der Agent den passenden Adapter an seinen Fähigkeiten erkennt, z. B. führt „öffne es in Lampa“ ohne vorheriges Lesen der Hilfe zu movieswipe (openInLampa).",
+				"ru": "В инструкциях агента теперь перечислены команды каждого адаптера со справкой, поэтому агент находит нужный адаптер по тому, что он умеет: например, «открой в Лампе» ведёт к movieswipe (openInLampa) без предварительного чтения справки.",
+				"pt": "As instruções indicam os comandos de cada adaptador que se descreve a si próprio, para que o agente encontre o adaptador certo pelo que ele sabe fazer, p. ex. \"abre no Lampa\" leva ao movieswipe (openInLampa) sem ler primeiro a ajuda.",
+				"nl": "De instructies noemen de opdrachten van elke adapter die zichzelf beschrijft, zodat de agent de juiste adapter vindt aan wat hij kan, bijv. \"open het in Lampa\" leidt naar movieswipe (openInLampa) zonder eerst de hulp te lezen.",
+				"fr": "Les instructions indiquent les commandes de chaque adaptateur qui se décrit lui-même, afin que l'agent trouve le bon adaptateur selon ce qu'il sait faire, p. ex. « ouvre-le dans Lampa » mène à movieswipe (openInLampa) sans lire d'abord son aide.",
+				"it": "Le istruzioni indicano i comandi di ogni adattatore che si descrive da sé, così l'agente trova l'adattatore giusto in base a ciò che sa fare, ad es. \"aprilo in Lampa\" porta a movieswipe (openInLampa) senza leggere prima l'aiuto.",
+				"es": "Las instrucciones nombran los comandos de cada adaptador que se describe a sí mismo, de modo que el agente encuentra el adaptador adecuado por lo que sabe hacer, p. ej. «ábrelo en Lampa» lleva a movieswipe (openInLampa) sin leer antes su ayuda.",
+				"pl": "Instrukcje podają polecenia każdego adaptera, który sam się opisuje, dzięki czemu agent znajduje właściwy adapter po tym, co potrafi, np. „otwórz to w Lampie” prowadzi do movieswipe (openInLampa) bez wcześniejszego czytania pomocy.",
+				"uk": "В інструкціях агента тепер наведено команди кожного адаптера з довідкою, тож агент знаходить потрібний адаптер за тим, що він уміє: наприклад, «відкрий у Лампі» веде до movieswipe (openInLampa) без попереднього читання довідки.",
+				"zh-cn": "指令中现在会列出每个自带说明的适配器的命令，因此代理能根据功能找到合适的适配器，例如“在 Lampa 中打开”会直接找到 movieswipe（openInLampa），无需先阅读其帮助。"
+			},
 			"0.12.3": {
 				"en": "A conversation now also hears when an adapter that had no help gains one, e.g. after an update that brings new commands, and reads the new help instead of answering from what it found before. Pictures in the answers of other adapters (e.g. a chart from echarts) reach the model as their type and size instead of unreadable characters.",
 				"de": "Ein Gespräch erfährt jetzt auch, wenn ein Adapter, der keine Hilfe hatte, eine bekommt, etwa nach einem Update mit neuen Befehlen, und liest die neue Hilfe, statt aus dem zu antworten, was es vorher fand. Bilder in den Antworten anderer Adapter (z. B. ein Diagramm von echarts) erreichen das Modell als Typ und Größe statt als unlesbare Zeichen.",
@@ -80,19 +93,6 @@
 				"pl": "Z zainstalowanym ioBroker.recorder agent czyta zapisany dom: co, kiedy i przez kogo zostało przełączone, jak wyglądał dom w danym momencie w przeszłości, nietypowe zdarzenia i zwykłe wartości. get_history używa recordera dla stanów bez historii.",
 				"uk": "Якщо встановлено ioBroker.recorder, агент читає записаний дім: що, коли й ким перемикалося, яким був дім у момент у минулому, незвичні події та звичні значення. get_history використовує recorder для станів без історії.",
 				"zh-cn": "安装 ioBroker.recorder 后，代理可读取记录的房屋数据：何时由谁切换了什么、过去某一时刻房屋的状态、异常事件和通常值。get_history 对没有历史记录的状态使用 recorder。"
-			},
-			"0.10.5": {
-				"en": "New setting \"Tokens per request (context)\": above it the older part of a conversation is summarised, so a long satellite conversation no longer sends its whole history with every request. The debug log shows the tokens of every model call.",
-				"de": "Neue Einstellung „Tokens pro Anfrage (Kontext)“: darüber wird der ältere Teil eines Gesprächs zusammengefasst, sodass ein langes Satelliten-Gespräch nicht mehr seinen ganzen Verlauf mit jeder Anfrage sendet. Das Debug-Log zeigt die Tokens jedes Modellaufrufs.",
-				"ru": "Новая настройка «Токенов на запрос (контекст)»: выше неё старая часть разговора сжимается в краткое содержание, поэтому длинный разговор сателлита больше не отправляет всю историю с каждым запросом. Отладочный лог показывает токены каждого вызова модели.",
-				"pt": "Nova definição \"Tokens por pedido (contexto)\": acima dela a parte mais antiga de uma conversa é resumida, pelo que uma conversa longa do satélite já não envia todo o histórico em cada pedido. O registo de depuração mostra os tokens de cada chamada ao modelo.",
-				"nl": "Nieuwe instelling \"Tokens per verzoek (context)\": daarboven wordt het oudere deel van een gesprek samengevat, zodat een lang satellietgesprek niet meer zijn hele geschiedenis met elk verzoek meestuurt. Het debuglog toont de tokens van elke modelaanroep.",
-				"fr": "Nouveau réglage « Jetons par requête (contexte) » : au-delà, la partie la plus ancienne d'une conversation est résumée, de sorte qu'une longue conversation du satellite n'envoie plus tout son historique à chaque requête. Le journal de débogage montre les jetons de chaque appel au modèle.",
-				"it": "Nuova impostazione \"Token per richiesta (contesto)\": oltre questo valore la parte più vecchia di una conversazione viene riassunta, così una lunga conversazione del satellite non invia più tutta la cronologia a ogni richiesta. Il log di debug mostra i token di ogni chiamata al modello.",
-				"es": "Nuevo ajuste \"Tokens por solicitud (contexto)\": por encima de él, la parte más antigua de una conversación se resume, de modo que una conversación larga del satélite ya no envía todo su historial con cada solicitud. El registro de depuración muestra los tokens de cada llamada al modelo.",
-				"pl": "Nowe ustawienie „Tokeny na zapytanie (kontekst)”: powyżej niego starsza część rozmowy jest streszczana, więc długa rozmowa satelity nie wysyła już całej historii z każdym zapytaniem. Dziennik debugowania pokazuje tokeny każdego wywołania modelu.",
-				"uk": "Нове налаштування «Токенів на запит (контекст)»: вище нього старша частина розмови стискається в короткий зміст, тому довга розмова сателіта більше не надсилає всю історію з кожним запитом. Журнал налагодження показує токени кожного виклику моделі.",
-				"zh-cn": "新设置“每次请求的令牌数（上下文）”：超过该值时，对话中较早的部分会被总结，因此卫星的长对话不再在每次请求时发送全部历史。调试日志会显示每次模型调用的令牌数。"
 			}
 		},
 		"titleLang": {

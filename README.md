@@ -640,7 +640,7 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 0.12.4 (2026-11-21)
 
 - (sadam6752-tech) The instructions name the commands of each instance that describes itself (at most 12, e.g. `movieswipe.0 (suggest, search, …, openInLampa)`), so the agent finds the instance by what it can do: "open it in Lampa" led to nothing while only the name movieswipe.0 was listed
 
@@ -694,11 +694,6 @@ the last copy.
 - (sadam6752-tech) New setting "Tokens per request (context)" (0 = as before): above it the older part of a
   conversation is summarised, so a long satellite conversation no longer sends up to 100k tokens with every request.
   The debug log shows the tokens of every model call (context, share from the cache, answer, cost)
-
-### 0.10.4 (2026-11-13)
-
-- (sadam6752-tech) Confirmation by voice: a bare yes or no keeps the language of the conversation. A spoken "Да" came
-  back from speech recognition as "Yeah.", and the confirmation that followed was asked in German instead of Russian
 
 Older changes are listed in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

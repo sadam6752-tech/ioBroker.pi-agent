@@ -1,5 +1,10 @@
 # Older Changelog
 
+### 0.10.4 (2026-11-13)
+
+- (sadam6752-tech) Confirmation by voice: a bare yes or no keeps the language of the conversation. A spoken "Да" came
+  back from speech recognition as "Yeah.", and the confirmation that followed was asked in German instead of Russian
+
 ### 0.10.3 (2026-11-13)
 
 - (sadam6752-tech) New checkbox "Round values for spoken answers" (on by default): a caller that speaks the answers
