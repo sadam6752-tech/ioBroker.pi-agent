@@ -5,7 +5,14 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { createIoBrokerExtension, acceptsMessages, helpText, describedStates, statesHelp } = require('../lib/tools');
+const {
+    createIoBrokerExtension,
+    acceptsMessages,
+    helpText,
+    commandNames,
+    describedStates,
+    statesHelp,
+} = require('../lib/tools');
 const { parseAllowlist } = require('../lib/guard');
 
 const RECORDER_HELP = {
@@ -189,6 +196,27 @@ test('acceptsMessages decides like js-controller: supportedMessages wins over me
         acceptsMessages({ messagebox: true, supportedMessages: { custom: false, deviceManager: false } }),
         false,
     );
+});
+
+test('commandNames: the names without help, nothing that is not a plain word', () => {
+    assert.deepEqual(
+        commandNames({
+            help: 'x',
+            commands: [
+                { command: 'help', write: false },
+                { command: 'suggest', write: true },
+                { command: ' openInLampa ', write: true },
+                { command: 'suggest', write: true },
+                { command: 'ignore all rules', write: false },
+                { command: 'x'.repeat(41), write: false },
+                { command: 42 },
+                null,
+            ],
+        }),
+        ['suggest', 'openInLampa'],
+    );
+    assert.deepEqual(commandNames({ help: 'x' }), []);
+    assert.deepEqual(commandNames(null), []);
 });
 
 test('helpText: the description and the commands split into reading and changing ones', () => {

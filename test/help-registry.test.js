@@ -43,7 +43,14 @@ function fakeAdapter() {
     };
     const helps = {
         'youtube-remote.0': 'youtube: a video ID or a URL.',
-        'recorder.0': 'getSnapshot {ts?}',
+        'recorder.0': {
+            help: 'getSnapshot {ts?}',
+            commands: [
+                { command: 'help', write: false },
+                { command: 'getSnapshot', write: false },
+                { command: 'houseEvents', write: false },
+            ],
+        },
     };
     const sent = [];
     const logs = [];
@@ -83,7 +90,10 @@ function fakeAdapter() {
             if (adapter.silent.has(instance)) {
                 throw adapter.silent.get(instance);
             }
-            return command === 'help' && helps[instance] ? { help: helps[instance] } : { error: 'unknown' };
+            if (command !== 'help' || !helps[instance]) {
+                return { error: 'unknown' };
+            }
+            return typeof helps[instance] === 'string' ? { help: helps[instance] } : helps[instance];
         },
         setTimeout: (fn, ms) => {
             const timer = { fn, ms };
@@ -157,7 +167,7 @@ test('at the start the helps of the running instances that describe themselves a
     const text = await instructions('c1');
     assert.match(
         text,
-        /Instances that describe themselves \(call adapter_help for them\): home3d\.0, recorder\.0, youtube-remote\.0\./,
+        /Instances that describe themselves, with their commands in brackets .*: home3d\.0, recorder\.0 \(getSnapshot, houseEvents\), youtube-remote\.0\./,
     );
     assert.match(text, /Before you first write the states of an instance that describes itself/);
     assert.match(text, /Before you tell the user that an adapter or a device cannot do something/);
@@ -192,6 +202,42 @@ test('after a restart with a new help the conversations that used the instance a
     const help = await call('adapter_help', { instance: 'youtube-remote.0' }, 'voice');
     assert.match(JSON.stringify(help), /Message search/);
     assert.doesNotMatch(await instructions('voice'), /UPDATED/);
+});
+
+test('a new command after an update shows in the list of every conversation, at most 12 per instance', async () => {
+    const { adapter, registry, instructions, call, restart } = await setup();
+    await registry.start();
+    const names = [
+        'suggest',
+        'search',
+        'getMovie',
+        'markMovie',
+        'history',
+        'genres',
+        'openInLampa',
+        'lampaDevices',
+        'a1',
+        'a2',
+        'a3',
+        'a4',
+        'a5',
+    ];
+    adapter.helps['recorder.0'] = {
+        help: 'Movies.',
+        commands: [{ command: 'help', write: false }, ...names.map(command => ({ command, write: false }))],
+    };
+    restart('recorder.0');
+    await fire(adapter);
+    assert.match(
+        await instructions('new conversation'),
+        /recorder\.0 \(suggest, search, getMovie, markMovie, history, genres, openInLampa, lampaDevices, a1, a2, a3, a4, …\)/,
+    );
+
+    // adapter_help takes the commands over too
+    adapter.helps['recorder.0'] = { help: 'Less.', commands: [{ command: 'only', write: true }] };
+    await call('adapter_help', { instance: 'recorder.0' }, 'c1');
+    assert.match(await instructions('c1'), /recorder\.0 \(only\), youtube-remote\.0\./);
+    assert.deepEqual(registry.commands().get('youtube-remote.0'), []);
 });
 
 test('an instance that gains a help is named to the conversations that used it or heard it has none', async () => {
@@ -265,7 +311,7 @@ test('an instance that no longer declares a help after its restart leaves the li
     );
     assert.match(
         await instructions('c1'),
-        /describe themselves \(call adapter_help for them\): home3d\.0, youtube-remote\.0\./,
+        /describe themselves, with their commands in brackets .*: home3d\.0, youtube-remote\.0\./,
     );
 });
 

@@ -640,6 +640,10 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### **WORK IN PROGRESS**
+
+- (sadam6752-tech) The instructions name the commands of each instance that describes itself (at most 12, e.g. `movieswipe.0 (suggest, search, …, openInLampa)`), so the agent finds the instance by what it can do: "open it in Lampa" led to nothing while only the name movieswipe.0 was listed
+
 ### 0.12.3 (2026-11-20)
 
 - (sadam6752-tech) A conversation that used an adapter without a help, or heard from adapter_help that it has none, is now told when the adapter gains one (the same "UPDATED" line as after a changed help). Seen with movieswipe: a voice conversation had heard "takes no messages" from 1.1.6 and after the update to 1.2.0, which brought a movie search, kept answering that it has no access to the movie database.

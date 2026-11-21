@@ -22,6 +22,8 @@ export interface HelpRead {
         'self' | 'missing' | 'states' | 'no messages' | 'not declared' | 'stopped' | 'no answer' | 'no help' | 'help';
     /** The help as the model gets it (help, states). */
     text?: string;
+    /** The command names of the help, without "help" (help). */
+    commands?: string[];
     /** Common part of the instance object. */
     common?: Partial<ioBroker.InstanceCommon>;
     /** Whether the instance declares a help (common.supportedMessages.help). */
@@ -94,7 +96,9 @@ export interface Policy {
      */
     helpRegistry?: {
         stamps: () => Map<string, string>;
-        set: (instance: string, stamp: string) => void;
+        set: (instance: string, stamp: string, names?: string[]) => void;
+        /** instance -> its command names, without "help" */
+        commands?: () => Map<string, string[]>;
     };
     /** The long-term memory shared by all conversations. */
     memory?: {
