@@ -650,6 +650,10 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### **WORK IN PROGRESS**
+
+- (sadam6752-tech) A request the model could not answer names the cause: "Request not answered (model_error: <error text of the model API>)" instead of only "model_error", in the chat, in the answer of sendTo and in the log
+
 ### 0.12.5 (2026-11-21)
 
 - (sadam6752-tech) Voice messages in several languages: a chat chooses the language of its voice messages with a message `ru`, `de`, `en` (or `/ru`), kept until the next one and over restarts; without one the language of the settings applies, and with an empty field the language of the system (before, an empty field let the server decide). Canary needs the language told: a Russian voice message came back as "(nothing recognized)" while the system language is German

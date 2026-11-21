@@ -2768,7 +2768,15 @@ class PiAgent extends utils.Adapter {
                 const submission = await conversation.submit({ type: 'input', content, requestId }, this.context);
                 const settled = await submission.wait(this.context);
                 if (settled.status !== 'done') {
-                    throw new Error(`Request not answered (${settled.reason ?? settled.status})`);
+                    // the detail names the cause, e.g. the error text of the model API ("402 Insufficient Balance")
+                    const raw = settled.status === 'unanswered' ? settled.detail : undefined;
+                    const detail = (typeof raw === 'string' ? raw : raw == null ? '' : JSON.stringify(raw))
+                        .replace(/\s+/g, ' ')
+                        .trim()
+                        .slice(0, 300);
+                    throw new Error(
+                        `Request not answered (${settled.status === 'unanswered' ? settled.reason : settled.status}${detail ? `: ${detail}` : ''})`,
+                    );
                 }
                 const answer = await this.lastAnswer(conversation);
                 await this.removePending(requestId);

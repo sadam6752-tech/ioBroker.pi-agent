@@ -251,6 +251,7 @@ test('admin chat: a failed request shows its error; an empty text is refused', a
     await call(agent, 'chatSend', { text: 'hello' });
     const history = await settled(agent);
     assert.ok(history.error, 'the error is shown');
+    assert.match(String(history.error), /provider down/, 'with the error text of the model, not only model_error');
     await stopAgent(agent);
 });
 
