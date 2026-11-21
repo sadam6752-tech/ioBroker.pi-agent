@@ -4,6 +4,12 @@
 
 - (sadam6752-tech) With ioBroker.recorder installed, four read-only tools: `house_events` (what was switched, when and by whom), `house_snapshot` (the house at a moment in the past), `house_anomalies` and `usual_value`; `get_history` reads from the recorder when the history instance has nothing for a state
 
+### 0.10.5 (2026-11-15)
+
+- (sadam6752-tech) New setting "Tokens per request (context)" (0 = as before): above it the older part of a
+  conversation is summarised, so a long satellite conversation no longer sends up to 100k tokens with every request.
+  The debug log shows the tokens of every model call (context, share from the cache, answer, cost)
+
 ### 0.10.4 (2026-11-13)
 
 - (sadam6752-tech) Confirmation by voice: a bare yes or no keeps the language of the conversation. A spoken "Да" came

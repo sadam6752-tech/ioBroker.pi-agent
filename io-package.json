@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.12.5",
+		"version": "0.12.6",
 		"news": {
+			"0.12.6": {
+				"en": "A request the model could not answer names the cause: \"Request not answered (model_error: <error text of the model API>)\" instead of only \"model_error\"",
+				"de": "Eine Anfrage, die das Modell nicht beantworten konnte, nennt die Ursache: \"Request not answered (model_error: <Fehlertext der Modell-API>)\" statt nur \"model_error\"",
+				"ru": "Запрос, на который модель не смогла ответить, называет причину: \"Request not answered (model_error: <текст ошибки API модели>)\" вместо одного \"model_error\"",
+				"pt": "Um pedido que o modelo não conseguiu responder indica a causa: \"Request not answered (model_error: <texto de erro da API do modelo>)\" em vez de apenas \"model_error\"",
+				"nl": "Een verzoek dat het model niet kon beantwoorden noemt de oorzaak: \"Request not answered (model_error: <fouttekst van de model-API>)\" in plaats van alleen \"model_error\"",
+				"fr": "Une requête à laquelle le modèle n'a pas pu répondre indique la cause : « Request not answered (model_error: <texte d'erreur de l'API du modèle>) » au lieu de seulement « model_error »",
+				"it": "Una richiesta a cui il modello non ha potuto rispondere indica la causa: \"Request not answered (model_error: <testo di errore dell'API del modello>)\" invece del solo \"model_error\"",
+				"es": "Una solicitud que el modelo no pudo responder indica la causa: \"Request not answered (model_error: <texto de error de la API del modelo>)\" en lugar de solo \"model_error\"",
+				"pl": "Żądanie, na które model nie mógł odpowiedzieć, podaje przyczynę: \"Request not answered (model_error: <tekst błędu API modelu>)\" zamiast samego \"model_error\"",
+				"uk": "Запит, на який модель не змогла відповісти, називає причину: \"Request not answered (model_error: <текст помилки API моделі>)\" замість лише \"model_error\"",
+				"zh-cn": "模型无法回答的请求会给出原因：\"Request not answered (model_error: <模型 API 的错误文本>)\"，而不再只有 \"model_error\""
+			},
 			"0.12.5": {
 				"en": "Voice messages in several languages: a chat chooses the language of its voice messages with a message ru, de or en (also /ru); without one the language of the settings, else of the system applies",
 				"de": "Sprachnachrichten in mehreren Sprachen: ein Chat wählt die Sprache seiner Sprachnachrichten mit einer Nachricht ru, de oder en (auch /ru); ohne sie gilt die Sprache der Einstellungen, sonst die des Systems",
@@ -67,19 +80,6 @@
 				"pl": "adapter_help także dla adapterów, które nie przyjmują wiadomości (tylko web, jak home3d): ich pomocą są opisane przez nie stany, więc agent może ich używać przez set_state. Taka pomoc mieści się w 20000 znaków, a list_updates oznacza nowy taki adapter jako help.",
 				"uk": "adapter_help також для адаптерів, які не приймають повідомлень (лише веб, наприклад home3d): їхня допомога — описані ними стани, тож агент може використовувати їх через set_state. Така допомога не довша за 20000 символів, а list_updates позначає новий такий адаптер як help.",
 				"zh-cn": "adapter_help 也支持不接收消息的适配器（纯网页适配器，如 home3d）：它们的帮助就是其描述的状态，代理可通过 set_state 使用它们。此类帮助不超过 20000 个字符，list_updates 会将新的此类适配器标记为 help。"
-			},
-			"0.12.0": {
-				"en": "New adapters are noticed: a recorder installed or switched on later restarts the agent with its tools, list_updates names the adapters installed since the last look. A report every morning can run a year or without an end (the agent asks), its conversation starts anew every 30 days, and with a recorder it tells what happened in the house.",
-				"de": "Neue Adapter werden bemerkt: ein später installierter oder eingeschalteter Recorder startet den Agenten mit seinen Werkzeugen neu, list_updates nennt die seit dem letzten Blick installierten Adapter. Ein Bericht jeden Morgen kann ein Jahr oder unbefristet laufen (der Agent fragt), sein Gespräch beginnt alle 30 Tage neu, und mit dem Recorder erzählt er, was im Haus passiert ist.",
-				"ru": "Новые адаптеры замечаются: recorder, установленный или включённый позже, перезапускает агента с его инструментами, list_updates называет адаптеры, установленные с прошлого просмотра. Отчёт каждое утро может работать год или бессрочно (агент спрашивает), его разговор начинается заново каждые 30 дней, а с recorder он рассказывает, что происходило в доме.",
-				"pt": "Novos adaptadores são notados: um recorder instalado ou ligado mais tarde reinicia o agente com as suas ferramentas, list_updates indica os adaptadores instalados desde a última vez. Um relatório todas as manhãs pode durar um ano ou sem fim (o agente pergunta), a sua conversa recomeça a cada 30 dias e, com o recorder, conta o que aconteceu em casa.",
-				"nl": "Nieuwe adapters worden opgemerkt: een later geïnstalleerde of ingeschakelde recorder herstart de agent met zijn tools, list_updates noemt de adapters die sinds de vorige keer zijn geïnstalleerd. Een rapport elke ochtend kan een jaar of zonder einde lopen (de agent vraagt het), het gesprek begint elke 30 dagen opnieuw en met de recorder vertelt het wat er in huis gebeurde.",
-				"fr": "Les nouveaux adaptateurs sont remarqués : un recorder installé ou activé plus tard redémarre l'agent avec ses outils, list_updates nomme les adaptateurs installés depuis la dernière fois. Un rapport chaque matin peut durer un an ou sans fin (l'agent demande), sa conversation recommence tous les 30 jours et, avec le recorder, il raconte ce qui s'est passé dans la maison.",
-				"it": "I nuovi adattatori vengono notati: un recorder installato o attivato più tardi riavvia l'agente con i suoi strumenti, list_updates indica gli adattatori installati dall'ultima volta. Un rapporto ogni mattina può durare un anno o senza fine (l'agente lo chiede), la sua conversazione ricomincia ogni 30 giorni e, con il recorder, racconta cosa è successo in casa.",
-				"es": "Se detectan adaptadores nuevos: un recorder instalado o activado más tarde reinicia el agente con sus herramientas, list_updates nombra los adaptadores instalados desde la última vez. Un informe cada mañana puede durar un año o sin fin (el agente pregunta), su conversación empieza de nuevo cada 30 días y, con el recorder, cuenta lo que pasó en casa.",
-				"pl": "Nowe adaptery są zauważane: recorder zainstalowany lub włączony później uruchamia agenta ponownie z jego narzędziami, list_updates wymienia adaptery zainstalowane od ostatniego sprawdzenia. Raport każdego ranka może działać rok lub bezterminowo (agent pyta), jego rozmowa zaczyna się od nowa co 30 dni, a z recorderem opowiada, co działo się w domu.",
-				"uk": "Нові адаптери помічаються: recorder, встановлений або увімкнений пізніше, перезапускає агента з його інструментами, list_updates називає адаптери, встановлені з минулого перегляду. Звіт щоранку може працювати рік або безстроково (агент питає), його розмова починається заново кожні 30 днів, а з recorder він розповідає, що відбувалося в домі.",
-				"zh-cn": "新适配器会被发现：之后安装或启用的 recorder 会让代理带着它的工具重启，list_updates 会列出自上次查看以来安装的适配器。每天早上的报告可以运行一年或无期限（代理会询问），其对话每 30 天重新开始，有 recorder 时会讲述家里发生了什么。"
 			},
 			"0.11.1": {
 				"en": "New tool adapter_help: before the first send_to the agent reads the description an adapter gives of its commands (message help), without a write permission. list_instances marks those adapters.",

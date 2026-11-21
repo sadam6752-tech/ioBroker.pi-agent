@@ -650,7 +650,7 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 0.12.6 (2026-11-21)
 
 - (sadam6752-tech) A request the model could not answer names the cause: "Request not answered (model_error: <error text of the model API>)" instead of only "model_error", in the chat, in the answer of sendTo and in the log
 
@@ -702,12 +702,6 @@ the last copy.
   adapter gives of its commands and states (message `help`, `common.supportedMessages.help`), without a write
   permission; `list_instances` marks those adapters with `"help": true`; the description of `send_to` points to it
   instead of telling the model to send `help` itself (that needed a write permission)
-
-### 0.10.5 (2026-11-15)
-
-- (sadam6752-tech) New setting "Tokens per request (context)" (0 = as before): above it the older part of a
-  conversation is summarised, so a long satellite conversation no longer sends up to 100k tokens with every request.
-  The debug log shows the tokens of every model call (context, share from the cache, answer, cost)
 
 Older changes are listed in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 
