@@ -115,7 +115,7 @@
 	"Speech model": "Speech model",
 	"Choose from the list or type a model ID. Empty: openai/whisper-large-v3-turbo with OpenRouter; a server needs one of its models": "Choose from the list or type a model ID. Empty: openai/whisper-large-v3-turbo with OpenRouter; a server needs one of its models",
 	"API key for speech (optional)": "API key for speech (optional)",
-	"Two letters, for example de or ru. Empty: detected for every message (a local server then needs longer)": "Two letters, for example de or ru. Empty: detected for every message (a local server then needs longer)",
+	"Two letters, for example de or ru. Empty: the language of the system. A chat switches with a message of its own: ru, de, en": "Two letters, for example de or ru. Empty: the language of the system. A chat switches with a message of its own: ru, de, en",
 	"Test speech recognition": "Test speech recognition",
 	"Language": "Language",
 	"Photos": "Photos",

@@ -755,7 +755,7 @@
                 "speechLanguage": {
                     "type": "text",
                     "label": "Language",
-                    "help": "Two letters, for example de or ru. Empty: detected for every message (a local server then needs longer)",
+                    "help": "Two letters, for example de or ru. Empty: the language of the system. A chat switches with a message of its own: ru, de, en",
                     "default": "",
                     "hidden": "!data.speechService",
                     "xs": 12,

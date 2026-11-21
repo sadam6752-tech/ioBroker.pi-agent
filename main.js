@@ -84,6 +84,7 @@ const {
 } = require('./lib/text-confirmation');
 const { createScriptHistory, scriptName } = require('./lib/scripts');
 const { createAdapterKnowledge } = require('./lib/adapter-knowledge');
+const { languageCommand, languageName, createVoiceLanguages } = require('./lib/voice-language');
 const { createHelpRegistry } = require('./lib/help-registry');
 const { speechSettings, transcribe, listSpeechModels, silenceWav } = require('./lib/speech');
 const { docsSettings, searchDocs, testDocs } = require('./lib/docs');
@@ -441,6 +442,9 @@ class PiAgent extends utils.Adapter {
             // what each conversation knows of the adapters that describe themselves (lib/adapter-knowledge.js)
             this.adapterKnowledge = createAdapterKnowledge(utils.getAbsoluteInstanceDataDir(this));
             this.adapterKnowledge.load();
+            // the language of the voice messages per chat, chosen with "ru", "de", ... (lib/voice-language.js)
+            this.voiceLanguages = createVoiceLanguages(utils.getAbsoluteInstanceDataDir(this));
+            this.voiceLanguages.load();
             // the helps of the instances, read again when one restarts (lib/help-registry.js)
             this.helpRegistry = createHelpRegistry(this);
             await this.watchHelps();
@@ -1070,14 +1074,16 @@ class PiAgent extends utils.Adapter {
         try {
             const audio = await this.readReceivedFile(instance, filePath, 'voice');
             const started = Date.now();
-            text = await transcribe(
-                await this.speechSettingsOf(this.config),
-                audio,
-                path.basename(filePath),
-                this.fetch,
-            );
+            const settings = await this.speechSettingsOf(this.config);
+            // the language the chat chose with "ru", "de", ..., else the one of the settings, else the one of the
+            // system: a model like Canary turns speech in an unexpected language into a translation or into nothing
+            settings.language =
+                this.voiceLanguages?.get(instance, chatId) ||
+                settings.language ||
+                (await this.systemLanguage()).toLowerCase().split(/[-_]/)[0];
+            text = await transcribe(settings, audio, path.basename(filePath), this.fetch);
             this.log.info(
-                `${driver.label} ${instance}: voice message (${Math.round(audio.length / 1024)} KB) recognized in ${((Date.now() - started) / 1000).toFixed(1)} s`,
+                `${driver.label} ${instance}: voice message (${Math.round(audio.length / 1024)} KB) recognized in ${((Date.now() - started) / 1000).toFixed(1)} s${settings.language ? ` (${settings.language})` : ''}`,
             );
         } catch (e) {
             this.log.warn(`${driver.label} ${instance}: speech recognition failed: ${e.message}`);
@@ -2968,7 +2974,7 @@ class PiAgent extends utils.Adapter {
         if (!state || !state.val) {
             return;
         }
-        const { allowed, prefix, driver, photosOn } = this.channels.get(instance);
+        const { allowed, prefix, driver, photosOn, voiceOn } = this.channels.get(instance);
         const request = await driver.readRequest(instance, state.val);
         const { chatId, messageId, text } = request;
         if (!chatId) {
@@ -2980,6 +2986,14 @@ class PiAgent extends utils.Adapter {
         }
         if (driver.takeButton(instance, request)) {
             return; // a button of a confirmation, not a message for the model
+        }
+        const language = voiceOn && !request.withPhotos ? languageCommand(stripPrefix(text, prefix) ?? text) : '';
+        if (language) {
+            // "ru", "/de": the language of the next voice messages of this chat, not a message for the model
+            this.voiceLanguages.set(instance, chatId, language);
+            this.log.info(`${driver.label} ${instance}: voice messages of chat ${chatId} in ${language} from now on`);
+            driver.send(instance, chatId, `🎤 ${languageName(language)} (${language})`);
+            return;
         }
         if (photosOn) {
             // the prefix does not apply to photos and their caption

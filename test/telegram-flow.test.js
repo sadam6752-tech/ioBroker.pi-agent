@@ -344,6 +344,7 @@ test('a voice message is recognized, shown in the chat and answered; refused sen
             speechBaseUrl: 'http://nas:8000/v1',
             speechModel: 'Systran/faster-whisper-small',
         },
+        seed: { objects: { 'system.config': { type: 'config', common: { language: 'de' } } } },
         responses: [
             context => {
                 seen.push(JSON.stringify(context));
@@ -354,7 +355,12 @@ test('a voice message is recognized, shown in the chat and answered; refused sen
     assert.deepEqual(communicateSubscriptions(agent), [`${TG}.communicate.request`, `${TG}.communicate.pathFile`]);
     const posted = [];
     agent.fetch = async (url, init) => {
-        posted.push({ url, file: init.body.get('file'), model: init.body.get('model') });
+        posted.push({
+            url,
+            file: init.body.get('file'),
+            model: init.body.get('model'),
+            language: init.body.get('language'),
+        });
         return new Response(JSON.stringify({ text: 'switch the light off' }), { status: 200 });
     };
     fs.mkdirSync(path.join(dataDir, 'voice'));
@@ -379,6 +385,7 @@ test('a voice message is recognized, shown in the chat and answered; refused sen
     assert.equal(posted[0].url, 'http://nas:8000/v1/audio/transcriptions');
     assert.equal(posted[0].model, 'Systran/faster-whisper-small');
     assert.equal(posted[0].file.name, 'temp.ogg');
+    assert.equal(posted[0].language, 'de', 'no language in the settings: the one of the system');
     assert.deepEqual(sentToTelegram(agent), [
         { text: '🎤 «switch the light off»', chatId: '100', parse_mode: 'HTML' },
         { text: 'The light is off', chatId: '100', parse_mode: 'HTML' },
@@ -386,6 +393,64 @@ test('a voice message is recognized, shown in the chat and answered; refused sen
     assert.match(seen[0], /🎤 switch the light off/, 'the model gets the text marked as a voice message');
     assert.match(seen[0], /voice message turned into text/, 'and the instruction how to read it');
     await stopAgent(agent);
+});
+
+test('"ru" / "/de" choose the language of the voice messages of a chat, kept after a restart', async () => {
+    const f = await faux();
+    const dataDir = tmp();
+    const config = {
+        ...CONFIG,
+        speechService: 'server',
+        speechBaseUrl: 'http://nas:8000/v1',
+        speechModel: 'canary',
+        speechLanguage: 'de',
+    };
+    const asked = [];
+    const { agent, db } = await startAgent({
+        dataDir,
+        config,
+        responses: Array.from({ length: 4 }, () => context => {
+            asked.push(JSON.stringify(context));
+            return f.fauxAssistantMessage('ok');
+        }),
+    });
+    const languages = [];
+    agent.fetch = async (url, init) => {
+        languages.push(init.body.get('language'));
+        return new Response(JSON.stringify({ text: 'привет' }), { status: 200 });
+    };
+    fs.mkdirSync(path.join(dataDir, 'voice'));
+    const voice = path.join(dataDir, 'voice', 'temp.ogg');
+    fs.writeFileSync(voice, 'OggS');
+    const speak = async (target, chatId, messageId) => {
+        const ts = Date.now();
+        target.db.setState(`${TG}.communicate.requestChatId`, { val: chatId, ack: true, ts });
+        target.db.setState(`${TG}.communicate.requestUserId`, { val: 1, ack: true, ts });
+        target.db.setState(`${TG}.communicate.requestMessageId`, { val: messageId, ack: true, ts });
+        target.db.setState(`${TG}.communicate.users`, { val: USERS, ack: true, ts });
+        await target.agent.onStateChange(`${TG}.communicate.pathFile`, { val: voice, ack: true, ts });
+    };
+
+    await speak({ agent, db }, 100, 40);
+    assert.deepEqual(languages, ['de'], 'without a choice the language of the settings');
+    await receive(agent, db, { chatId: 100, userId: 1, messageId: 41, name: 'Alex', text: 'ru' });
+    await receive(agent, db, { chatId: 100, userId: 1, messageId: 42, name: 'Alex', text: '/ai hi' });
+    await waitFor(() => asked.length === 2, 'the answers to the voice message and to "hi"');
+    assert.ok(sentToTelegram(agent).some(m => m.text === '🎤 русский (ru)'));
+    assert.ok(!asked.some(c => /"ru"/.test(c)), 'the command does not reach the model');
+    await speak({ agent, db }, 100, 43);
+    await speak({ agent, db }, 200, 44);
+    assert.deepEqual(languages, ['de', 'ru', 'de'], 'only the chat that chose it');
+    await stopAgent(agent);
+
+    const second = await startAgent({ dataDir, config, responses: [] });
+    second.agent.fetch = agent.fetch;
+    await speak(second, 100, 45);
+    assert.deepEqual(languages.at(-1), 'ru');
+    await receive(second.agent, second.db, { chatId: 100, userId: 1, messageId: 46, name: 'Alex', text: '/DE@my_bot' });
+    await speak(second, 100, 47);
+    assert.deepEqual(languages.at(-1), 'de');
+    await stopAgent(second.agent);
 });
 
 test('a failed speech recognition is reported in the chat; "Voice" off or no service: no subscription', async () => {

@@ -123,3 +123,16 @@ test('silenceWav is a valid 16 kHz mono WAV of the given length', () => {
     assert.equal(wav.readUInt32LE(40), 16000);
     assert.equal(wav.length, 44 + 16000);
 });
+
+test('languageCommand: "ru", "/de", "/EN@bot" choose a language; greetings and sentences do not', () => {
+    const { languageCommand, languageName } = require('../lib/voice-language');
+    assert.equal(languageCommand('ru'), 'ru');
+    assert.equal(languageCommand(' /de '), 'de');
+    assert.equal(languageCommand('/EN@my_bot'), 'en');
+    assert.equal(languageCommand('uk'), 'uk');
+    for (const text of ['hi', 'no', 'ok', 'xx', 'de bitte', '', null]) {
+        assert.equal(languageCommand(text), '', String(text));
+    }
+    assert.equal(languageName('ru'), 'русский');
+    assert.equal(languageName('de'), 'Deutsch');
+});

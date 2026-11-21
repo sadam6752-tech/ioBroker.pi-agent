@@ -115,7 +115,7 @@
 	"Speech model": "识别模型",
 	"Choose from the list or type a model ID. Empty: openai/whisper-large-v3-turbo with OpenRouter; a server needs one of its models": "从列表中选择或输入模型 ID。留空：OpenRouter 使用 openai/whisper-large-v3-turbo；服务器需要其已安装的模型之一",
 	"API key for speech (optional)": "语音识别 API 密钥（可选）",
-	"Two letters, for example de or ru. Empty: detected for every message (a local server then needs longer)": "两个字母，例如 de 或 ru。留空：每条消息自动检测（本地服务器会更慢）",
+	"Two letters, for example de or ru. Empty: the language of the system. A chat switches with a message of its own: ru, de, en": "两个字母，例如 de 或 ru。留空：使用系统语言。聊天中单独发送 ru、de、en 即可切换",
 	"Test speech recognition": "测试语音识别",
 	"Language": "语言",
 	"Photos": "照片",

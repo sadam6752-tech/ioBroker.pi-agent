@@ -283,8 +283,14 @@ conversation, same confirmations, same limits.
   speech itself but understands more.
 - **OpenRouter:** its transcription models, `openai/whisper-large-v3-turbo` when none is chosen. Without a key in this
   block, the OpenRouter key of the agent (provider OpenRouter) or of the system settings of admin (tab "AI") is used.
-- **Language:** two letters (`de`, `ru`) or empty. Empty detects the language of every message, which costs a local
-  server extra time but understands messages in several languages.
+- **Language:** two letters (`de`, `ru`) or empty. Empty takes the language of the ioBroker system. It is always told
+  to the server: a model like Canary (ioBroker.voice) turns speech in another language into a translation or into
+  nothing, and Whisper does not need extra time to detect it.
+- **Several languages in one chat:** send `ru`, `de`, `en` (also `/ru`, or `/ru@bot` from the command menu of
+  telegram) as a message of its own. The voice messages of that chat are then recognized in this language until the
+  next such message, also after a restart; the bot confirms with e.g. "🎤 русский (ru)". The message does not reach
+  the model. Without one the language above applies. Taken are the languages of Canary 1B v2 (bg, cs, da, de, el, en,
+  es, et, fi, fr, hr, hu, it, lt, lv, mt, nl, pl, pt, ro, ru, sk, sl, sv, uk), so a greeting like "hi" stays a message.
 - The column **Voice** of the table chooses the bots that take voice messages; the prefix does not apply to them. Only
   allowed users are heard. An older max adapter does not save voice messages; they are then ignored.
 - The text goes to the model as `🎤 <text>`; the instructions of the messenger chats tell it that such a text may contain
@@ -639,6 +645,10 @@ the last copy.
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+
+- (sadam6752-tech) Voice messages in several languages: a chat chooses the language of its voice messages with a message `ru`, `de`, `en` (or `/ru`), kept until the next one and over restarts; without one the language of the settings applies, and with an empty field the language of the system (before, an empty field let the server decide). Canary needs the language told: a Russian voice message came back as "(nothing recognized)" while the system language is German
 
 ### 0.12.4 (2026-11-21)
 
