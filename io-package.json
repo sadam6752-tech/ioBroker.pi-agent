@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.12.4",
+		"version": "0.12.5",
 		"news": {
+			"0.12.5": {
+				"en": "Voice messages in several languages: a chat chooses the language of its voice messages with a message ru, de or en (also /ru); without one the language of the settings, else of the system applies",
+				"de": "Sprachnachrichten in mehreren Sprachen: ein Chat wählt die Sprache seiner Sprachnachrichten mit einer Nachricht ru, de oder en (auch /ru); ohne sie gilt die Sprache der Einstellungen, sonst die des Systems",
+				"ru": "Голосовые сообщения на нескольких языках: чат выбирает язык голосовых сообщением ru, de или en (также /ru); без него действует язык из настроек, иначе язык системы",
+				"pt": "Mensagens de voz em vários idiomas: um chat escolhe o idioma das suas mensagens de voz com uma mensagem ru, de ou en (também /ru); sem ela vale o idioma das definições, senão o do sistema",
+				"nl": "Spraakberichten in meerdere talen: een chat kiest de taal van zijn spraakberichten met een bericht ru, de of en (ook /ru); zonder geldt de taal van de instellingen, anders die van het systeem",
+				"fr": "Messages vocaux en plusieurs langues : un chat choisit la langue de ses messages vocaux avec un message ru, de ou en (aussi /ru) ; sans cela, la langue des réglages s'applique, sinon celle du système",
+				"it": "Messaggi vocali in più lingue: una chat sceglie la lingua dei suoi messaggi vocali con un messaggio ru, de o en (anche /ru); senza vale la lingua delle impostazioni, altrimenti quella del sistema",
+				"es": "Mensajes de voz en varios idiomas: un chat elige el idioma de sus mensajes de voz con un mensaje ru, de o en (también /ru); sin él rige el idioma de los ajustes, si no el del sistema",
+				"pl": "Wiadomości głosowe w kilku językach: czat wybiera język swoich wiadomości głosowych wiadomością ru, de lub en (także /ru); bez niej obowiązuje język z ustawień, a w przeciwnym razie język systemu",
+				"uk": "Голосові повідомлення кількома мовами: чат вибирає мову голосових повідомленням ru, de або en (також /ru); без нього діє мова з налаштувань, інакше мова системи",
+				"zh-cn": "多语言语音消息：聊天中发送 ru、de 或 en（也可 /ru）即可选择语音消息的语言；未选择时使用设置中的语言，否则使用系统语言"
+			},
 			"0.12.4": {
 				"en": "The instructions name the commands of each adapter that describes itself, so the agent finds the right adapter by what it can do, e.g. \"open it in Lampa\" leads to movieswipe (openInLampa) without reading its help first.",
 				"de": "Die Anweisungen nennen die Befehle jedes Adapters, der sich selbst beschreibt, sodass der Agent den passenden Adapter an seinen Fähigkeiten erkennt, z. B. führt „öffne es in Lampa“ ohne vorheriges Lesen der Hilfe zu movieswipe (openInLampa).",
@@ -80,19 +93,6 @@
 				"pl": "Nowe narzędzie adapter_help: przed pierwszym send_to agent czyta opis poleceń, który podaje adapter (wiadomość help), bez prawa zapisu. list_instances oznacza takie adaptery.",
 				"uk": "Новий інструмент adapter_help: перед першим send_to агент читає опис команд, який дає адаптер (повідомлення help), без права запису. list_instances позначає такі адаптери.",
 				"zh-cn": "新工具 adapter_help：在第一次 send_to 之前，代理读取适配器对其命令的说明（消息 help），无需写入权限。list_instances 会标记这些适配器。"
-			},
-			"0.11.0": {
-				"en": "With ioBroker.recorder installed, the agent reads the recorded house: what was switched, when and by whom, how the house was at a moment in the past, unusual events and usual values. get_history uses the recorder for states without history.",
-				"de": "Mit installiertem ioBroker.recorder liest der Agent das aufgezeichnete Haus: was wann von wem geschaltet wurde, wie das Haus zu einem Zeitpunkt in der Vergangenheit war, ungewöhnliche Ereignisse und übliche Werte. get_history nutzt den Recorder für Datenpunkte ohne History.",
-				"ru": "Если установлен ioBroker.recorder, агент читает записанный дом: что, когда и кем переключалось, каким был дом в момент в прошлом, необычные события и обычные значения. get_history использует recorder для состояний без истории.",
-				"pt": "Com o ioBroker.recorder instalado, o agente lê a casa gravada: o que foi ligado, quando e por quem, como estava a casa num momento do passado, eventos invulgares e valores habituais. get_history usa o recorder para estados sem histórico.",
-				"nl": "Met ioBroker.recorder geïnstalleerd leest de agent het opgenomen huis: wat wanneer door wie werd geschakeld, hoe het huis op een moment in het verleden was, ongebruikelijke gebeurtenissen en gebruikelijke waarden. get_history gebruikt de recorder voor states zonder geschiedenis.",
-				"fr": "Avec ioBroker.recorder installé, l'agent lit la maison enregistrée : ce qui a été commuté, quand et par qui, l'état de la maison à un moment du passé, les événements inhabituels et les valeurs habituelles. get_history utilise le recorder pour les états sans historique.",
-				"it": "Con ioBroker.recorder installato, l'agente legge la casa registrata: cosa è stato commutato, quando e da chi, com'era la casa in un momento del passato, eventi insoliti e valori abituali. get_history usa il recorder per gli stati senza cronologia.",
-				"es": "Con ioBroker.recorder instalado, el agente lee la casa grabada: qué se conmutó, cuándo y quién, cómo estaba la casa en un momento del pasado, eventos inusuales y valores habituales. get_history usa el recorder para estados sin historial.",
-				"pl": "Z zainstalowanym ioBroker.recorder agent czyta zapisany dom: co, kiedy i przez kogo zostało przełączone, jak wyglądał dom w danym momencie w przeszłości, nietypowe zdarzenia i zwykłe wartości. get_history używa recordera dla stanów bez historii.",
-				"uk": "Якщо встановлено ioBroker.recorder, агент читає записаний дім: що, коли й ким перемикалося, яким був дім у момент у минулому, незвичні події та звичні значення. get_history використовує recorder для станів без історії.",
-				"zh-cn": "安装 ioBroker.recorder 后，代理可读取记录的房屋数据：何时由谁切换了什么、过去某一时刻房屋的状态、异常事件和通常值。get_history 对没有历史记录的状态使用 recorder。"
 			}
 		},
 		"titleLang": {

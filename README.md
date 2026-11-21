@@ -291,6 +291,10 @@ conversation, same confirmations, same limits.
   next such message, also after a restart; the bot confirms with e.g. "🎤 русский (ru)". The message does not reach
   the model. Without one the language above applies. Taken are the languages of Canary 1B v2 (bg, cs, da, de, el, en,
   es, et, fi, fr, hr, hu, it, lt, lv, mt, nl, pl, pt, ro, ru, sk, sl, sv, uk), so a greeting like "hi" stays a message.
+  The telegram adapter does not fill the command menu of the bot; to choose with a tap, send `/setcommands` to
+  @BotFather, pick the bot and send `ru - Голосовые на русском`, `de - Sprachnachrichten auf Deutsch`,
+  `en - Voice messages in English` (one per line). `/setcommands` replaces the whole list: add other commands of the
+  bot to the same message.
 - The column **Voice** of the table chooses the bots that take voice messages; the prefix does not apply to them. Only
   allowed users are heard. An older max adapter does not save voice messages; they are then ignored.
 - The text goes to the model as `🎤 <text>`; the instructions of the messenger chats tell it that such a text may contain
@@ -646,7 +650,7 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 0.12.5 (2026-11-21)
 
 - (sadam6752-tech) Voice messages in several languages: a chat chooses the language of its voice messages with a message `ru`, `de`, `en` (or `/ru`), kept until the next one and over restarts; without one the language of the settings applies, and with an empty field the language of the system (before, an empty field let the server decide). Canary needs the language told: a Russian voice message came back as "(nothing recognized)" while the system language is German
 
@@ -694,10 +698,6 @@ the last copy.
   adapter gives of its commands and states (message `help`, `common.supportedMessages.help`), without a write
   permission; `list_instances` marks those adapters with `"help": true`; the description of `send_to` points to it
   instead of telling the model to send `help` itself (that needed a write permission)
-
-### 0.11.0 (2026-11-18)
-
-- (sadam6752-tech) With ioBroker.recorder installed, four read-only tools: `house_events` (what was switched, when and by whom), `house_snapshot` (the house at a moment in the past), `house_anomalies` and `usual_value`; `get_history` reads from the recorder when the history instance has nothing for a state
 
 ### 0.10.5 (2026-11-15)
 
