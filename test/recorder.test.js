@@ -308,3 +308,57 @@ test('a recorder installed or removed while the agent runs restarts it; a change
     await waitFor(async () => agent.restarted === 2, 'the restart without the recorder');
     await stopAgent(agent);
 });
+
+test('get_history and house_snapshot: a state logged by influxdb is asked there, not only in the recorder', async () => {
+    const f = await faux();
+    const GUST = 'alias.0.Weather.Gust.ACTUAL';
+    const objects = {
+        ...RECORDER.objects,
+        [GUST]: {
+            type: 'state',
+            common: {
+                name: 'ACTUAL',
+                type: 'number',
+                custom: { 'influxdb.0': { enabled: true }, 'sql.0': { enabled: false } },
+            },
+        },
+    };
+    let seen = '';
+    const { agent, db } = await startAgent({
+        dataDir: tmp(),
+        config: TELEGRAM,
+        seed: { objects },
+        responses: [
+            f.fauxAssistantMessage(f.fauxToolCall('house_snapshot', { at: '03:00', ids: [GUST] }), {
+                stopReason: 'toolUse',
+            }),
+            f.fauxAssistantMessage(f.fauxToolCall('get_history', { id: GUST, hours: 14 }), { stopReason: 'toolUse' }),
+            context => {
+                seen = JSON.stringify(context.messages);
+                return f.fauxAssistantMessage('36 kn.');
+            },
+        ],
+        hooks: {
+            sendToAsync: (to, command) =>
+                command === 'getSnapshot'
+                    ? { states: [] }
+                    : to === 'influxdb.0' && command === 'getHistory'
+                      ? { result: [{ val: 36.2, ts: Date.now() - 3600_000 }] }
+                      : command === 'getHistory'
+                        ? { result: [] }
+                        : undefined,
+        },
+    });
+    await receive(agent, db, 1, 'what was the strongest gust last night?');
+    await waitFor(() => seen, 'the answer');
+    // the snapshot says where the state is logged
+    assert.match(seen, /notInRecorder/);
+    assert.match(seen, /influxdb\.0/);
+    // the history of the state comes from the instance that logs it, first and only
+    assert.deepEqual(
+        agent.asked.filter(([, c]) => c === 'getHistory').map(([to]) => to),
+        ['influxdb.0'],
+    );
+    assert.match(seen, /36\.2/);
+    await stopAgent(agent);
+});

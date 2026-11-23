@@ -650,6 +650,10 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### **WORK IN PROGRESS**
+
+- (GermanBluefox) get_history asks the history instance that logs the state (its custom settings, e.g. influxdb.0) first, and house_snapshot names the asked states that a history adapter logs instead of the recorder: the gusts of a weather station logged by influxdb were answered as "not recorded"
+
 ### 0.12.6 (2026-11-21)
 
 - (sadam6752-tech) A request the model could not answer names the cause: "Request not answered (model_error: <error text of the model API>)" instead of only "model_error", in the chat, in the answer of sendTo and in the log
