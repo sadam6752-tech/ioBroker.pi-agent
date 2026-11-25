@@ -650,9 +650,10 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 0.12.7 (2026-11-25)
 
 - (sadam6752-tech) Code mode: `send_to` gives a script the answer of the adapter as a value, `{sent, instance, answer, note}`, instead of the text "Sent. Answer of …: {…}"; a script read `stations` of that text and found none. The chat keeps the text
+- (sadam6752-tech) The pi libraries (chord, pi-ai, pi-codemode, pi-durable, pi-schema) are updated from 1.5.0 to 1.5.2 together
 
 ### 0.12.6 (2026-11-21)
 
@@ -671,41 +672,6 @@ the last copy.
 - (sadam6752-tech) A conversation that used an adapter without a help, or heard from adapter_help that it has none, is now told when the adapter gains one (the same "UPDATED" line as after a changed help). Seen with movieswipe: a voice conversation had heard "takes no messages" from 1.1.6 and after the update to 1.2.0, which brought a movie search, kept answering that it has no access to the movie database.
 - (@GermanBluefox) `send_to`: a data URL in an answer (e.g. the picture echarts rendered) reaches the model as its
   type and size instead of 4000 characters of base64
-
-### 0.12.2 (2026-11-20)
-
-- (@GermanBluefox) The helps of the adapters stay current: pi-agent reads them at its start and again after an
-  instance restarts or its object changes; an instance without a help any more leaves the list. A conversation that
-  used an instance whose help changed since is told to read it again, so it does not answer from what an older
-  version could do (seen with a voice satellite: "the TV takes only exact links" after youtube-remote learned to search)
-- (@GermanBluefox) The instructions name the instances that describe themselves; before telling the user that an
-  adapter cannot do something, the agent reads its help in that request
-- (sadam6752-tech) `@iobroker/testing` 6.3.2 (repository checker W0037); the changelog links to CHANGELOG_OLD.md
-
-### 0.12.1 (2026-11-20)
-
-- (@GermanBluefox) `adapter_help` for adapters that take no messages (web-only ones such as home3d): their help is
-  the states they describe in their `io-package.json` (`instanceObjects` with `common.desc`), listed with type,
-  whether they are writable and the description; `list_instances` marks them with `"help": true` too
-- (sadam6752-tech) The help from states stays within 20000 characters like any other help; `list_updates` marks
-  a new web-only adapter that describes its states with `"help": true` in `newAdapters`
-
-### 0.12.0 (2026-11-20)
-
-- (sadam6752-tech) A recorder installed, switched on, off or removed while the agent runs restarts the agent, so its
-  tools come and go without a manual restart; `list_updates` names the adapters installed since the last look
-  (`newAdapters`, with `"help": true` when the adapter describes its commands for `adapter_help`)
-- (sadam6752-tech) A background job whose triggers are all times of day (a report every morning) runs up to 365 days
-  or without an end instead of 30 days; the agent asks "one year or without an end?" when the user did not say how
-  long, and the admin chat shows "no end"; every job conversation starts anew after 30 days, so a long report does
-  not send months of history; with a recorder, job reports use `house_events`, `house_anomalies` and `usual_value`
-
-### 0.11.1 (2026-11-19)
-
-- (@GermanBluefox) Tool `adapter_help`: before the first `send_to` to an adapter the agent reads the description the
-  adapter gives of its commands and states (message `help`, `common.supportedMessages.help`), without a write
-  permission; `list_instances` marks those adapters with `"help": true`; the description of `send_to` points to it
-  instead of telling the model to send `help` itself (that needed a write permission)
 
 Older changes are listed in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.12.6",
+		"version": "0.12.7",
 		"news": {
+			"0.12.7": {
+				"en": "Code mode: send_to gives a script the answer of the adapter as a value ({sent, instance, answer, note}) instead of the chat text; the pi libraries are updated to 1.5.2",
+				"de": "Code-Modus: send_to gibt einem Skript die Antwort des Adapters als Wert ({sent, instance, answer, note}) statt des Chat-Texts; die pi-Bibliotheken sind auf 1.5.2 aktualisiert",
+				"ru": "Режим кода: send_to отдаёт скрипту ответ адаптера как значение ({sent, instance, answer, note}), а не текст чата; библиотеки pi обновлены до 1.5.2",
+				"pt": "Modo de código: send_to entrega a um script a resposta do adaptador como valor ({sent, instance, answer, note}) em vez do texto do chat; as bibliotecas pi foram atualizadas para 1.5.2",
+				"nl": "Codemodus: send_to geeft een script het antwoord van de adapter als waarde ({sent, instance, answer, note}) in plaats van de chattekst; de pi-bibliotheken zijn bijgewerkt naar 1.5.2",
+				"fr": "Mode code : send_to donne à un script la réponse de l'adaptateur comme valeur ({sent, instance, answer, note}) au lieu du texte du chat ; les bibliothèques pi sont mises à jour en 1.5.2",
+				"it": "Modalità codice: send_to restituisce a uno script la risposta dell'adattatore come valore ({sent, instance, answer, note}) invece del testo della chat; le librerie pi sono aggiornate alla 1.5.2",
+				"es": "Modo código: send_to entrega a un script la respuesta del adaptador como valor ({sent, instance, answer, note}) en lugar del texto del chat; las bibliotecas pi se actualizan a 1.5.2",
+				"pl": "Tryb kodu: send_to przekazuje skryptowi odpowiedź adaptera jako wartość ({sent, instance, answer, note}) zamiast tekstu czatu; biblioteki pi zaktualizowane do 1.5.2",
+				"uk": "Режим коду: send_to віддає скрипту відповідь адаптера як значення ({sent, instance, answer, note}), а не текст чату; бібліотеки pi оновлено до 1.5.2",
+				"zh-cn": "代码模式：send_to 将适配器的回答作为值（{sent, instance, answer, note}）而不是聊天文本交给脚本；pi 库已更新到 1.5.2"
+			},
 			"0.12.6": {
 				"en": "A request the model could not answer names the cause: \"Request not answered (model_error: <error text of the model API>)\" instead of only \"model_error\"",
 				"de": "Eine Anfrage, die das Modell nicht beantworten konnte, nennt die Ursache: \"Request not answered (model_error: <Fehlertext der Modell-API>)\" statt nur \"model_error\"",
@@ -80,19 +93,6 @@
 				"pl": "adapter_help także dla adapterów, które nie przyjmują wiadomości (tylko web, jak home3d): ich pomocą są opisane przez nie stany, więc agent może ich używać przez set_state. Taka pomoc mieści się w 20000 znaków, a list_updates oznacza nowy taki adapter jako help.",
 				"uk": "adapter_help також для адаптерів, які не приймають повідомлень (лише веб, наприклад home3d): їхня допомога — описані ними стани, тож агент може використовувати їх через set_state. Така допомога не довша за 20000 символів, а list_updates позначає новий такий адаптер як help.",
 				"zh-cn": "adapter_help 也支持不接收消息的适配器（纯网页适配器，如 home3d）：它们的帮助就是其描述的状态，代理可通过 set_state 使用它们。此类帮助不超过 20000 个字符，list_updates 会将新的此类适配器标记为 help。"
-			},
-			"0.11.1": {
-				"en": "New tool adapter_help: before the first send_to the agent reads the description an adapter gives of its commands (message help), without a write permission. list_instances marks those adapters.",
-				"de": "Neues Werkzeug adapter_help: vor dem ersten send_to liest der Agent die Beschreibung, die ein Adapter von seinen Befehlen gibt (Nachricht help), ohne Schreibrecht. list_instances markiert diese Adapter.",
-				"ru": "Новый инструмент adapter_help: перед первым send_to агент читает описание команд, которое даёт адаптер (сообщение help), без права записи. list_instances отмечает такие адаптеры.",
-				"pt": "Nova ferramenta adapter_help: antes do primeiro send_to o agente lê a descrição que um adaptador dá dos seus comandos (mensagem help), sem permissão de escrita. list_instances marca esses adaptadores.",
-				"nl": "Nieuwe tool adapter_help: vóór de eerste send_to leest de agent de beschrijving die een adapter van zijn commando's geeft (bericht help), zonder schrijfrecht. list_instances markeert die adapters.",
-				"fr": "Nouvel outil adapter_help : avant le premier send_to, l'agent lit la description qu'un adaptateur donne de ses commandes (message help), sans droit d'écriture. list_instances marque ces adaptateurs.",
-				"it": "Nuovo strumento adapter_help: prima del primo send_to l'agente legge la descrizione che un adattatore dà dei suoi comandi (messaggio help), senza permesso di scrittura. list_instances contrassegna questi adattatori.",
-				"es": "Nueva herramienta adapter_help: antes del primer send_to el agente lee la descripción que un adaptador da de sus comandos (mensaje help), sin permiso de escritura. list_instances marca esos adaptadores.",
-				"pl": "Nowe narzędzie adapter_help: przed pierwszym send_to agent czyta opis poleceń, który podaje adapter (wiadomość help), bez prawa zapisu. list_instances oznacza takie adaptery.",
-				"uk": "Новий інструмент adapter_help: перед першим send_to агент читає опис команд, який дає адаптер (повідомлення help), без права запису. list_instances позначає такі адаптери.",
-				"zh-cn": "新工具 adapter_help：在第一次 send_to 之前，代理读取适配器对其命令的说明（消息 help），无需写入权限。list_instances 会标记这些适配器。"
 			}
 		},
 		"titleLang": {
