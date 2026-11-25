@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "pi-agent",
-		"version": "0.12.7",
+		"version": "0.12.8",
 		"news": {
+			"0.12.8": {
+				"en": "get_history asks the history instance that logs the state (e.g. influxdb.0) first and leaves out instances that are not running; house_snapshot names the asked states that a history adapter logs instead of the recorder",
+				"de": "get_history fragt zuerst die History-Instanz, die den Datenpunkt aufzeichnet (z. B. influxdb.0), und lässt nicht laufende Instanzen aus; house_snapshot nennt die gefragten Datenpunkte, die ein History-Adapter statt des Recorders aufzeichnet",
+				"ru": "get_history сначала спрашивает экземпляр истории, который записывает это состояние (например, influxdb.0), и пропускает незапущенные экземпляры; house_snapshot называет запрошенные состояния, которые пишет адаптер истории, а не recorder",
+				"pt": "get_history pergunta primeiro à instância de histórico que regista o estado (por exemplo influxdb.0) e ignora instâncias que não estão a correr; house_snapshot indica os estados pedidos que um adaptador de histórico regista em vez do recorder",
+				"nl": "get_history vraagt eerst de history-instantie die de status logt (bijv. influxdb.0) en slaat instanties over die niet draaien; house_snapshot noemt de gevraagde statussen die een history-adapter logt in plaats van de recorder",
+				"fr": "get_history interroge d'abord l'instance d'historique qui enregistre l'état (par ex. influxdb.0) et ignore les instances arrêtées ; house_snapshot indique les états demandés qu'un adaptateur d'historique enregistre à la place du recorder",
+				"it": "get_history chiede prima all'istanza di cronologia che registra lo stato (ad es. influxdb.0) e salta le istanze non in esecuzione; house_snapshot indica gli stati richiesti che un adattatore di cronologia registra al posto del recorder",
+				"es": "get_history pregunta primero a la instancia de historial que registra el estado (p. ej. influxdb.0) y omite las instancias que no están en marcha; house_snapshot indica los estados pedidos que registra un adaptador de historial en lugar del recorder",
+				"pl": "get_history najpierw pyta instancję historii, która zapisuje dany stan (np. influxdb.0), i pomija instancje, które nie działają; house_snapshot wskazuje żądane stany zapisywane przez adapter historii zamiast recordera",
+				"uk": "get_history спочатку питає екземпляр історії, який записує цей стан (наприклад, influxdb.0), і пропускає незапущені екземпляри; house_snapshot називає запитані стани, які пише адаптер історії, а не recorder",
+				"zh-cn": "get_history 先询问记录该状态的历史实例（例如 influxdb.0），并跳过未运行的实例；house_snapshot 会指出由历史适配器而非 recorder 记录的所请求状态"
+			},
 			"0.12.7": {
 				"en": "Code mode: send_to gives a script the answer of the adapter as a value ({sent, instance, answer, note}) instead of the chat text; the pi libraries are updated to 1.5.2",
 				"de": "Code-Modus: send_to gibt einem Skript die Antwort des Adapters als Wert ({sent, instance, answer, note}) statt des Chat-Texts; die pi-Bibliotheken sind auf 1.5.2 aktualisiert",
@@ -80,19 +93,6 @@
 				"pl": "Pomoce adapterów pozostają aktualne: pi-agent czyta je przy starcie i ponownie, gdy instancja się restartuje lub zmienia się jej obiekt. Rozmowa, która używała adaptera, którego pomoc od tego czasu się zmieniła, dostaje polecenie ponownego jej przeczytania, aby nie odpowiadała według starszej wersji. Zanim agent powie, że adapter czegoś nie potrafi, czyta jego pomoc.",
 				"uk": "Довідки адаптерів залишаються актуальними: pi-agent читає їх під час запуску й знову після перезапуску інстанції або зміни її об’єкта. Розмові, яка користувалася адаптером, чия довідка відтоді змінилася, пропонується прочитати її знову, щоб вона не відповідала за старою версією. Перш ніж сказати, що адаптер чогось не вміє, агент читає його довідку.",
 				"zh-cn": "适配器的帮助保持最新：pi-agent 在启动时读取它们，并在实例重启或其对象更改后再次读取。如果某个对话使用过的适配器的帮助此后发生了变化，该对话会被提示重新读取，以免按旧版本回答。在告诉用户某个适配器做不到某事之前，代理会先读取它的帮助。"
-			},
-			"0.12.1": {
-				"en": "adapter_help also for adapters that take no messages (web-only ones such as home3d): their help is the states they describe, so the agent can use them with set_state. Such a help stays within 20000 characters, and list_updates marks a new one with help.",
-				"de": "adapter_help auch für Adapter, die keine Nachrichten annehmen (reine Web-Adapter wie home3d): ihre Hilfe sind die Datenpunkte, die sie beschreiben, sodass der Agent sie mit set_state nutzen kann. Diese Hilfe bleibt unter 20000 Zeichen, und list_updates markiert einen neuen solchen Adapter mit help.",
-				"ru": "adapter_help также для адаптеров, которые не принимают сообщений (только веб, например home3d): их помощь — описанные ими состояния, поэтому агент может использовать их через set_state. Такая помощь не длиннее 20000 символов, а list_updates отмечает новый такой адаптер как help.",
-				"pt": "adapter_help também para adaptadores que não recebem mensagens (apenas web, como o home3d): a sua ajuda são os estados que descrevem, para que o agente os use com set_state. Essa ajuda fica abaixo de 20000 caracteres e list_updates marca um novo com help.",
-				"nl": "adapter_help ook voor adapters die geen berichten aannemen (alleen web, zoals home3d): hun hulp zijn de states die ze beschrijven, zodat de agent ze met set_state kan gebruiken. Zo'n hulp blijft onder 20000 tekens en list_updates markeert een nieuwe met help.",
-				"fr": "adapter_help aussi pour les adaptateurs qui ne reçoivent pas de messages (web uniquement, comme home3d) : leur aide, ce sont les états qu'ils décrivent, afin que l'agent les utilise avec set_state. Cette aide reste sous 20000 caractères et list_updates marque un nouvel adaptateur de ce type avec help.",
-				"it": "adapter_help anche per gli adattatori che non ricevono messaggi (solo web, come home3d): il loro aiuto sono gli stati che descrivono, così l'agente può usarli con set_state. Questo aiuto resta sotto i 20000 caratteri e list_updates segna un nuovo adattatore di questo tipo con help.",
-				"es": "adapter_help también para adaptadores que no reciben mensajes (solo web, como home3d): su ayuda son los estados que describen, para que el agente los use con set_state. Esa ayuda se queda por debajo de 20000 caracteres y list_updates marca uno nuevo con help.",
-				"pl": "adapter_help także dla adapterów, które nie przyjmują wiadomości (tylko web, jak home3d): ich pomocą są opisane przez nie stany, więc agent może ich używać przez set_state. Taka pomoc mieści się w 20000 znaków, a list_updates oznacza nowy taki adapter jako help.",
-				"uk": "adapter_help також для адаптерів, які не приймають повідомлень (лише веб, наприклад home3d): їхня допомога — описані ними стани, тож агент може використовувати їх через set_state. Така допомога не довша за 20000 символів, а list_updates позначає новий такий адаптер як help.",
-				"zh-cn": "adapter_help 也支持不接收消息的适配器（纯网页适配器，如 home3d）：它们的帮助就是其描述的状态，代理可通过 set_state 使用它们。此类帮助不超过 20000 个字符，list_updates 会将新的此类适配器标记为 help。"
 			}
 		},
 		"titleLang": {
