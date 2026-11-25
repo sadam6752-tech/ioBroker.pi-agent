@@ -650,6 +650,10 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### **WORK IN PROGRESS**
+
+- (GermanBluefox) get_history asks the history instance that logs the state (its custom settings, e.g. influxdb.0) first, and house_snapshot names the asked states that a history adapter logs instead of the recorder: the gusts of a weather station logged by influxdb were answered as "not recorded"
+
 ### 0.12.7 (2026-11-25)
 
 - (sadam6752-tech) Code mode: `send_to` gives a script the answer of the adapter as a value, `{sent, instance, answer, note}`, instead of the text "Sent. Answer of …: {…}"; a script read `stations` of that text and found none. The chat keeps the text
