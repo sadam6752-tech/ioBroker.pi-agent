@@ -99,6 +99,47 @@ test('a script gets the values of the read tools as objects', async () => {
     await stopAgent(agent);
 });
 
+test('in a script, send_to gives the answer of the adapter as an object, not the text of the chat', async () => {
+    // live 2026-11-25: a script read s.stations of the text "Sent. Answer of webradio.0: {...}" and found none
+    const f = await faux();
+    const stations = [
+        { name: 'Radio A', url: 'http://a' },
+        { name: 'Radio B', url: 'http://b' },
+    ];
+    const { agent } = await startAgent({
+        dataDir: tmp(),
+        config: { codeMode: true, dryRun: false, writeRules: [{ scope: 'webradio.0', write: true, confirm: false }] },
+        seed: SEED(),
+        hooks: { sendToAsync: async (instance, command) => (command === 'list_stations' ? { stations } : undefined) },
+        responses: script(
+            f,
+            `const r = await tools.send_to({ instance: 'webradio.0', command: 'list_stations', message: {} });
+             text('sent ' + r.sent + ', ' + r.instance + ', ' + r.answer.stations.length + ' stations, first ' + r.answer.stations[0].name + ', typeof ' + typeof r);
+             try { await tools.send_to({ instance: 'telegram.0', command: 'send', message: { text: 'x' } }); text('SENT'); } catch (e) { text(' BLOCKED ' + e.message); }`,
+        ),
+    });
+    await page(agent)('chatSend', { text: 'stations' });
+    const result = await lastResult(agent);
+    assert.match(result, /sent true, webradio\.0, 2 stations, first Radio A, typeof object/);
+    assert.match(result, /BLOCKED .*not allowed/);
+    await stopAgent(agent);
+
+    const simulated = await startAgent({
+        dataDir: tmp(),
+        config: { codeMode: true, dryRun: true, writeRules: [{ scope: 'webradio.0', write: true }] },
+        seed: SEED(),
+        hooks: { sendToAsync: async () => ({ stations }) },
+        responses: script(
+            f,
+            `const r = await tools.send_to({ instance: 'webradio.0', command: 'play', message: {} });
+             text('sent ' + r.sent + ', answer ' + r.answer + ', ' + r.note);`,
+        ),
+    });
+    await page(simulated.agent)('chatSend', { text: 'play' });
+    assert.match(await lastResult(simulated.agent), /sent false, answer null, DRY RUN - NOTHING WAS SENT/);
+    await stopAgent(simulated.agent);
+});
+
 test('in a script, a write that is not allowed is blocked and simulation mode writes nothing', async () => {
     const f = await faux();
     const blocked = await startAgent({

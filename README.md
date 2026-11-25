@@ -650,6 +650,10 @@ the last copy.
     ### **WORK IN PROGRESS**
 -->
 
+### **WORK IN PROGRESS**
+
+- (sadam6752-tech) Code mode: `send_to` gives a script the answer of the adapter as a value, `{sent, instance, answer, note}`, instead of the text "Sent. Answer of …: {…}"; a script read `stations` of that text and found none. The chat keeps the text
+
 ### 0.12.6 (2026-11-21)
 
 - (sadam6752-tech) A request the model could not answer names the cause: "Request not answered (model_error: <error text of the model API>)" instead of only "model_error", in the chat, in the answer of sendTo and in the log
