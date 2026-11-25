@@ -653,6 +653,7 @@ the last copy.
 ### **WORK IN PROGRESS**
 
 - (GermanBluefox) get_history asks the history instance that logs the state (its custom settings, e.g. influxdb.0) first, and house_snapshot names the asked states that a history adapter logs instead of the recorder: the gusts of a weather station logged by influxdb were answered as "not recorded"
+- (sadam6752-tech) get_history leaves out a history instance that logs the state but is not running, so a stopped influxdb costs no wait for its answer
 
 ### 0.12.7 (2026-11-25)
 

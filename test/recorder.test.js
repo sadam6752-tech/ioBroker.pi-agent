@@ -327,7 +327,7 @@ test('get_history and house_snapshot: a state logged by influxdb is asked there,
     const { agent, db } = await startAgent({
         dataDir: tmp(),
         config: TELEGRAM,
-        seed: { objects },
+        seed: { objects, states: { 'system.adapter.influxdb.0.alive': { val: true, ack: true, ts: 1 } } },
         responses: [
             f.fauxAssistantMessage(f.fauxToolCall('house_snapshot', { at: '03:00', ids: [GUST] }), {
                 stopReason: 'toolUse',
@@ -360,5 +360,38 @@ test('get_history and house_snapshot: a state logged by influxdb is asked there,
         ['influxdb.0'],
     );
     assert.match(seen, /36\.2/);
+    await stopAgent(agent);
+});
+
+test('get_history: a history instance that logs the state but does not run is not asked (no sendTo timeout)', async () => {
+    const f = await faux();
+    const GUST = 'alias.0.Weather.Gust.ACTUAL';
+    const objects = {
+        ...RECORDER.objects,
+        [GUST]: {
+            type: 'state',
+            common: { name: 'ACTUAL', type: 'number', custom: { 'influxdb.0': { enabled: true } } },
+        },
+    };
+    let seen = '';
+    const { agent, db } = await startAgent({
+        dataDir: tmp(),
+        config: TELEGRAM,
+        seed: { objects, states: { 'system.adapter.influxdb.0.alive': { val: false, ack: true, ts: 1 } } },
+        responses: [
+            f.fauxAssistantMessage(f.fauxToolCall('get_history', { id: GUST, hours: 14 }), { stopReason: 'toolUse' }),
+            context => {
+                seen = JSON.stringify(context.messages);
+                return f.fauxAssistantMessage('no data');
+            },
+        ],
+        hooks: {
+            sendToAsync: (to, command) => (command === 'getHistory' ? { result: [] } : undefined),
+        },
+    });
+    await receive(agent, db, 1, 'what was the strongest gust last night?');
+    await waitFor(() => seen, 'the answer');
+    const asked = agent.asked.filter(([, c]) => c === 'getHistory').map(([to]) => to);
+    assert.ok(!asked.includes('influxdb.0'), `influxdb.0 is stopped and must not be asked: ${asked.join(', ')}`);
     await stopAgent(agent);
 });
